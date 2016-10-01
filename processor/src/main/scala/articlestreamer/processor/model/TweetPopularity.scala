@@ -1,3 +1,3 @@
 package articlestreamer.processor.model
 
-case class TweetPopularity(favoriteCount: Int, retweetCount: Int)
+case class TweetPopularity(retweetCount: Int, favoriteCount: Int)

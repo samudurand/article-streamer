@@ -20,12 +20,11 @@ trait TwitterService extends TwitterAuthorizationConfig {
 
     try {
       val status: Status = twitter.showStatus(tweetId)
-      Some(TweetPopularity(status.getFavoriteCount, status.getRetweetCount))
+      Some(TweetPopularity(status.getRetweetCount, status.getFavoriteCount))
     } catch {
-      case ex: Exception => {
+      case ex: Exception =>
         ex.printNeatStackTrace()
         None
-      }
     }
 
   }
