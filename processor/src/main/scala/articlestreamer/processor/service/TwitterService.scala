@@ -2,10 +2,11 @@ package articlestreamer.processor.service
 
 import javax.ws.rs.core.HttpHeaders
 
-import articlestreamer.processor.model.TweetDetails
+import articlestreamer.processor.model.TweetPopularity
+import articlestreamer.shared.exception.exceptions._
 import articlestreamer.shared.twitter.TwitterAuthorizationConfig
 import twitter4j.auth.AccessToken
-import twitter4j.{TwitterFactory, Twitter}
+import twitter4j.{Status, TwitterFactory, Twitter}
 
 trait TwitterService extends TwitterAuthorizationConfig {
 
@@ -15,16 +16,18 @@ trait TwitterService extends TwitterAuthorizationConfig {
   val accessToken: AccessToken = new AccessToken(twitterConfig.getOAuthAccessToken, twitterConfig.getOAuthAccessTokenSecret)
   twitter.setOAuthAccessToken(accessToken)
 
-  def getTweet(tweetId: Long): Option[TweetDetails] = {
+  def getTweetPopularity(tweetId: Long): Option[TweetPopularity] = {
 
     try {
-      val status = twitter.showStatus(tweetId)
-      println(status)
+      val status: Status = twitter.showStatus(tweetId)
+      Some(TweetPopularity(status.getFavoriteCount, status.getRetweetCount))
     } catch {
-      case ex: Exception => System.err.println(ex)
+      case ex: Exception => {
+        ex.printNeatStackTrace()
+        None
+      }
     }
 
-    Some(TweetDetails())
   }
 
 

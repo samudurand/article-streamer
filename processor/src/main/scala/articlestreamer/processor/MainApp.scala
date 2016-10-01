@@ -53,6 +53,7 @@ object MainApp extends ArticleMarshaller with TwitterService {
     val recordsDs: Dataset[String] = sparkSession.createDataset(records)
 
     recordsDs.foreach { record =>
+
       unmarshallArticle(record) match {
         case twitterArticle: Some[TwitterArticle] => processTwitterArticle(twitterArticle.get)
         case article: Some[Article] =>
@@ -114,8 +115,8 @@ object MainApp extends ArticleMarshaller with TwitterService {
     try {
       val twitterId = article.originalId.toLong
 
-      getTweet(twitterId) match {
-        case Some(tweet) => println(s"Retrieved details for tweet [$twitterId] : \n $tweet")
+      getTweetPopularity(twitterId) match {
+        case Some(tweet) => println(s"Tweet popularity : $tweet")
         case None =>
           println(s"Unable to retrieve tweet details for article [${article.id}] with tweet id [${article.originalId}]")
       }
