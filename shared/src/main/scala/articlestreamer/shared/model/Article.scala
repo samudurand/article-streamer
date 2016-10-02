@@ -8,15 +8,17 @@ import articlestreamer.shared.model.ArticleSource.ArticleSource
 trait Article
 
 class BaseArticle(id: UUID,
-                     source: ArticleSource,
-                     originalId: String,
-                     createdAt: LocalDate,
-                     link: List[String],
-                     description: String) extends Article
+                  source: ArticleSource,
+                  originalId: String,
+                  createdAt: LocalDate,
+                  link: List[String],
+                  description: String,
+                  score: Option[Int]) extends Article
 
 case class TwitterArticle(id: UUID,
                           originalId: String,
                           createdAt: LocalDate,
                           link: List[String],
-                          description: String)
-  extends BaseArticle(id, ArticleSource.Twitter, originalId, createdAt, link, description)
+                          description: String,
+                          score: Option[Int])
+  extends BaseArticle(id, ArticleSource.Twitter, originalId, createdAt, link, description, score)

@@ -1,7 +1,5 @@
 package articlestreamer.processor.service
 
-import javax.ws.rs.core.HttpHeaders
-
 import articlestreamer.processor.model.TweetPopularity
 import articlestreamer.shared.exception.exceptions._
 import articlestreamer.shared.twitter.TwitterAuthorizationConfig

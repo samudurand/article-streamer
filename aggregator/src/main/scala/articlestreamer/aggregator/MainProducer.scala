@@ -61,7 +61,7 @@ object MainProducer extends App {
 
     val creationDate: LocalDate = status.getCreatedAt.toInstant.atZone(ZoneId.of("UTC")).toLocalDate
 
-    TwitterArticle(UUID.randomUUID(), String.valueOf(status.getId), creationDate, urls, status.getText)
+    TwitterArticle(UUID.randomUUID(), String.valueOf(status.getId), creationDate, urls, status.getText, Some(1))
 
   }
 

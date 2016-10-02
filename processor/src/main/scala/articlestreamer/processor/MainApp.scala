@@ -3,6 +3,7 @@ package articlestreamer.processor
 import _root_.kafka.serializer.{StringEncoder, StringDecoder}
 import articlestreamer.processor.marshalling.ArticleMarshaller
 import articlestreamer.processor.kafka.KafkaConsumerWrapper
+import articlestreamer.processor.model.TweetPopularity
 import articlestreamer.processor.service.TwitterService
 import articlestreamer.shared.exception.exceptions._
 import articlestreamer.shared.model.{TwitterArticle, BaseArticle, Article}
@@ -61,7 +62,6 @@ object MainApp extends ArticleMarshaller with TwitterService {
         case None => System.err.println("Could not parse article.")
       }
 
-      //println(response)
     }
 
 //    val ssc = new StreamingContext(config, Seconds(1))
@@ -116,7 +116,10 @@ object MainApp extends ArticleMarshaller with TwitterService {
       val twitterId = article.originalId.toLong
 
       getTweetPopularity(twitterId) match {
-        case Some(tweet) => println(s"Tweet popularity : $tweet")
+        case Some(popularity) =>
+          val updatedScore = calculateTweetScore(article, popularity)
+          val updatedArticle = article.copy(score = Some(updatedScore))
+          println(updatedArticle)
         case None =>
           println(s"Unable to retrieve tweet details for article [${article.id}] with tweet id [${article.originalId}]")
       }
@@ -127,6 +130,11 @@ object MainApp extends ArticleMarshaller with TwitterService {
       case ex: Throwable =>
         ex.printNeatStackTrace()
     }
+  }
+
+  // Calculate a naive score
+  private def calculateTweetScore(article: TwitterArticle, popularity: TweetPopularity): Int = {
+    article.score.getOrElse(0) + popularity.retweetCount + popularity.favoriteCount * 2
   }
 
 }
