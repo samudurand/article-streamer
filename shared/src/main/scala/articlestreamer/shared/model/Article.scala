@@ -10,15 +10,15 @@ trait Article
 class BaseArticle(id: UUID,
                   source: ArticleSource,
                   originalId: String,
-                  createdAt: LocalDate,
+                  publicationDate: LocalDate,
                   link: List[String],
                   description: String,
                   score: Option[Int]) extends Article
 
 case class TwitterArticle(id: UUID,
                           originalId: String,
-                          createdAt: LocalDate,
+                          publicationDate: LocalDate,
                           link: List[String],
                           description: String,
                           score: Option[Int])
-  extends BaseArticle(id, ArticleSource.Twitter, originalId, createdAt, link, description, score)
+  extends BaseArticle(id, ArticleSource.Twitter, originalId, publicationDate, link, description, score)
