@@ -1,14 +1,12 @@
 package articlestreamer.processor
 
-import _root_.kafka.serializer.{StringEncoder, StringDecoder}
 import articlestreamer.processor.marshalling.ArticleMarshaller
 import articlestreamer.processor.kafka.KafkaConsumerWrapper
 import articlestreamer.processor.model.TweetPopularity
 import articlestreamer.processor.service.TwitterService
 import articlestreamer.shared.exception.exceptions._
-import articlestreamer.shared.model.{TwitterArticle, BaseArticle, Article}
+import articlestreamer.shared.model.{TwitterArticle, Article}
 import com.typesafe.config.ConfigFactory
-import org.apache.kafka.common.serialization.{StringDeserializer, StringSerializer}
 
 import scala.concurrent.duration._
 
@@ -21,11 +19,6 @@ import org.apache.spark._
 import org.apache.log4j.{Level, Logger}
 
 import org.apache.spark.sql.{Dataset, SparkSession}
-import org.apache.spark.streaming._
-import org.apache.spark.streaming.kafka010._
-import scala.collection.JavaConverters._
-import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
-import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
 
 object MainApp extends ArticleMarshaller with TwitterService {
 
@@ -53,16 +46,20 @@ object MainApp extends ArticleMarshaller with TwitterService {
 
     val recordsDs: Dataset[String] = sparkSession.createDataset(records)
 
-    recordsDs.foreach { record =>
-
+    val results = recordsDs.map { record =>
       unmarshallArticle(record) match {
-        case twitterArticle: Some[TwitterArticle] => processTwitterArticle(twitterArticle.get)
-        case article: Some[Article] =>
-          println(s"Article ignored : no processing planned for type of article [${article.get.getClass.getCanonicalName}] yet.")
-        case None => System.err.println("Could not parse article.")
+        case Some(twitterArticle: TwitterArticle) => processTwitterArticle(twitterArticle)
+        case Some(article: Article) =>
+          println(s"Article ignored : no processing planned for type of article [${article.getClass.getCanonicalName}] yet.")
+          None
+        case None =>
+          System.err.println("Could not parse article.")
+          None
       }
-
     }
+    .filter(_.isDefined)
+    .map(_.get)
+    .collectAsList()
 
 //    val ssc = new StreamingContext(config, Seconds(1))
 //
@@ -111,7 +108,7 @@ object MainApp extends ArticleMarshaller with TwitterService {
     recordsValues
   }
 
-  private def processTwitterArticle(article: TwitterArticle) {
+  private def processTwitterArticle(article: TwitterArticle): Option[TwitterArticle] = {
     try {
       val twitterId = article.originalId.toLong
 
@@ -119,16 +116,19 @@ object MainApp extends ArticleMarshaller with TwitterService {
         case Some(popularity) =>
           val updatedScore = calculateTweetScore(article, popularity)
           val updatedArticle = article.copy(score = Some(updatedScore))
-          println(updatedArticle)
+          Some(updatedArticle)
         case None =>
           println(s"Unable to retrieve tweet details for article [${article.id}] with tweet id [${article.originalId}]")
+          None
       }
 
     } catch {
       case _: NumberFormatException =>
         System.err.println(s"Unexpected format for twitter Id, cannot convert ${article.originalId} to Long.")
+        None
       case ex: Throwable =>
         ex.printNeatStackTrace()
+        None
     }
   }
 
