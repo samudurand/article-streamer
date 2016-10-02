@@ -1,22 +1,19 @@
 package articlestreamer.processor.marshalling
 
 import articlestreamer.shared.exception.exceptions._
-import articlestreamer.shared.model.{TwitterArticle, Article}
+import articlestreamer.shared.model.TwitterArticle
 
-import scala.pickling.Defaults._
-import scala.pickling.json._
+import org.json4s._
+import org.json4s.jackson.Serialization
+import org.json4s.jackson.Serialization.read
 
 trait ArticleMarshaller {
 
-  def unmarshallArticle(articleJson: String): Option[Article] = {
+  def unmarshallTwitterArticle(articleJson: String): Option[TwitterArticle] = {
+    implicit val formats = Serialization.formats(NoTypeHints)
+
     try {
-      articleJson.unpickle[Article] match {
-        case twitter: TwitterArticle => Some(twitter)
-        case unknown => {
-          System.err.println(s"Failed to parse article, found type [${unknown.getClass.getCanonicalName}]")
-          None
-        }
-      }
+      Some(read[TwitterArticle](articleJson))
     } catch {
       case ex: Exception => {
         System.err.println(s"Failed to parse article, exception thrown. \n ${ex.getStackTraceAsString}")

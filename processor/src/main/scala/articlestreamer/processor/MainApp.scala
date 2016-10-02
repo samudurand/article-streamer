@@ -47,11 +47,8 @@ object MainApp extends ArticleMarshaller with TwitterService {
     val recordsDs: Dataset[String] = sparkSession.createDataset(records)
 
     val results = recordsDs.map { record =>
-      unmarshallArticle(record) match {
+      unmarshallTwitterArticle(record) match {
         case Some(twitterArticle: TwitterArticle) => processTwitterArticle(twitterArticle)
-        case Some(article: Article) =>
-          println(s"Article ignored : no processing planned for type of article [${article.getClass.getCanonicalName}] yet.")
-          None
         case None =>
           System.err.println("Could not parse article.")
           None
@@ -59,7 +56,9 @@ object MainApp extends ArticleMarshaller with TwitterService {
     }
     .filter(_.isDefined)
     .map(_.get)
-    .collectAsList()
+    .collect()
+
+    println(results.mkString("\n"))
 
 //    val ssc = new StreamingContext(config, Seconds(1))
 //

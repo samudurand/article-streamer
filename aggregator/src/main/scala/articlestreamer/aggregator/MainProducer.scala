@@ -1,14 +1,21 @@
 package articlestreamer.aggregator
 
+import java.sql.Timestamp
 import java.time.{LocalDate, ZoneId}
 import java.util.UUID
 
 import articlestreamer.aggregator.kafka.KafkaProducerWrapper
 import articlestreamer.aggregator.twitter.TwitterStreamer
-import articlestreamer.shared.model.{TwitterArticle, Article}
+import articlestreamer.shared.model.TwitterArticle
 import com.typesafe.config.ConfigFactory
 import org.apache.kafka.clients.producer._
+import org.json4s.jackson.Serialization
 import twitter4j.Status
+
+import org.json4s._
+import org.json4s.JsonDSL._
+import org.json4s.jackson.JsonMethods._
+import org.json4s.jackson.Serialization.write
 
 object MainProducer extends App {
 
@@ -37,9 +44,6 @@ object MainProducer extends App {
   def tweetHandler(producer: KafkaProducerWrapper): (Status) => Unit = {
     (status: Status) => {
 
-      import scala.pickling.Defaults._
-      import scala.pickling.json._
-
       println(s"Status received: ${status.getCreatedAt}")
 
       val appConfig = ConfigFactory.load()
@@ -47,21 +51,23 @@ object MainProducer extends App {
 
       val article = convertToArticle(status)
 
-      val record = new ProducerRecord[String, String](topic, s"tweet${status.getId}", article.pickle.value)
+      implicit val formats = Serialization.formats(NoTypeHints)
+
+      val record = new ProducerRecord[String, String](topic, s"tweet${status.getId}", write(article))
       producer.send(record)
 
     }
   }
 
-  private def convertToArticle(status: Status): Article = {
+  private def convertToArticle(status: Status): TwitterArticle = {
 
     val urls: List[String] = status.getURLEntities.map{
       urlEntity => urlEntity.getURL
     }.toList
 
-    val creationDate: LocalDate = status.getCreatedAt.toInstant.atZone(ZoneId.of("UTC")).toLocalDate
+    val publicationDate = new Timestamp(status.getCreatedAt.getTime)
 
-    TwitterArticle(UUID.randomUUID(), String.valueOf(status.getId), creationDate, urls, status.getText, Some(1))
+    TwitterArticle(UUID.randomUUID().toString, String.valueOf(status.getId), publicationDate, urls, status.getText, Some(1))
 
   }
 

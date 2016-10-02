@@ -1,11 +1,12 @@
 package articlestreamer.shared.model
 
+import java.sql.Timestamp
 import java.time.LocalDate
 import java.util.UUID
 
 import articlestreamer.shared.model.ArticleSource.ArticleSource
 
-trait Article
+sealed trait Article
 
 /**
  * Generic article class
@@ -15,10 +16,10 @@ trait Article
  * @param publicationDate date on which that article was published on the source
  * @param score the highest the score, the higher the probability that this article is worth your while
  */
-abstract class BaseArticle(id: String,
+class BaseArticle(id: String,
                   source: ArticleSource,
                   originalId: String,
-                  publicationDate: LocalDate,
+                  publicationDate: Timestamp,
                   score: Option[Int]) extends Article
 
 /**
@@ -28,8 +29,8 @@ abstract class BaseArticle(id: String,
  */
 case class TwitterArticle(id: String,
                           originalId: String,
-                          publicationDate: LocalDate,
-                          links: List[String],
+                          publicationDate: Timestamp,
+                          links: Seq[String],
                           content: String,
                           score: Option[Int])
   extends BaseArticle(id, ArticleSource.Twitter, originalId, publicationDate, score)

@@ -12,4 +12,6 @@ libraryDependencies += "joda-time" % "joda-time" % "2.9.4"
 
 libraryDependencies += "com.typesafe" % "config" % "1.3.0"
 
-libraryDependencies += "org.scala-lang.modules" %% "scala-pickling" % "0.10.1"
+libraryDependencies += "org.json4s" %% "json4s-native" % "3.4.1"
+
+libraryDependencies += "org.json4s" %% "json4s-jackson" % "3.4.1"

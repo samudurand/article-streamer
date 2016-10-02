@@ -16,10 +16,12 @@ libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka-0-10" % "2.0
 
 libraryDependencies += "com.typesafe" % "config" % "1.3.0"
 
-libraryDependencies += "org.scala-lang.modules" %% "scala-pickling" % "0.10.1"
-
 libraryDependencies +=  "org.scalaj" %% "scalaj-http" % "2.3.0"
 
 libraryDependencies += "org.twitter4j" % "twitter4j-stream" % "[4.0,)"
+
+libraryDependencies += "org.json4s" %% "json4s-native" % "3.4.1"
+
+libraryDependencies += "org.json4s" %% "json4s-jackson" % "3.4.1"
 
 
