@@ -9,5 +9,7 @@ version := "1.0"
 
 scalaVersion := "2.11.8"
 
+enablePlugins(JavaAppPackaging)
+
 // Starts the aggregator
 run in Compile <<= (run in Compile in aggregator)
