@@ -1,3 +1,4 @@
+
 name := "aggregator"
 
 version := "1.0"
@@ -9,6 +10,10 @@ fork in run := true
 javaOptions in run += "-Dconfig.resource=/development.conf"
 
 mainClass in (Compile, run) := Some("articlestreamer.aggregator.MainProducer")
+
+mainClass in (Compile, packageBin) := Some("articlestreamer.aggregator.MainProducer")
+
+mainClass in assembly := Some("articlestreamer.aggregator.MainProducer")
 
 libraryDependencies += "org.apache.kafka" % "kafka-clients" % "0.10.0.1"
 
