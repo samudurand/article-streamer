@@ -28,17 +28,18 @@ object MainProducer extends App {
     println("Starting streaming")
     twitterStreamer.startStreaming()
 
-    Thread.sleep(10000)
-
-    println("Stopping streaming")
-    twitterStreamer.stop()
-    println("Streaming stopped")
-
 //    val record = new ProducerRecord[String, String]("tweets", "tweet" + Random.nextInt(), "tweet_value_" + Random.nextInt())
 //    producer.send(record)
 
     producer.stopProducer()
 
+    sys.addShutdownHook({
+      println("Stopping streaming")
+      twitterStreamer.stop()
+      println("Streaming stopped")
+
+      producer.stopProducer()
+    })
   }
 
   def tweetHandler(producer: KafkaProducerWrapper): (Status) => Unit = {
