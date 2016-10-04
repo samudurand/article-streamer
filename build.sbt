@@ -1,27 +1,64 @@
-lazy val root = project.in(file(".")) dependsOn(aggregator) aggregate(aggregator) enablePlugins(JavaAppPackaging)
+import com.heroku.sbt.HerokuPlugin.autoImport._
 
-lazy val aggregator = project.dependsOn(shared) enablePlugins(JavaAppPackaging)
+lazy val root = (project in file(".")).
+  settings(Commons.settings: _*).
+  settings(
+    name := "article-streamer",
 
-lazy val processor = project.dependsOn(shared) enablePlugins(JavaAppPackaging)
+    // sbt-assembly for FatJar generation
+    mainClass in assembly <<= (mainClass in assembly in aggregator),
 
-lazy val shared = project enablePlugins(JavaAppPackaging)
+    // sbt run by default starts the Aggregator
+    run in Compile <<= (run in Compile in aggregator),
+    packageBin in Compile <<= (packageBin in Compile in aggregator),
 
-version := "1.0"
+    // Heroku configuration
+    herokuAppName in Compile := "article-streamer-aggregator",
+    herokuFatJar in Compile := Some((assemblyOutputPath in assembly).value),
+    herokuProcessTypes in Compile := Map(
+      "worker" -> "java -jar target/scala-2.11/article-streamer-assembly-1.0.0.jar")
 
-scalaVersion := "2.11.8"
+  ) dependsOn (aggregator) aggregate(aggregator)
 
-// Starts the aggregator
-run in Compile <<= (run in Compile in aggregator)
+lazy val aggregator = (project in file("aggregator")).
+  settings(Commons.settings: _*).
+  settings(
+    name := "aggregator",
 
-packageBin in Compile <<= (packageBin in Compile in aggregator)
+    fork in run := true,
+    javaOptions in run += "-Dconfig.resource=/development.conf",
 
-assembly in Compile <<= (assembly in Compile in aggregator)
+    mainClass in (Compile, run) := Commons.producerMainClass,
+    mainClass in (Compile, packageBin) := Commons.producerMainClass,
+    mainClass in assembly := Commons.producerMainClass,
 
-herokuAppName in Compile := "article-streamer-aggregator"
+    libraryDependencies ++= Dependencies.commonDependencies,
+    libraryDependencies += "org.apache.kafka" % "kafka-clients" % "0.10.0.1",
+    libraryDependencies += "org.twitter4j" % "twitter4j-stream" % Dependencies.twitter4JVersion
 
-herokuFatJar in Compile := Some((assemblyOutputPath in assembly).value)
+  ) dependsOn shared
 
-herokuProcessTypes in Compile := Map(
-  "worker" -> "java -jar target/scala-2.11/root-assembly-1.0.jar"
-)
+lazy val processor = (project in file("processor")).
+  settings(Commons.settings: _*).
+  settings(
+    name := "processor",
 
+    libraryDependencies ++= Dependencies.commonDependencies,
+    libraryDependencies += "org.apache.kafka" % "kafka-clients"     % "0.10.0.1",
+    libraryDependencies += "org.apache.spark" %% "spark-core"       % "2.0.0",
+    libraryDependencies += "org.apache.spark" %% "spark-sql"        % "2.0.0",
+    libraryDependencies += "org.apache.spark" %% "spark-streaming"  % "2.0.0",
+    libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka-0-10" % "2.0.0",
+    libraryDependencies += "org.scalaj"       %% "scalaj-http"      % "2.3.0",
+    libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion
+
+  ) dependsOn shared
+
+lazy val shared = (project in file("shared")).
+  settings(Commons.settings: _*).
+  settings(
+    name := "shared",
+
+    libraryDependencies ++= Dependencies.commonDependencies,
+    libraryDependencies += "org.twitter4j" % "twitter4j-stream" % "[4.0,)"
+  )
