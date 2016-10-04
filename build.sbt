@@ -25,16 +25,13 @@ lazy val aggregator = (project in file("aggregator")).
   settings(
     name := "aggregator",
 
-    fork in run := true,
-    javaOptions in run += "-Dconfig.resource=/development.conf",
-
     mainClass in (Compile, run) := Commons.producerMainClass,
     mainClass in (Compile, packageBin) := Commons.producerMainClass,
     mainClass in assembly := Commons.producerMainClass,
 
     libraryDependencies ++= Dependencies.commonDependencies,
-    libraryDependencies += "org.apache.kafka" % "kafka-clients" % "0.10.0.1",
-    libraryDependencies += "org.twitter4j" % "twitter4j-stream" % Dependencies.twitter4JVersion
+    libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
+    libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion
 
   ) dependsOn shared
 
@@ -44,7 +41,7 @@ lazy val processor = (project in file("processor")).
     name := "processor",
 
     libraryDependencies ++= Dependencies.commonDependencies,
-    libraryDependencies += "org.apache.kafka" % "kafka-clients"     % "0.10.0.1",
+    libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
     libraryDependencies += "org.apache.spark" %% "spark-core"       % "2.0.0",
     libraryDependencies += "org.apache.spark" %% "spark-sql"        % "2.0.0",
     libraryDependencies += "org.apache.spark" %% "spark-streaming"  % "2.0.0",
@@ -60,5 +57,5 @@ lazy val shared = (project in file("shared")).
     name := "shared",
 
     libraryDependencies ++= Dependencies.commonDependencies,
-    libraryDependencies += "org.twitter4j" % "twitter4j-stream" % "[4.0,)"
+    libraryDependencies += "org.twitter4j" % "twitter4j-stream" % Dependencies.twitter4JVersion
   )

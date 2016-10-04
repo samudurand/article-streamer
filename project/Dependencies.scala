@@ -2,6 +2,7 @@ import sbt._
 
 object Dependencies {
 
+  val kafkaClientVersion = "0.10.0.1"
   val twitter4JVersion = "[4.0,)"
 
   val commonDependencies: Seq[ModuleID] = Seq(

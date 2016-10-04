@@ -28,9 +28,6 @@ object MainProducer extends App {
     println("Starting streaming")
     twitterStreamer.startStreaming()
 
-//    val record = new ProducerRecord[String, String]("tweets", "tweet" + Random.nextInt(), "tweet_value_" + Random.nextInt())
-//    producer.send(record)
-
     producer.stopProducer()
 
     sys.addShutdownHook({
