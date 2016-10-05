@@ -23,7 +23,8 @@ class KafkaProducerWrapper() {
 object KafkaProducerWrapper {
 
   val properties = new Properties()
-  properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "dogsled-01.srvs.cloudkafka.com")
+  properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "54.152.233.227:9092")
+  properties.put(ProducerConfig., "54.152.233.227:9092")
   properties.put(ProducerConfig.ACKS_CONFIG, "all")
   properties.put(ProducerConfig.RETRIES_CONFIG, 0.asInstanceOf[AnyRef])
   properties.put(ProducerConfig.BATCH_SIZE_CONFIG, 16384.asInstanceOf[AnyRef])
@@ -32,6 +33,6 @@ object KafkaProducerWrapper {
   properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer")
   properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer")
   properties.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 2000.asInstanceOf[AnyRef])
-  properties.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, 5000.asInstanceOf[AnyRef])
+  properties.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, 10000.asInstanceOf[AnyRef])
 
 }
