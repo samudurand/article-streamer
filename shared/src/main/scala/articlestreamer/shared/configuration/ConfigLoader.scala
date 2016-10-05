@@ -24,9 +24,8 @@ object ConfigLoader {
 
   private def setupTrustStore() = {
 
-    val localDir = Paths.get(".").toAbsolutePath.normalize().toString
-    val storeLocation = localDir + trustStoreLocation
-    val caFilePath = s"$storeLocation/ca.pem"
+    //val localDir = Paths.get(".").toAbsolutePath.normalize().toString
+    val caFilePath = s"$trustStoreLocation/ca.pem"
 
     //Create the directories in path if necessary
     val file = new File(caFilePath)
@@ -37,12 +36,12 @@ object ConfigLoader {
     caWriter.println(ca)
     caWriter.close()
 
-    val certWriter = new PrintWriter(s"$storeLocation/cert.pem", "UTF-8")
+    val certWriter = new PrintWriter(s"$trustStoreLocation/cert.pem", "UTF-8")
     val cert = appConfig.getString("kafka.security.certificate")
     certWriter.println(cert)
     certWriter.close()
 
-    val keyWriter = new PrintWriter(s"$storeLocation/key.pem", "UTF-8")
+    val keyWriter = new PrintWriter(s"$trustStoreLocation/key.pem", "UTF-8")
     val privateKey = appConfig.getString("kafka.security.privateKey")
     keyWriter.println(privateKey)
     keyWriter.close()
