@@ -2,8 +2,11 @@ package articlestreamer.aggregator.kafka
 
 import java.util.Properties
 
+import articlestreamer.shared.configuration.ConfigLoader
 import com.typesafe.config.ConfigFactory
+import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.producer.{ProducerConfig, ProducerRecord, KafkaProducer}
+import org.apache.kafka.common.config.SslConfigs
 
 import scala.Int
 
@@ -23,7 +26,7 @@ class KafkaProducerWrapper() {
 object KafkaProducerWrapper {
 
   val properties = new Properties()
-  properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "54.152.233.227:9092")
+  properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, ConfigLoader.kafkaBrokers)
   properties.put(ProducerConfig.ACKS_CONFIG, "all")
   properties.put(ProducerConfig.RETRIES_CONFIG, 0.asInstanceOf[AnyRef])
   properties.put(ProducerConfig.BATCH_SIZE_CONFIG, 16384.asInstanceOf[AnyRef])
@@ -33,5 +36,12 @@ object KafkaProducerWrapper {
   properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer")
   properties.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 2000.asInstanceOf[AnyRef])
   properties.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, 10000.asInstanceOf[AnyRef])
+
+  properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL")
+  properties.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, s"${ConfigLoader.trustStoreLocation}/truststore.jks")
+  properties.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, "test1234")
+  properties.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, s"${ConfigLoader.trustStoreLocation}/keystore.jks")
+  properties.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, "test1234")
+  properties.put(SslConfigs.SSL_KEY_PASSWORD_CONFIG, "test1234")
 
 }

@@ -6,6 +6,7 @@ import java.util.UUID
 
 import articlestreamer.aggregator.kafka.KafkaProducerWrapper
 import articlestreamer.aggregator.twitter.TwitterStreamer
+import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.model.TwitterArticle
 import com.typesafe.config.ConfigFactory
 import org.apache.kafka.clients.producer._
@@ -45,7 +46,7 @@ object MainProducer extends App {
       println(s"Status received: ${status.getCreatedAt}")
 
       val appConfig = ConfigFactory.load()
-      val topic = appConfig.getString("kafka.topic")
+      val topic = ConfigLoader.kafkaMainTopic
 
       val article = convertToArticle(status)
 
