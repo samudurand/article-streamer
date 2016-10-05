@@ -4,6 +4,7 @@ main.iml
 ### Scala template
 *.class
 development.conf
+/truststore
 
 # sbt specific
 .cache
