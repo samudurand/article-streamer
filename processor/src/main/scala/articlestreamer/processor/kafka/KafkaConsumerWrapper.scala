@@ -61,11 +61,13 @@ object KafkaConsumerWrapper {
   properties.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, "5000")
   properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
 
-  properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL")
-  properties.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, s"${ConfigLoader.trustStoreLocation}/truststore.jks")
-  properties.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, "test1234")
-  properties.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, s"${ConfigLoader.trustStoreLocation}/keystore.jks")
-  properties.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, "test1234")
-  properties.put(SslConfigs.SSL_KEY_PASSWORD_CONFIG, "test1234")
+  if (ConfigLoader.kafkaSSLMode) {
+    properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL")
+    properties.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, s"${ConfigLoader.kafkaTrustStore}/truststore.jks")
+    properties.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, "test1234")
+    properties.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, s"${ConfigLoader.kafkaTrustStore}/keystore.jks")
+    properties.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, "test1234")
+    properties.put(SslConfigs.SSL_KEY_PASSWORD_CONFIG, "test1234")
+  }
 
 }

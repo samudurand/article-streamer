@@ -10,10 +10,6 @@ object ConfigLoader {
 
   private val appConfig = ConfigFactory.load()
 
-  val trustStoreLocation = appConfig.getString("kafka.security.storeLocation")
-
-  setupTrustStore()
-
   val twitterOuathConsumerKey = appConfig.getString("twitter.oauth.oauthConsumerKey")
   val twitterOauthConsumerSecret = appConfig.getString("twitter.oauth.oauthConsumerSecret")
   val twitterOauthAccessToken = appConfig.getString("twitter.oauth.oauthAccessToken")
@@ -22,10 +18,20 @@ object ConfigLoader {
   val kafkaBrokers = appConfig.getString("kafka.brokers")
   val kafkaMainTopic = appConfig.getString("kafka.topic")
 
-  private def setupTrustStore() = {
+  val kafkaSSLMode = appConfig.getBoolean("kafka.sslProtocol")
+
+  var kafkaTrustStore = ""
+  if (kafkaSSLMode) {
+    kafkaTrustStore = appConfig.getString("kafka.security.storeLocation")
+    setupTrustStore(kafkaTrustStore)
+  }
+
+  private def setupTrustStore(kafkaTrustStore: String) = {
+
+    val kafkaTrustStore = appConfig.getString("kafka.security.storeLocation")
 
     //val localDir = Paths.get(".").toAbsolutePath.normalize().toString
-    val caFilePath = s"$trustStoreLocation/ca.pem"
+    val caFilePath = s"$kafkaTrustStore/ca.pem"
 
     //Create the directories in path if necessary
     val file = new File(caFilePath)
@@ -36,21 +42,21 @@ object ConfigLoader {
     caWriter.println(ca)
     caWriter.close()
 
-    val certWriter = new PrintWriter(s"$trustStoreLocation/cert.pem", "UTF-8")
+    val certWriter = new PrintWriter(s"$kafkaTrustStore/cert.pem", "UTF-8")
     val cert = appConfig.getString("kafka.security.certificate")
     certWriter.println(cert)
     certWriter.close()
 
-    val keyWriter = new PrintWriter(s"$trustStoreLocation/key.pem", "UTF-8")
+    val keyWriter = new PrintWriter(s"$kafkaTrustStore/key.pem", "UTF-8")
     val privateKey = appConfig.getString("kafka.security.privateKey")
     keyWriter.println(privateKey)
     keyWriter.close()
 
-    exec(s"openssl pkcs12 -export -password pass:test1234 -out $trustStoreLocation/store.pkcs12 -inkey $trustStoreLocation/key.pem -certfile $trustStoreLocation/ca.pem -in $trustStoreLocation/cert.pem -caname 'CARoot' -name client")(println)
+    exec(s"openssl pkcs12 -export -password pass:test1234 -out $kafkaTrustStore/store.pkcs12 -inkey $kafkaTrustStore/key.pem -certfile $kafkaTrustStore/ca.pem -in $kafkaTrustStore/cert.pem -caname 'CARoot' -name client")(println)
 
-    exec(s"keytool -importkeystore -noprompt -srckeystore $trustStoreLocation/store.pkcs12 -destkeystore $trustStoreLocation/keystore.jks -srcstoretype pkcs12 -srcstorepass test1234 -srckeypass test1234 -destkeypass test1234 -deststorepass test1234 -alias client")(println)
+    exec(s"keytool -importkeystore -noprompt -srckeystore $kafkaTrustStore/store.pkcs12 -destkeystore $kafkaTrustStore/keystore.jks -srcstoretype pkcs12 -srcstorepass test1234 -srckeypass test1234 -destkeypass test1234 -deststorepass test1234 -alias client")(println)
 
-    exec(s"keytool -noprompt -keystore $trustStoreLocation/truststore.jks -alias CARoot -import -file $trustStoreLocation/ca.pem -storepass test1234")(println)
+    exec(s"keytool -noprompt -keystore $kafkaTrustStore/truststore.jks -alias CARoot -import -file $kafkaTrustStore/ca.pem -storepass test1234")(println)
 
   }
 
