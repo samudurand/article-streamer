@@ -3,12 +3,9 @@ package articlestreamer.aggregator.kafka
 import java.util.Properties
 
 import articlestreamer.shared.configuration.ConfigLoader
-import com.typesafe.config.ConfigFactory
 import org.apache.kafka.clients.CommonClientConfigs
-import org.apache.kafka.clients.producer.{ProducerConfig, ProducerRecord, KafkaProducer}
+import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
 import org.apache.kafka.common.config.SslConfigs
-
-import scala.Int
 
 
 class KafkaProducerWrapper() {
