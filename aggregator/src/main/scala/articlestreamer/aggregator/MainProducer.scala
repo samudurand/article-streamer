@@ -1,21 +1,18 @@
 package articlestreamer.aggregator
 
 import java.sql.Timestamp
-import java.time.{LocalDate, ZoneId}
 import java.util.UUID
 
 import articlestreamer.aggregator.kafka.KafkaProducerWrapper
 import articlestreamer.aggregator.twitter.TwitterStreamer
+import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.model.TwitterArticle
 import com.typesafe.config.ConfigFactory
 import org.apache.kafka.clients.producer._
-import org.json4s.jackson.Serialization
-import twitter4j.Status
-
 import org.json4s._
-import org.json4s.JsonDSL._
-import org.json4s.jackson.JsonMethods._
+import org.json4s.jackson.Serialization
 import org.json4s.jackson.Serialization.write
+import twitter4j.Status
 
 object MainProducer extends App {
 
@@ -27,8 +24,6 @@ object MainProducer extends App {
 
     println("Starting streaming")
     twitterStreamer.startStreaming()
-
-    producer.stopProducer()
 
     sys.addShutdownHook({
       println("Stopping streaming")
@@ -45,7 +40,7 @@ object MainProducer extends App {
       println(s"Status received: ${status.getCreatedAt}")
 
       val appConfig = ConfigFactory.load()
-      val topic = appConfig.getString("kafka.topic")
+      val topic = ConfigLoader.kafkaMainTopic
 
       val article = convertToArticle(status)
 

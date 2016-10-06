@@ -3,11 +3,13 @@ package articlestreamer.aggregator.kafka
 import java.util
 import java.util.Properties
 
-import com.typesafe.config.ConfigFactory
-import org.apache.kafka.clients.consumer.{ConsumerRecord, ConsumerRecords, KafkaConsumer, ConsumerConfig}
+import articlestreamer.shared.configuration.ConfigLoader
+import org.apache.kafka.clients.CommonClientConfigs
+import org.apache.kafka.clients.consumer.{ConsumerConfig, KafkaConsumer}
+import org.apache.kafka.common.config.SslConfigs
 
-import scala.concurrent.duration.Duration
 import scala.collection.JavaConversions._
+import scala.concurrent.duration.Duration
 
 class KafkaConsumerWrapper {
 
@@ -34,11 +36,10 @@ class KafkaConsumerWrapper {
 
 object KafkaConsumerWrapper {
 
-  private val appConfig = ConfigFactory.load()
-  val topic = appConfig.getString("kafka.topic")
+  val topic = ConfigLoader.kafkaMainTopic
 
   val properties = new Properties()
-  properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
+  properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, ConfigLoader.kafkaBrokers)
   properties.put(ConsumerConfig.GROUP_ID_CONFIG, "test")
   properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true")
   properties.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "1000")
@@ -46,5 +47,14 @@ object KafkaConsumerWrapper {
   properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer")
   properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer")
   properties.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, "5000")
+
+  if (ConfigLoader.kafkaSSLMode) {
+    properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL")
+    properties.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, s"${ConfigLoader.kafkaTrustStore}/truststore.jks")
+    properties.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, "test1234")
+    properties.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, s"${ConfigLoader.kafkaTrustStore}/keystore.jks")
+    properties.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, "test1234")
+    properties.put(SslConfigs.SSL_KEY_PASSWORD_CONFIG, "test1234")
+  }
 
 }

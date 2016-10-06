@@ -1,8 +1,10 @@
+/env
 /.idea
 main.iml
 ### Scala template
 *.class
-*.log
+development.conf
+/truststore
 
 # sbt specific
 .cache
