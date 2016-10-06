@@ -15,6 +15,11 @@ object ConfigLoader {
   val twitterOauthAccessToken = appConfig.getString("twitter.oauth.oauthAccessToken")
   val twitterOauthAccessTokenSecret = appConfig.getString("twitter.oauth.oauthAccessTokenSecret")
 
+  /**
+   * Tag to track on twitter
+   */
+  val twitterTag = appConfig.getString("twitter.tagToTrack")
+
   val kafkaBrokers = appConfig.getString("kafka.brokers")
   val kafkaMainTopic = appConfig.getString("kafka.topic")
 
