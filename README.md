@@ -18,12 +18,12 @@ There is two possible way of configuration :
  
 2. The configuration file _application.conf_ contains all other and default configurations
   - Twitter authentication
-  - Kakfa
+  - Kakfa (including SSL certificates)
   - Spark
     
 ### Tweaking the config
     
-  If you need to modify the config beyond the environment variables provided, I highly recommend to avoid modifying _application.conf_, and instead to add a local file with your modifications and all the values you want to override ( typically _develop.conf_ ).
+  If you need to modify the config beyond the environment variables provided, I highly recommend to avoid modifying _application.conf_, and instead to add a local file with your modifications and all the values you want to override ( typically _development.conf_ ).
   
   This file must be located in the same repository as _application.conf_ and must contain ```include application``` as first line. You also have to add ```-Dconfig.resource=/development.conf``` as an argument to SBT when running the app.
   
