@@ -10,11 +10,12 @@ For each a score will be calculated. That score will represent the potential int
 
 There is two possible way of configuration :
 
-1. Setting environment variables, which will override any other value (currently only the twitter authentication data can be configured by that mean)
+1. Setting environment variables, which will override any other value (currently only the twitter authentication data and kafka can be configured by that mean)
   - TW_CONS_KEY  : twitter consumer key
   - TW_CONS_SEC  : twitter consumer secret
   - TW_ACC_TOKEN : twitter access token
   - TW_ACC_SEC   : twitter access token secret
+  - KAFKA_BROKERS, KAFKA_CA, KAFKA_CERT, KAFKA_PRIVATE_KEY for kafka and SSL config
  
 2. The configuration file _application.conf_ contains all other and default configurations
   - Twitter authentication
