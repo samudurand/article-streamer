@@ -20,7 +20,7 @@ import org.apache.log4j.{Level, Logger}
 
 import org.apache.spark.sql.{Dataset, SparkSession}
 
-object MainApp extends ArticleMarshaller with TwitterService {
+object ArticleProcessor extends ArticleMarshaller with TwitterService {
 
   private val appConfig = ConfigFactory.load()
   val topic = appConfig.getString("kafka.topic")

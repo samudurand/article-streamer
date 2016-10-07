@@ -4,7 +4,10 @@ import articlestreamer.aggregator.kafka.KafkaConsumerWrapper
 
 import scala.concurrent.duration._
 
-object MainConsumer extends App {
+/**
+ * Used for testing the kafka connection and content
+ */
+object BasicConsumer extends App {
 
   override def main(args: Array[String]) {
 

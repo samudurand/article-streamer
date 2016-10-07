@@ -38,6 +38,32 @@ class KafkaConsumerWrapper {
     values
   }
 
+//  /**
+//   * Process the records and return (num processing successful, num processing failed)
+//   */
+//  type RecordHandler = Iterator[ConsumerRecord[String, AnyRef]] => (Int, Int)
+//
+//  private val consumer = new KafkaConsumer[String, AnyRef](KafkaConsumerWrapper.properties)
+//
+//  consumer.subscribe(util.Arrays.asList(KafkaConsumerWrapper.topic))
+//
+//  def poll(duration: Duration, count: Int, processing: RecordHandler): Unit = {
+//    val millis = duration.toMillis
+//
+//    (1 to count).foreach { _ =>
+//      val records = consumer.poll(millis)
+//      val totalRecords = records.count()
+//      println(s"retrieved ${} records")
+//      Future {
+//        processing(records.iterator())
+//      } onComplete {
+//        case Success(processingResults) => println(s"Finished to process $totalRecords. " +
+//          s"Successes : ${processingResults._1}, failures: ${processingResults._2}.")
+//        case Failure(ex: Exception) => System.err.println(ex)
+//      }
+//    }
+//  }
+
   def stopConsumer() = {
     println("Stopping consumer.")
     consumer.close()
@@ -47,8 +73,7 @@ class KafkaConsumerWrapper {
 
 object KafkaConsumerWrapper {
 
-  private val appConfig = ConfigFactory.load()
-  val topic = appConfig.getString("kafka.topic")
+  val topic = ConfigLoader.kafkaMainTopic
 
   val properties = new Properties()
   properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")

@@ -14,7 +14,7 @@ import org.json4s.jackson.Serialization
 import org.json4s.jackson.Serialization.write
 import twitter4j.Status
 
-object MainProducer extends App {
+object Aggregator extends App {
 
   override def main(args: Array[String]) {
 
