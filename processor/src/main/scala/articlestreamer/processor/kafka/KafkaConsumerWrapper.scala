@@ -76,7 +76,7 @@ object KafkaConsumerWrapper {
   val topic = ConfigLoader.kafkaMainTopic
 
   val properties = new Properties()
-  properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
+  properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, ConfigLoader.kafkaBrokers)
   properties.put(ConsumerConfig.GROUP_ID_CONFIG, "test-" + UUID.randomUUID().toString)
   properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true")
   properties.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "1000")
