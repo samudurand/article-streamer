@@ -20,6 +20,11 @@ object ConfigLoader {
    */
   val twitterTag = appConfig.getString("twitter.tagToTrack")
 
+  /**
+   * Size of the tweets batch when querying for tweet info
+   */
+  val tweetsBatchSize = appConfig.getInt("twitter.tweetsBatchSize")
+
   val kafkaBrokers = appConfig.getString("kafka.brokers")
   val kafkaMainTopic = appConfig.getString("kafka.topic")
 

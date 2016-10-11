@@ -1,7 +1,5 @@
 package articlestreamer.processor.service
 
-import java.util.stream.Collectors
-
 import articlestreamer.processor.model.TweetPopularity
 import articlestreamer.shared.exception.exceptions._
 import articlestreamer.shared.twitter.TwitterAuthorizationConfig

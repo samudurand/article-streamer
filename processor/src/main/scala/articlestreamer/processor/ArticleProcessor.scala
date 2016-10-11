@@ -4,6 +4,7 @@ import articlestreamer.processor.marshalling.ArticleMarshaller
 import articlestreamer.processor.kafka.KafkaConsumerWrapper
 import articlestreamer.processor.model.TweetPopularity
 import articlestreamer.processor.service.TwitterService
+import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.exception.exceptions._
 import articlestreamer.shared.model.{TwitterArticle, Article}
 import com.typesafe.config.ConfigFactory
@@ -58,9 +59,10 @@ object ArticleProcessor extends ArticleMarshaller with TwitterService {
     .collect()
     .toList
 
-    val updatedArticles  = processScores(articles)
+    val updatedArticles = processScores(articles)
 
-    updatedArticles.sortBy(a => a.score).foreach(a => println(s"Article score ${a.score} : ${a.content}"))
+    updatedArticles.sortBy(a => a.score)
+      .foreach(a => println(s"Article ${a.originalId} \nScore : ${a.score} \nContent : ${a.content} \n"))
 
 //    val ssc = new StreamingContext(config, Seconds(1))
 //
@@ -114,11 +116,15 @@ object ArticleProcessor extends ArticleMarshaller with TwitterService {
 
       val articlesById = articles.map(article => (article.originalId.toLong, article)).toMap
 
-      val updatedArticles = getTweetsDetails(articlesById.keys.toList).map { details =>
-        val article = articlesById(details._1)
-        val updatedScore = calculateTweetScore(article, details._2)
-        article.copy(score = Some(updatedScore))
-      }.toList
+      val updatedArticles = articlesById
+        .grouped(ConfigLoader.tweetsBatchSize)
+        .flatMap { articleGroup =>
+          getTweetsDetails(articleGroup.keys.toList).map { details =>
+            val article = articlesById(details._1)
+            val updatedScore = calculateTweetScore(article, details._2)
+            article.copy(score = Some(updatedScore))
+          }
+        }.toList
 
       if (updatedArticles.size != articles.size) {
         System.err.println("Something went wrong. Could not update the score of every article.")
