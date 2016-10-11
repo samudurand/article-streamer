@@ -4,6 +4,7 @@ import articlestreamer.processor.marshalling.ArticleMarshaller
 import articlestreamer.processor.kafka.KafkaConsumerWrapper
 import articlestreamer.processor.model.TweetPopularity
 import articlestreamer.processor.service.TwitterService
+import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.exception.exceptions._
 import articlestreamer.shared.model.{TwitterArticle, Article}
 import com.typesafe.config.ConfigFactory
@@ -46,19 +47,22 @@ object ArticleProcessor extends ArticleMarshaller with TwitterService {
 
     val recordsDs: Dataset[String] = sparkSession.createDataset(records)
 
-    val results = recordsDs.map { record =>
-      unmarshallTwitterArticle(record) match {
-        case Some(twitterArticle: TwitterArticle) => processTwitterArticle(twitterArticle)
-        case None =>
-          System.err.println("Could not parse article.")
-          None
+    val articles = recordsDs.map { record =>
+      val maybeArticle = unmarshallTwitterArticle(record)
+      if (maybeArticle.isEmpty) {
+        System.err.println(s"Could not parse record $record into an article.")
       }
+      maybeArticle
     }
     .filter(_.isDefined)
     .map(_.get)
     .collect()
+    .toList
 
-    println(results.mkString("\n"))
+    val updatedArticles = processScores(articles)
+
+    updatedArticles.sortBy(a => a.score)
+      .foreach(a => println(s"Article ${a.originalId} \nScore : ${a.score} \nContent : ${a.content} \n"))
 
 //    val ssc = new StreamingContext(config, Seconds(1))
 //
@@ -107,27 +111,31 @@ object ArticleProcessor extends ArticleMarshaller with TwitterService {
     recordsValues
   }
 
-  private def processTwitterArticle(article: TwitterArticle): Option[TwitterArticle] = {
+  private def processScores(articles: List[TwitterArticle]): List[TwitterArticle] = {
     try {
-      val twitterId = article.originalId.toLong
 
-      getTweetPopularity(twitterId) match {
-        case Some(popularity) =>
-          val updatedScore = calculateTweetScore(article, popularity)
-          val updatedArticle = article.copy(score = Some(updatedScore))
-          Some(updatedArticle)
-        case None =>
-          println(s"Unable to retrieve tweet details for article [${article.id}] with tweet id [${article.originalId}]")
-          None
+      val articlesById = articles.map(article => (article.originalId.toLong, article)).toMap
+
+      val updatedArticles = articlesById
+        .grouped(ConfigLoader.tweetsBatchSize)
+        .flatMap { articleGroup =>
+          getTweetsDetails(articleGroup.keys.toList).map { details =>
+            val article = articlesById(details._1)
+            val updatedScore = calculateTweetScore(article, details._2)
+            article.copy(score = Some(updatedScore))
+          }
+        }.toList
+
+      if (updatedArticles.size != articles.size) {
+        System.err.println("Something went wrong. Could not update the score of every article.")
       }
 
+      updatedArticles
+
     } catch {
-      case _: NumberFormatException =>
-        System.err.println(s"Unexpected format for twitter Id, cannot convert ${article.originalId} to Long.")
-        None
       case ex: Throwable =>
         ex.printNeatStackTrace()
-        None
+        List()
     }
   }
 
