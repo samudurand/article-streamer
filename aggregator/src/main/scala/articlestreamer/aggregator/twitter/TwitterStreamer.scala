@@ -20,7 +20,7 @@ case class TwitterStreamer(onStatusFct: (Status) => Unit, onStop: () => Unit) ex
   def startStreaming() = {
     println("Twitter Streamer : Starting streaming")
     stream.addListener(simpleStatusListener)
-    stream.filter(new FilterQuery().track(ConfigLoader.twitterTag))
+    stream.filter(new FilterQuery().track(ConfigLoader.twitterSearchConfig.mainTag))
     println("Twitter Streamer : Streaming started")
   }
 

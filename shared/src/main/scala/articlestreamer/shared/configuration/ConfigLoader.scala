@@ -1,10 +1,19 @@
 package articlestreamer.shared.configuration
 
-import java.io.{InputStreamReader, BufferedReader, File, PrintWriter}
-import java.nio.file.Paths
-import java.util
+import java.io.{File, PrintWriter}
+import collection.JavaConversions._
 
 import com.typesafe.config.ConfigFactory
+
+case class TwitterSearchConfig(mainTag: String,
+                        minimumScore: Int,
+                        relatedTags: List[String],
+                        articleCloseWords: List[String],
+                        articleRelatedWords: List[String],
+                        subjectCloseWords: List[String],
+                        subjectRelatedWords: List[String],
+                        articleUnrelatedWords: List[String],
+                        subjectUnrelatedWords: List[String])
 
 object ConfigLoader {
 
@@ -15,10 +24,18 @@ object ConfigLoader {
   val twitterOauthAccessToken = appConfig.getString("twitter.oauth.oauthAccessToken")
   val twitterOauthAccessTokenSecret = appConfig.getString("twitter.oauth.oauthAccessTokenSecret")
 
-  /**
-   * Tag to track on twitter
-   */
-  val twitterTag = appConfig.getString("twitter.tagToTrack")
+  val twitterPath = "twitter.search"
+  val twitterSearchConfig = TwitterSearchConfig(
+    appConfig.getString(s"$twitterPath.tagToTrack"),
+    appConfig.getInt(s"$twitterPath.minimumScore"),
+    appConfig.getStringList(s"$twitterPath.relatedTags").toList,
+    appConfig.getStringList(s"$twitterPath.articleCloseWords").toList,
+    appConfig.getStringList(s"$twitterPath.articleRelatedWords").toList,
+    appConfig.getStringList(s"$twitterPath.subjectCloseWords").toList,
+    appConfig.getStringList(s"$twitterPath.subjectRelatedWords").toList,
+    appConfig.getStringList(s"$twitterPath.articleUnrelatedWords").toList,
+    appConfig.getStringList(s"$twitterPath.subjectUnrelatedWords").toList
+  )
 
   /**
    * Size of the tweets batch when querying for tweet info

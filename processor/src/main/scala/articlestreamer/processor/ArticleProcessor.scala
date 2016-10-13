@@ -5,6 +5,7 @@ import articlestreamer.processor.kafka.KafkaConsumerWrapper
 import articlestreamer.processor.model.TweetPopularity
 import articlestreamer.processor.service.TwitterService
 import articlestreamer.shared.configuration.ConfigLoader
+import articlestreamer.shared.configuration.ConfigLoader.tweetsBatchSize
 import articlestreamer.shared.exception.exceptions._
 import articlestreamer.shared.model.{TwitterArticle, Article}
 import com.typesafe.config.ConfigFactory
@@ -117,7 +118,7 @@ object ArticleProcessor extends ArticleMarshaller with TwitterService {
       val articlesById = articles.map(article => (article.originalId.toLong, article)).toMap
 
       val updatedArticles = articlesById
-        .grouped(ConfigLoader.tweetsBatchSize)
+        .grouped(tweetsBatchSize)
         .flatMap { articleGroup =>
           getTweetsDetails(articleGroup.keys.toList).map { details =>
             val article = articlesById(details._1)

@@ -4,6 +4,7 @@ import java.sql.Timestamp
 import java.util.UUID
 
 import articlestreamer.aggregator.kafka.KafkaProducerWrapper
+import articlestreamer.aggregator.scoring.TwitterScoreCalculator
 import articlestreamer.aggregator.twitter.TwitterStreamer
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.model.TwitterArticle
@@ -14,7 +15,7 @@ import org.json4s.jackson.Serialization
 import org.json4s.jackson.Serialization.write
 import twitter4j.Status
 
-object Aggregator extends App {
+object Aggregator extends App with TwitterScoreCalculator {
 
   override def main(args: Array[String]) {
 
@@ -60,7 +61,9 @@ object Aggregator extends App {
 
     val publicationDate = new Timestamp(status.getCreatedAt.getTime)
 
-    TwitterArticle(UUID.randomUUID().toString, String.valueOf(status.getId), publicationDate, urls, status.getText, Some(1))
+    val article = TwitterArticle(UUID.randomUUID().toString, String.valueOf(status.getId), publicationDate, urls, status.getText, None)
+    val baseScore = calculateBaseScore(article)
+    article.copy(score = Some(baseScore))
 
   }
 
