@@ -114,18 +114,12 @@ object ArticleProcessor extends ArticleMarshaller with TwitterService {
 
   private def processScores(articles: List[TwitterArticle]): List[TwitterArticle] = {
     try {
-
       val articlesById = articles.map(article => (article.originalId.toLong, article)).toMap
 
       val updatedArticles = articlesById
         .grouped(tweetsBatchSize)
-        .flatMap { articleGroup =>
-          getTweetsDetails(articleGroup.keys.toList).map { details =>
-            val article = articlesById(details._1)
-            val updatedScore = calculateTweetScore(article, details._2)
-            article.copy(score = Some(updatedScore))
-          }
-        }.toList
+        .flatMap(articleGroup => updateScore(articleGroup))
+        .toList
 
       if (updatedArticles.size != articles.size) {
         System.err.println("Something went wrong. Could not update the score of every article.")
@@ -137,6 +131,17 @@ object ArticleProcessor extends ArticleMarshaller with TwitterService {
       case ex: Throwable =>
         ex.printNeatStackTrace()
         List()
+    }
+  }
+
+  private def updateScore(articlesById: Map[Long, TwitterArticle]): Iterable[TwitterArticle] = {
+    getTweetsDetails(articlesById.keys.toList).map {
+      case (id, Some(details)) => {
+        val article = articlesById(id)
+        val updatedScore = calculateTweetScore(article, details)
+        article.copy(score = Some(updatedScore))
+      }
+      case (id, None) => articlesById(id)
     }
   }
 
