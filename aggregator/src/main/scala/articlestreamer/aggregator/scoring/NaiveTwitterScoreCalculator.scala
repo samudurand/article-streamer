@@ -31,7 +31,7 @@ trait NaiveTwitterScoreCalculator extends ScoreCalculator[TwitterArticle] {
   )
 
   override def calculateBaseScore(article: TwitterArticle): Int = {
-    val score = 1
+    val score = 0
 
     wordsAndValues.foldLeft(score) { case (acc, (words, value)) =>
       acc + value * countOccurrences(words, article.content)
@@ -42,7 +42,7 @@ trait NaiveTwitterScoreCalculator extends ScoreCalculator[TwitterArticle] {
    * Count the occurrences of the words from the list in the text
    */
   private def countOccurrences(wordsToSearch: List[String], toAnalyse: String): Int = {
-    wordsToSearch.foldLeft(0)((acc, word) => acc + s"""\b$word\b""".r.findAllIn(toAnalyse).length)
+    wordsToSearch.foldLeft(0)((acc, word) => acc + s"""\\b$word\\b""".r.findAllIn(toAnalyse).length)
   }
 
 }
