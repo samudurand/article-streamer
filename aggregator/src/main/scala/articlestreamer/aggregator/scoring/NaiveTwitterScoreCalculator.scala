@@ -3,9 +3,11 @@ package articlestreamer.aggregator.scoring
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.model.TwitterArticle
 
-trait TwitterScoreCalculator extends ScoreCalculator[TwitterArticle] {
+trait NaiveTwitterScoreCalculator extends ScoreCalculator[TwitterArticle] {
 
-  val config = ConfigLoader.twitterSearchConfig
+  self :ConfigLoader =>
+
+  val config = twitterSearchConfig
 
   val VALUE_RELATED_TAGS = 100
 
@@ -18,7 +20,7 @@ trait TwitterScoreCalculator extends ScoreCalculator[TwitterArticle] {
   val COST_ARTICLE_UNRELATED_WORDS = -200
   val COST_SUBJECT_UNRELATED_WORDS = -50
 
-  val wordsAndValues = List(
+  lazy val wordsAndValues = List(
     (config.relatedTags, VALUE_RELATED_TAGS),
     (config.articleCloseWords, VALUE_ARTICLE_CLOSE_WORDS),
     (config.articleRelatedWords, VALUE_ARTICLE_RELATED_WORDS),

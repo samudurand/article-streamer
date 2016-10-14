@@ -4,7 +4,7 @@ import java.sql.Timestamp
 import java.util.UUID
 
 import articlestreamer.aggregator.kafka.KafkaProducerWrapper
-import articlestreamer.aggregator.scoring.TwitterScoreCalculator
+import articlestreamer.aggregator.scoring.NaiveTwitterScoreCalculator
 import articlestreamer.aggregator.twitter.TwitterStreamer
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.model.TwitterArticle
@@ -15,7 +15,7 @@ import org.json4s.jackson.Serialization
 import org.json4s.jackson.Serialization.write
 import twitter4j.Status
 
-object Aggregator extends App with TwitterScoreCalculator {
+object Aggregator extends App with NaiveTwitterScoreCalculator with ConfigLoader {
 
   override def main(args: Array[String]) {
 
@@ -41,7 +41,7 @@ object Aggregator extends App with TwitterScoreCalculator {
       println(s"Status received: ${status.getCreatedAt}")
 
       val appConfig = ConfigFactory.load()
-      val topic = ConfigLoader.kafkaMainTopic
+      val topic = kafkaMainTopic
 
       val article = convertToArticle(status)
 

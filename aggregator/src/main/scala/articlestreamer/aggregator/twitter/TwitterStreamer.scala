@@ -4,7 +4,8 @@ import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.twitter.TwitterAuthorizationConfig
 import twitter4j._
 
-case class TwitterStreamer(onStatusFct: (Status) => Unit, onStop: () => Unit) extends TwitterAuthorizationConfig {
+case class TwitterStreamer(onStatusFct: (Status) => Unit, onStop: () => Unit)
+  extends TwitterAuthorizationConfig with ConfigLoader {
 
   val stream = new TwitterStreamFactory(twitterConfig).getInstance
 
@@ -20,7 +21,7 @@ case class TwitterStreamer(onStatusFct: (Status) => Unit, onStop: () => Unit) ex
   def startStreaming() = {
     println("Twitter Streamer : Starting streaming")
     stream.addListener(simpleStatusListener)
-    stream.filter(new FilterQuery().track(ConfigLoader.twitterSearchConfig.mainTag))
+    stream.filter(new FilterQuery().track(twitterSearchConfig.mainTag))
     println("Twitter Streamer : Streaming started")
   }
 

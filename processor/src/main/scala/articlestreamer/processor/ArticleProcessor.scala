@@ -5,7 +5,6 @@ import articlestreamer.processor.kafka.KafkaConsumerWrapper
 import articlestreamer.processor.model.TweetPopularity
 import articlestreamer.processor.service.TwitterService
 import articlestreamer.shared.configuration.ConfigLoader
-import articlestreamer.shared.configuration.ConfigLoader.tweetsBatchSize
 import articlestreamer.shared.exception.exceptions._
 import articlestreamer.shared.model.{TwitterArticle, Article}
 import com.typesafe.config.ConfigFactory
@@ -22,11 +21,7 @@ import org.apache.log4j.{Level, Logger}
 
 import org.apache.spark.sql.{Dataset, SparkSession}
 
-object ArticleProcessor extends ArticleMarshaller with TwitterService {
-
-  private val appConfig = ConfigFactory.load()
-  val topic = appConfig.getString("kafka.topic")
-  val streamingTimeout = appConfig.getLong("spark.streamingTimeout")
+object ArticleProcessor extends ArticleMarshaller with TwitterService with ConfigLoader {
 
   Logger.getLogger("org").setLevel(Level.WARN)
 

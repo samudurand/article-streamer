@@ -15,9 +15,9 @@ case class TwitterSearchConfig(mainTag: String,
                         articleUnrelatedWords: List[String],
                         subjectUnrelatedWords: List[String])
 
-object ConfigLoader {
+trait ConfigLoader {
 
-  private val appConfig = ConfigFactory.load()
+  val appConfig = ConfigFactory.load()
 
   val twitterOuathConsumerKey = appConfig.getString("twitter.oauth.oauthConsumerKey")
   val twitterOauthConsumerSecret = appConfig.getString("twitter.oauth.oauthConsumerSecret")

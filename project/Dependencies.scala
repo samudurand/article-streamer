@@ -9,7 +9,9 @@ object Dependencies {
     "joda-time" % "joda-time" % "2.9.4",
     "com.typesafe" % "config" % "1.3.0",
     "org.json4s" %% "json4s-native" % "3.4.1",
-    "org.json4s" %% "json4s-jackson" % "3.4.1"
+    "org.json4s" %% "json4s-jackson" % "3.4.1",
+    "org.scalatest" % "scalatest_2.11" % "3.0.0" % "test",
+    "org.scalamock" %% "scalamock-scalatest-support" % "3.3.0" % "test"
   )
 
 }

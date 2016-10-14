@@ -20,10 +20,10 @@ class KafkaProducerWrapper() {
 
 }
 
-object KafkaProducerWrapper {
+object KafkaProducerWrapper extends ConfigLoader {
 
   val properties = new Properties()
-  properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, ConfigLoader.kafkaBrokers)
+  properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBrokers)
   properties.put(ProducerConfig.ACKS_CONFIG, "all")
   properties.put(ProducerConfig.RETRIES_CONFIG, 0.asInstanceOf[AnyRef])
   properties.put(ProducerConfig.BATCH_SIZE_CONFIG, 16384.asInstanceOf[AnyRef])
@@ -34,11 +34,11 @@ object KafkaProducerWrapper {
   properties.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 2000.asInstanceOf[AnyRef])
   properties.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, 10000.asInstanceOf[AnyRef])
 
-  if (ConfigLoader.kafkaSSLMode) {
+  if (kafkaSSLMode) {
     properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL")
-    properties.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, s"${ConfigLoader.kafkaTrustStore}/truststore.jks")
+    properties.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, s"${kafkaTrustStore}/truststore.jks")
     properties.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, "test1234")
-    properties.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, s"${ConfigLoader.kafkaTrustStore}/keystore.jks")
+    properties.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, s"${kafkaTrustStore}/keystore.jks")
     properties.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, "test1234")
     properties.put(SslConfigs.SSL_KEY_PASSWORD_CONFIG, "test1234")
   }

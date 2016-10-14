@@ -5,11 +5,13 @@ import com.typesafe.config.ConfigFactory
 
 trait TwitterAuthorizationConfig {
 
+  self: ConfigLoader =>
+
   val twitterConfig = new twitter4j.conf.ConfigurationBuilder()
     .setJSONStoreEnabled(true)
-    .setOAuthConsumerKey(ConfigLoader.twitterOuathConsumerKey)
-    .setOAuthConsumerSecret(ConfigLoader.twitterOauthConsumerSecret)
-    .setOAuthAccessToken(ConfigLoader.twitterOauthAccessToken)
-    .setOAuthAccessTokenSecret(ConfigLoader.twitterOauthAccessTokenSecret)
+    .setOAuthConsumerKey(twitterOuathConsumerKey)
+    .setOAuthConsumerSecret(twitterOauthConsumerSecret)
+    .setOAuthAccessToken(twitterOauthAccessToken)
+    .setOAuthAccessTokenSecret(twitterOauthAccessTokenSecret)
     .build
 }
