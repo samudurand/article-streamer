@@ -71,12 +71,12 @@ class KafkaConsumerWrapper {
 
 }
 
-object KafkaConsumerWrapper {
+object KafkaConsumerWrapper extends ConfigLoader {
 
-  val topic = ConfigLoader.kafkaMainTopic
+  val topic = kafkaMainTopic
 
   val properties = new Properties()
-  properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, ConfigLoader.kafkaBrokers)
+  properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBrokers)
   properties.put(ConsumerConfig.GROUP_ID_CONFIG, "test-" + UUID.randomUUID().toString)
   properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true")
   properties.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "1000")
@@ -86,11 +86,11 @@ object KafkaConsumerWrapper {
   properties.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, "5000")
   properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
 
-  if (ConfigLoader.kafkaSSLMode) {
+  if (kafkaSSLMode) {
     properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL")
-    properties.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, s"${ConfigLoader.kafkaTrustStore}/truststore.jks")
+    properties.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, s"${kafkaTrustStore}/truststore.jks")
     properties.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, "test1234")
-    properties.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, s"${ConfigLoader.kafkaTrustStore}/keystore.jks")
+    properties.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, s"${kafkaTrustStore}/keystore.jks")
     properties.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, "test1234")
     properties.put(SslConfigs.SSL_KEY_PASSWORD_CONFIG, "test1234")
   }

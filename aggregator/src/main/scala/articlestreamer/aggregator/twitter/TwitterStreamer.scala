@@ -5,7 +5,7 @@ import articlestreamer.shared.twitter.TwitterAuthorizationConfig
 import twitter4j._
 
 case class TwitterStreamer(onStatusFct: (Status) => Unit, onStop: () => Unit)
-  extends TwitterAuthorizationConfig with ConfigLoader {
+  extends ConfigLoader with TwitterAuthorizationConfig {
 
   val stream = new TwitterStreamFactory(twitterConfig).getInstance
 

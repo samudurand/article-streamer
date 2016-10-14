@@ -21,7 +21,7 @@ import org.apache.log4j.{Level, Logger}
 
 import org.apache.spark.sql.{Dataset, SparkSession}
 
-object ArticleProcessor extends ArticleMarshaller with TwitterService with ConfigLoader {
+object ArticleProcessor extends ConfigLoader with ArticleMarshaller with TwitterService {
 
   Logger.getLogger("org").setLevel(Level.WARN)
 

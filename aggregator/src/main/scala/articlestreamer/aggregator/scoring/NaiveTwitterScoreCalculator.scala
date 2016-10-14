@@ -20,7 +20,7 @@ trait NaiveTwitterScoreCalculator extends ScoreCalculator[TwitterArticle] {
   val COST_ARTICLE_UNRELATED_WORDS = -200
   val COST_SUBJECT_UNRELATED_WORDS = -50
 
-  lazy val wordsAndValues = List(
+  val wordsAndValues = List(
     (config.relatedTags, VALUE_RELATED_TAGS),
     (config.articleCloseWords, VALUE_ARTICLE_CLOSE_WORDS),
     (config.articleRelatedWords, VALUE_ARTICLE_RELATED_WORDS),

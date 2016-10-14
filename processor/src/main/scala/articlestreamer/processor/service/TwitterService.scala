@@ -1,13 +1,15 @@
 package articlestreamer.processor.service
 
 import articlestreamer.processor.model.TweetPopularity
+import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.exception.exceptions._
 import articlestreamer.shared.twitter.TwitterAuthorizationConfig
 import twitter4j.auth.AccessToken
-import twitter4j.{ResponseList, Status, TwitterFactory, Twitter}
+import twitter4j.{ResponseList, Status, Twitter, TwitterFactory}
+
 import scala.collection.JavaConversions._
 
-trait TwitterService extends TwitterAuthorizationConfig {
+trait TwitterService extends ConfigLoader with TwitterAuthorizationConfig {
 
   val twitter: Twitter  = new TwitterFactory().getInstance()
   twitter.setOAuthConsumer(twitterConfig.getOAuthConsumerKey, twitterConfig.getOAuthConsumerSecret)

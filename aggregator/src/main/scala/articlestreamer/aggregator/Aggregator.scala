@@ -15,7 +15,7 @@ import org.json4s.jackson.Serialization
 import org.json4s.jackson.Serialization.write
 import twitter4j.Status
 
-object Aggregator extends App with NaiveTwitterScoreCalculator with ConfigLoader {
+object Aggregator extends App with ConfigLoader with NaiveTwitterScoreCalculator {
 
   override def main(args: Array[String]) {
 
