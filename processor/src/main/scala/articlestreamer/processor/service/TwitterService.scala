@@ -12,6 +12,7 @@ import scala.collection.JavaConversions._
 class TwitterService(config: ConfigLoader, twitterFactory: TwitterFactory) {
 
   val authorizationConfig = TwitterAuthorizationConfig.getTwitterConfig(config)
+
   val twitter: Twitter  = twitterFactory.getInstance()
   twitter.setOAuthConsumer(authorizationConfig.getOAuthConsumerKey, authorizationConfig.getOAuthConsumerSecret)
 
