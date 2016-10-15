@@ -14,14 +14,13 @@ import org.json4s._
 import org.json4s.jackson.Serialization
 import org.json4s.jackson.Serialization.write
 import twitter4j.Status
+import com.softwaremill.macwire._
 
-object Aggregator extends App with ConfigLoader with NaiveTwitterScoreCalculator {
+class Aggregator(config: ConfigLoader, scoreCalculator: NaiveTwitterScoreCalculator, producer: KafkaProducerWrapper) {
 
-  override def main(args: Array[String]) {
+  def run() {
 
-    val producer = new KafkaProducerWrapper
-
-    val twitterStreamer = TwitterStreamer(tweetHandler(producer), stopHandler(producer))
+    val twitterStreamer = TwitterStreamer(config, tweetHandler(producer), stopHandler(producer))
 
     println("Starting streaming")
     twitterStreamer.startStreaming()
@@ -41,7 +40,7 @@ object Aggregator extends App with ConfigLoader with NaiveTwitterScoreCalculator
       println(s"Status received: ${status.getCreatedAt}")
 
       val appConfig = ConfigFactory.load()
-      val topic = kafkaMainTopic
+      val topic = config.kafkaMainTopic
 
       val article = convertToArticle(status)
 
@@ -62,7 +61,7 @@ object Aggregator extends App with ConfigLoader with NaiveTwitterScoreCalculator
     val publicationDate = new Timestamp(status.getCreatedAt.getTime)
 
     val article = TwitterArticle(UUID.randomUUID().toString, String.valueOf(status.getId), publicationDate, urls, status.getText, None)
-    val baseScore = calculateBaseScore(article)
+    val baseScore = scoreCalculator.calculateBaseScore(article)
     article.copy(score = Some(baseScore))
 
   }

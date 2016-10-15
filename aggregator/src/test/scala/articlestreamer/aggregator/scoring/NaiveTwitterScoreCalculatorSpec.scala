@@ -3,17 +3,24 @@ package articlestreamer.aggregator.scoring
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FlatSpec, Matchers}
 import articlestreamer.aggregator.scoring.NaiveTwitterScoreCalculator
+import articlestreamer.shared.BaseSpec
 import articlestreamer.shared.configuration.{ConfigLoader, TwitterSearchConfig}
 import articlestreamer.shared.model.TwitterArticle
 import com.typesafe.config.ConfigFactory
 
-class NaiveTwitterScoreCalculatorSpec extends FlatSpec with MockFactory with Matchers with ConfigLoader with NaiveTwitterScoreCalculator {
 
-  override val wordsAndValues = List(
-    (List("close1", "close2"), 1000),
-    (List("related3", "related4"), 100),
-    (List("unrelated1", "unrelated2"), -200)
-  )
+class NaiveTwitterScoreCalculatorSpec extends BaseSpec {
+
+  class TestCalculator extends NaiveTwitterScoreCalculator(new ConfigLoader) {
+    override val wordsAndValues = List(
+      (List("close1", "close2"), 1000),
+      (List("related3", "related4"), 100),
+      (List("unrelated1", "unrelated2"), -200)
+    )
+  }
+
+  val scoreCalculator = new TestCalculator
+  import scoreCalculator._
 
   "A tweet with no words of any import" should "get a 0 base score" in {
     val content = "other1 other2 other3"

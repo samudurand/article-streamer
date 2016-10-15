@@ -1,6 +1,7 @@
 package articlestreamer.aggregator
 
 import articlestreamer.aggregator.kafka.KafkaConsumerWrapper
+import articlestreamer.shared.configuration.ConfigLoader
 
 import scala.concurrent.duration._
 
@@ -11,7 +12,7 @@ object BasicConsumer extends App {
 
   override def main(args: Array[String]) {
 
-   val consumer = new KafkaConsumerWrapper
+   val consumer = new KafkaConsumerWrapper(new ConfigLoader())
 
     println("Starting polling")
 

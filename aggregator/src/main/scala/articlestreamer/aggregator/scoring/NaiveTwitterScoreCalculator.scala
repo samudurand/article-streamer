@@ -3,9 +3,9 @@ package articlestreamer.aggregator.scoring
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.model.TwitterArticle
 
-trait NaiveTwitterScoreCalculator extends ScoreCalculator[TwitterArticle] {
+class NaiveTwitterScoreCalculator(configLoader: ConfigLoader) extends ScoreCalculator[TwitterArticle] {
 
-  self :ConfigLoader =>
+  import configLoader._
 
   val config = twitterSearchConfig
 

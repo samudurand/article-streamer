@@ -56,6 +56,7 @@ lazy val shared = (project in file("shared")).
   settings(
     name := "shared",
 
+    libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
     libraryDependencies ++= Dependencies.commonDependencies,
     libraryDependencies += "org.twitter4j" % "twitter4j-stream" % Dependencies.twitter4JVersion
   )

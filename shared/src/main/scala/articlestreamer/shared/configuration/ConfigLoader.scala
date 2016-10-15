@@ -15,7 +15,7 @@ case class TwitterSearchConfig(mainTag: String,
                         articleUnrelatedWords: List[String],
                         subjectUnrelatedWords: List[String])
 
-trait ConfigLoader {
+class ConfigLoader {
 
   val appConfig = ConfigFactory.load()
 

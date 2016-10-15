@@ -16,16 +16,17 @@ import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import org.apache.spark.SparkConf
 import org.apache.spark._
+import com.softwaremill.macwire._
 
 import org.apache.log4j.{Level, Logger}
 
 import org.apache.spark.sql.{Dataset, SparkSession}
 
-object ArticleProcessor extends ConfigLoader with ArticleMarshaller with TwitterService {
+class ArticleProcessor(config: ConfigLoader, consumer: KafkaConsumerWrapper, twitterService: TwitterService) extends ArticleMarshaller {
 
   Logger.getLogger("org").setLevel(Level.WARN)
 
-  def main(args: Array[String]) {
+  def run() {
 
     val records = getRecordsFromSource
 
@@ -101,9 +102,8 @@ object ArticleProcessor extends ConfigLoader with ArticleMarshaller with Twitter
   }
 
   private def getRecordsFromSource: List[String] = {
-    val kafkaConsumer = new KafkaConsumerWrapper
-    val recordsValues: List[String] = kafkaConsumer.poll(10 seconds, 1)
-    kafkaConsumer.stopConsumer()
+    val recordsValues: List[String] = consumer.poll(10 seconds, 1)
+    consumer.stopConsumer()
     recordsValues
   }
 
@@ -112,7 +112,7 @@ object ArticleProcessor extends ConfigLoader with ArticleMarshaller with Twitter
       val articlesById = articles.map(article => (article.originalId.toLong, article)).toMap
 
       val updatedArticles = articlesById
-        .grouped(tweetsBatchSize)
+        .grouped(config.tweetsBatchSize)
         .flatMap(articleGroup => updateScore(articleGroup))
         .toList
 
@@ -130,7 +130,7 @@ object ArticleProcessor extends ConfigLoader with ArticleMarshaller with Twitter
   }
 
   private def updateScore(articlesById: Map[Long, TwitterArticle]): Iterable[TwitterArticle] = {
-    getTweetsDetails(articlesById.keys.toList).map {
+    twitterService.getTweetsDetails(articlesById.keys.toList).map {
       case (id, Some(details)) => {
         val article = articlesById(id)
         val updatedScore = calculateTweetScore(article, details)

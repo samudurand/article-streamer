@@ -9,12 +9,13 @@ import twitter4j.{ResponseList, Status, Twitter, TwitterFactory}
 
 import scala.collection.JavaConversions._
 
-trait TwitterService extends ConfigLoader with TwitterAuthorizationConfig {
+class TwitterService(config: ConfigLoader) {
 
+  val authorizationConfig = TwitterAuthorizationConfig.getTwitterConfig(config)
   val twitter: Twitter  = new TwitterFactory().getInstance()
-  twitter.setOAuthConsumer(twitterConfig.getOAuthConsumerKey, twitterConfig.getOAuthConsumerSecret)
+  twitter.setOAuthConsumer(authorizationConfig.getOAuthConsumerKey, authorizationConfig.getOAuthConsumerSecret)
 
-  val accessToken: AccessToken = new AccessToken(twitterConfig.getOAuthAccessToken, twitterConfig.getOAuthAccessTokenSecret)
+  val accessToken: AccessToken = new AccessToken(authorizationConfig.getOAuthAccessToken, authorizationConfig.getOAuthAccessTokenSecret)
   twitter.setOAuthAccessToken(accessToken)
 
   def getTweetsDetails(ids: List[Long]): Map[Long, Option[TweetPopularity]] = {
