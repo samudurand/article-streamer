@@ -10,7 +10,7 @@ import org.apache.kafka.common.config.SslConfigs
 
 class KafkaProducerWrapper(config: ConfigLoader) {
 
-  private val producer: KafkaProducer[String, String] = new KafkaProducer[String, String](KafkaProducerWrapper.getProperties(config))
+  private val producer = new KafkaProducer[String, String](KafkaProducerWrapper.getProperties(config))
 
   def send(record: ProducerRecord[String, String]) = producer.send(record, new RecordCallback)
 

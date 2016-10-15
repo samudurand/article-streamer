@@ -4,6 +4,7 @@ import articlestreamer.processor.kafka.KafkaConsumerWrapper
 import articlestreamer.processor.service.TwitterService
 import articlestreamer.shared.configuration.ConfigLoader
 import com.softwaremill.macwire._
+import twitter4j.TwitterFactory
 
 object MainApp extends App {
 
@@ -11,6 +12,7 @@ object MainApp extends App {
 
     lazy val configLoader = wire[ConfigLoader]
 
+    lazy val twitterFactory = wire[TwitterFactory]
     lazy val twitterService = wire[TwitterService]
     lazy val kafkaConsumerWrapper = wire[KafkaConsumerWrapper]
 

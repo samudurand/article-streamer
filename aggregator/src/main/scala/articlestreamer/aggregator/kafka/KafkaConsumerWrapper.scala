@@ -16,7 +16,7 @@ class KafkaConsumerWrapper(config: ConfigLoader) {
 
   val topic = config.kafkaMainTopic
 
-  private val consumer: KafkaConsumer[String, AnyRef] = new KafkaConsumer[String, AnyRef](KafkaConsumerWrapper.getProperties(config))
+  private val consumer = new KafkaConsumer[String, AnyRef](KafkaConsumerWrapper.getProperties(config))
 
   consumer.subscribe(util.Arrays.asList(topic))
 
