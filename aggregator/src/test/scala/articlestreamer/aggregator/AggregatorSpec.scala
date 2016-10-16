@@ -1,28 +1,23 @@
 package articlestreamer.aggregator
 
 import java.text.{DateFormat, SimpleDateFormat}
-import java.util
-import java.util.{Date, TimeZone}
+import java.util.TimeZone
 import java.util.concurrent.Future
 
 import articlestreamer.aggregator.kafka.KafkaProducerWrapper
 import articlestreamer.aggregator.scoring.TwitterScoreCalculator
 import articlestreamer.aggregator.twitter.{TwitterStreamer, TwitterStreamerFactory}
-import articlestreamer.shared.{AdditionalMatchers, BaseSpec}
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.model.TwitterArticle
+import articlestreamer.shared.{AdditionalMatchers, BaseSpec}
 import org.apache.kafka.clients.producer.{ProducerRecord, RecordMetadata}
-import org.joda.time.DateTimeZone
-import org.mockito.ArgumentCaptor
-import org.scalamock.matchers.MatchAny
-import org.scalamock.scalatest.MockFactory
-import org.scalatest.Matchers
-import twitter4j.{Status, URLEntity}
 import org.json4s._
 import org.json4s.jackson.Serialization
 import org.json4s.jackson.Serialization.read
+import org.scalatest.OneInstancePerTest
+import twitter4j.{Status, URLEntity}
 
-class AggregatorSpec extends BaseSpec with MockFactory with AdditionalMatchers {
+class AggregatorSpec extends BaseSpec with AdditionalMatchers with OneInstancePerTest {
 
   val df: DateFormat = new SimpleDateFormat("dd-MM-yyyy")
   df.setTimeZone(TimeZone.getDefault)
@@ -53,7 +48,6 @@ class AggregatorSpec extends BaseSpec with MockFactory with AdditionalMatchers {
   val kafkaWrapper = mock[TestProducer]
 
   val scoreCalculator = mock[TwitterScoreCalculator]
-  (scoreCalculator.calculateBaseScore _).expects(*).returns(10)
 
   val streamer = new TestStreamer
 
@@ -68,6 +62,8 @@ class AggregatorSpec extends BaseSpec with MockFactory with AdditionalMatchers {
   }
 
   "Every received tweet" should "be converted to an article and send to kafka" in {
+    (scoreCalculator.calculateBaseScore _).expects(*).returns(10)
+
     val tweetHandler = captureTweetHandler[(Status) => Unit]()
 
     val status = mock[Status]

@@ -53,52 +53,12 @@ class ArticleProcessor(config: ConfigLoader, consumer: KafkaConsumerWrapper, twi
     }
     .filter(_.isDefined)
     .map(_.get)
-    .collect()
-    .toList
+    .collect().toList
 
     val updatedArticles = processScores(articles)
 
     updatedArticles.sortBy(a => a.score)
       .foreach(a => println(s"Article ${a.originalId} \nScore : ${a.score} \nContent : ${a.content} \n"))
-
-//    val ssc = new StreamingContext(config, Seconds(1))
-//
-//    val consumerStrategy = Subscribe[String, String](Set(topic), KafkaConsumerWrapper.properties.asScala.toMap)
-//    val messages = KafkaUtils.createDirectStream[String, String](ssc, PreferConsistent, consumerStrategy)
-//
-//    messages.foreachRDD { message =>
-//      println(message.count())
-//    }
-//
-//    ssc.start()
-//    ssc.awaitTerminationOrTimeout(streamingTimeout)
-
-//    val conf = new SparkConf().setMaster("local[2]").setAppName("NetworkWordCount")
-//    val ssc = new StreamingContext(conf, Seconds(1))
-
-//
-
-//
-//    var offsetRanges = Array[OffsetRange]()
-//
-//    directKafkaStream.transform { rdd =>
-//      offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
-//      rdd
-////    }.map {
-////      ...
-//    }.foreachRDD { rdd =>
-//      for (o <- offsetRanges) {
-//        println(s"${o.topic} ${o.partition} ${o.fromOffset} ${o.untilOffset}")
-//      }
-//    }
-
-//    val logFile = "YOUR_SPARK_HOME/README.md" // Should be some file on your system
-//    val conf = new SparkConf().setAppName("Simple Application")
-//    val sc = new SparkContext(conf)
-//    val logData = sc.textFile(logFile, 2).cache()
-//    val numAs = logData.filter(line => line.contains("a")).count()
-//    val numBs = logData.filter(line => line.contains("b")).count()
-//    println("Lines with a: %s, Lines with b: %s".format(numAs, numBs))
   }
 
   private def getRecordsFromSource: List[String] = {
