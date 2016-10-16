@@ -11,7 +11,9 @@ import com.typesafe.config.ConfigFactory
 
 class NaiveTwitterScoreCalculatorSpec extends BaseSpec {
 
-  class TestCalculator extends NaiveTwitterScoreCalculator(new ConfigLoader) {
+  class TestConfigLoader extends ConfigLoader
+
+  class TestCalculator extends NaiveTwitterScoreCalculator(new TestConfigLoader) {
     override val wordsAndValues = List(
       (List("close1", "close2"), 1000),
       (List("related3", "related4"), 100),

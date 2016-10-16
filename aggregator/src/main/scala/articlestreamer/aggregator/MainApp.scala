@@ -2,7 +2,7 @@ package articlestreamer.aggregator
 
 import articlestreamer.aggregator.kafka.KafkaProducerWrapper
 import articlestreamer.aggregator.scoring.NaiveTwitterScoreCalculator
-import articlestreamer.shared.configuration.ConfigLoader
+import articlestreamer.shared.configuration.DefaultConfigLoader
 import com.softwaremill.macwire._
 
 /**
@@ -12,7 +12,7 @@ object MainApp extends App {
 
   override def main(args: Array[String]) {
 
-    lazy val config = wire[ConfigLoader]
+    lazy val config = wire[DefaultConfigLoader]
     lazy val scoreCalculator = wire[NaiveTwitterScoreCalculator]
     lazy val producer = wire[KafkaProducerWrapper]
 
