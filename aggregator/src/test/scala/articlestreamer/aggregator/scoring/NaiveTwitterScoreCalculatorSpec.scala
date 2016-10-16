@@ -1,12 +1,8 @@
 package articlestreamer.aggregator.scoring
 
-import org.scalamock.scalatest.MockFactory
-import org.scalatest.{FlatSpec, Matchers}
-import articlestreamer.aggregator.scoring.NaiveTwitterScoreCalculator
 import articlestreamer.shared.BaseSpec
-import articlestreamer.shared.configuration.{ConfigLoader, TwitterSearchConfig}
+import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.model.TwitterArticle
-import com.typesafe.config.ConfigFactory
 
 
 class NaiveTwitterScoreCalculatorSpec extends BaseSpec {

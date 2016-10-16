@@ -3,7 +3,7 @@ package articlestreamer.aggregator.scoring
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.model.TwitterArticle
 
-class NaiveTwitterScoreCalculator(configLoader: ConfigLoader) extends ScoreCalculator[TwitterArticle] {
+class NaiveTwitterScoreCalculator(configLoader: ConfigLoader) extends TwitterScoreCalculator {
 
   import configLoader._
 
