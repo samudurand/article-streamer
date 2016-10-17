@@ -1,28 +1,24 @@
 package articlestreamer.processor
 
-import articlestreamer.processor.marshalling.ArticleMarshaller
 import articlestreamer.processor.kafka.KafkaConsumerWrapper
+import articlestreamer.processor.marshalling.ArticleMarshaller
 import articlestreamer.processor.model.TweetPopularity
 import articlestreamer.processor.service.TwitterService
+import articlestreamer.processor.spark.SparkSessionProvider
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.exception.exceptions._
-import articlestreamer.shared.model.{TwitterArticle, Article}
-import com.typesafe.config.ConfigFactory
+import articlestreamer.shared.model.TwitterArticle
 
 import scala.concurrent.duration._
 
 //import org.apache.kafka.common.serialization.{StringDeserializer, StringSerializer}
-import org.apache.spark.SparkContext
-import org.apache.spark.SparkContext._
-import org.apache.spark.SparkConf
-import org.apache.spark._
-import com.softwaremill.macwire._
-
 import org.apache.log4j.{Level, Logger}
+import org.apache.spark.sql.Dataset
 
-import org.apache.spark.sql.{Dataset, SparkSession}
-
-class ArticleProcessor(config: ConfigLoader, consumer: KafkaConsumerWrapper, twitterService: TwitterService) extends ArticleMarshaller {
+class ArticleProcessor(config: ConfigLoader,
+                       consumer: KafkaConsumerWrapper,
+                       twitterService: TwitterService,
+                       sparkSessionProvider: SparkSessionProvider) extends ArticleMarshaller {
 
   Logger.getLogger("org").setLevel(Level.WARN)
 
@@ -30,16 +26,7 @@ class ArticleProcessor(config: ConfigLoader, consumer: KafkaConsumerWrapper, twi
 
     val records = getRecordsFromSource
 
-    val config = new SparkConf()
-      .setAppName("Spark App")
-      .setMaster("local[2]")
-      .set("spark.streaming.stopGracefullyOnShutdown","true")
-
-    val sparkSession = SparkSession
-      .builder()
-      .config(config)
-      .getOrCreate()
-
+    val sparkSession = sparkSessionProvider.getSparkSession()
     import sparkSession.implicits._
 
     val recordsDs: Dataset[String] = sparkSession.createDataset(records)

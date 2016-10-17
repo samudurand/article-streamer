@@ -1,5 +1,8 @@
 import com.heroku.sbt.HerokuPlugin.autoImport._
 
+javaOptions ++= Seq("-Xms512M", "-Xmx2048M", "-XX:MaxPermSize=2048M", "-XX:+CMSClassUnloadingEnabled")
+parallelExecution in Test := false
+
 lazy val root = (project in file(".")).
   settings(Commons.settings: _*).
   settings(
@@ -45,6 +48,7 @@ lazy val processor = (project in file("processor")).
     libraryDependencies += "org.apache.spark" %% "spark-core"       % "2.0.0",
     libraryDependencies += "org.apache.spark" %% "spark-sql"        % "2.0.0",
     libraryDependencies += "org.apache.spark" %% "spark-streaming"  % "2.0.0",
+    libraryDependencies += "org.apache.spark" %% "spark-hive"       % "2.0.0" % "test",
 //    libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka-0-10" % "2.0.0",
     libraryDependencies += "org.scalaj"       %% "scalaj-http"      % "2.3.0",
     libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion
