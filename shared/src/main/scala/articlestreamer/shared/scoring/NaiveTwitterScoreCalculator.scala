@@ -1,9 +1,10 @@
-package articlestreamer.aggregator.scoring
+package articlestreamer.shared.scoring
 
 import articlestreamer.shared.configuration.ConfigLoader
-import articlestreamer.shared.model.TwitterArticle
+import articlestreamer.shared.model.{TweetPopularity, TwitterArticle}
+import articlestreamer.shared.twitter.service.TwitterService
 
-class NaiveTwitterScoreCalculator(configLoader: ConfigLoader) extends TwitterScoreCalculator {
+class NaiveTwitterScoreCalculator(configLoader: ConfigLoader, twitterService: TwitterService) extends TwitterScoreCalculator {
 
   import configLoader._
 
@@ -45,4 +46,18 @@ class NaiveTwitterScoreCalculator(configLoader: ConfigLoader) extends TwitterSco
     wordsToSearch.foldLeft(0)((acc, word) => acc + s"""\\b$word\\b""".r.findAllIn(toAnalyse).length)
   }
 
+  override def updateScores(articlesById: Map[Long, TwitterArticle]): Traversable[TwitterArticle] = {
+    twitterService.getTweetsDetails(articlesById.keys.toList).map {
+      case (id, Some(details: TweetPopularity)) => {
+        val article = articlesById(id)
+        val updatedScore = calculateTweetScore(article, details)
+        article.copy(score = Some(updatedScore))
+      }
+      case (id, None) => articlesById(id)
+    }
+  }
+
+  private def calculateTweetScore(article: TwitterArticle, popularity: TweetPopularity): Int = {
+    article.score.getOrElse(0) + popularity.retweetCount + popularity.favoriteCount * 2
+  }
 }

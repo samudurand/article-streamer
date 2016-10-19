@@ -1,8 +1,8 @@
-package articlestreamer.processor.service
+package articlestreamer.shared.twitter.service
 
-import articlestreamer.processor.model.TweetPopularity
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.exception.exceptions._
+import articlestreamer.shared.model.TweetPopularity
 import articlestreamer.shared.twitter.TwitterAuthorizationConfig
 import twitter4j.auth.AccessToken
 import twitter4j.{ResponseList, Status, Twitter, TwitterFactory}

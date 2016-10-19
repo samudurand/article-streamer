@@ -1,24 +1,22 @@
 package articlestreamer.processor
 
 import articlestreamer.processor.kafka.KafkaConsumerWrapper
-import articlestreamer.processor.marshalling.TwitterMarshaller
 import articlestreamer.processor.marshalling.TwitterMarshaller.unmarshallTwitterArticle
-import articlestreamer.processor.model.TweetPopularity
-import articlestreamer.processor.service.TwitterService
 import articlestreamer.processor.spark.SparkSessionProvider
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.exception.exceptions._
 import articlestreamer.shared.model.TwitterArticle
+import articlestreamer.shared.scoring.TwitterScoreCalculator
+import articlestreamer.shared.twitter.service.TwitterService
 
 import scala.concurrent.duration._
-
-//import org.apache.kafka.common.serialization.{StringDeserializer, StringSerializer}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.Dataset
 
 class ArticleProcessor(config: ConfigLoader,
                        consumer: KafkaConsumerWrapper,
                        twitterService: TwitterService,
+                       scoreCalculator: TwitterScoreCalculator,
                        sparkSessionProvider: SparkSessionProvider) {
 
   Logger.getLogger("org").setLevel(Level.WARN)
@@ -34,7 +32,6 @@ class ArticleProcessor(config: ConfigLoader,
 
     val articles = recordsDs.map { record =>
       val maybeArticle = unmarshallTwitterArticle(record)
-      //val maybeArticle: Option[TwitterArticle] = None
       if (maybeArticle.isEmpty) {
         System.err.println(s"Could not parse record $record into an article.")
       }
@@ -44,8 +41,7 @@ class ArticleProcessor(config: ConfigLoader,
     .map(_.get)
     .collect().toList
 
-//    val updatedArticles = processScores(articles)
-    val updatedArticles = List[TwitterArticle]()
+    val updatedArticles = processScores(articles)
 
     updatedArticles.sortBy(a => a.score)
       .foreach(a => println(s"Article ${a.originalId} \nScore : ${a.score} \nContent : ${a.content} \n"))
@@ -63,7 +59,7 @@ class ArticleProcessor(config: ConfigLoader,
 
       val updatedArticles = articlesById
         .grouped(config.tweetsBatchSize)
-        .flatMap(articleGroup => updateScore(articleGroup))
+        .flatMap(articleGroup => scoreCalculator.updateScores(articleGroup))
         .toList
 
       if (updatedArticles.size != articles.size) {
@@ -77,22 +73,6 @@ class ArticleProcessor(config: ConfigLoader,
         ex.printNeatStackTrace()
         List()
     }
-  }
-
-  private def updateScore(articlesById: Map[Long, TwitterArticle]): Iterable[TwitterArticle] = {
-    twitterService.getTweetsDetails(articlesById.keys.toList).map {
-      case (id, Some(details)) => {
-        val article = articlesById(id)
-        val updatedScore = calculateTweetScore(article, details)
-        article.copy(score = Some(updatedScore))
-      }
-      case (id, None) => articlesById(id)
-    }
-  }
-
-  // Calculate a naive score
-  private def calculateTweetScore(article: TwitterArticle, popularity: TweetPopularity): Int = {
-    article.score.getOrElse(0) + popularity.retweetCount + popularity.favoriteCount * 2
   }
 
 }

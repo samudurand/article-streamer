@@ -4,10 +4,10 @@ import java.sql.Timestamp
 import java.util.UUID
 
 import articlestreamer.aggregator.kafka.KafkaProducerWrapper
-import articlestreamer.aggregator.scoring.TwitterScoreCalculator
 import articlestreamer.aggregator.twitter.TwitterStreamerFactory
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.model.TwitterArticle
+import articlestreamer.shared.scoring.TwitterScoreCalculator
 import org.apache.kafka.clients.producer._
 import org.json4s._
 import org.json4s.jackson.Serialization

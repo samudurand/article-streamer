@@ -1,9 +1,10 @@
 package articlestreamer.processor
 
 import articlestreamer.processor.kafka.KafkaConsumerWrapper
-import articlestreamer.processor.service.TwitterService
-import articlestreamer.processor.spark.{OnDemandSparkSessionProvider, SparkSessionProvider}
-import articlestreamer.shared.configuration.{ConfigLoader, DefaultConfigLoader}
+import articlestreamer.processor.spark.OnDemandSparkSessionProvider
+import articlestreamer.shared.configuration.DefaultConfigLoader
+import articlestreamer.shared.scoring.NaiveTwitterScoreCalculator
+import articlestreamer.shared.twitter.service.TwitterService
 import com.softwaremill.macwire._
 import twitter4j.TwitterFactory
 
@@ -16,7 +17,8 @@ object MainApp extends App {
     lazy val twitterFactory = wire[TwitterFactory]
     lazy val twitterService = wire[TwitterService]
     lazy val kafkaConsumerWrapper = wire[KafkaConsumerWrapper]
-    lazy val sparProvider = wire[OnDemandSparkSessionProvider]
+    lazy val sparkProvider = wire[OnDemandSparkSessionProvider]
+    lazy val twitterScoreCalculator = wire[NaiveTwitterScoreCalculator]
 
     val processor = wire[ArticleProcessor]
     processor.run()

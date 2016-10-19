@@ -1,16 +1,14 @@
 package articlestreamer.processor
 
 import articlestreamer.processor.kafka.KafkaConsumerWrapper
-import articlestreamer.processor.service.TwitterService
 import articlestreamer.processor.spark.SparkSessionProvider
 import articlestreamer.shared.BaseSpec
 import articlestreamer.shared.configuration.ConfigLoader
+import articlestreamer.shared.scoring.NaiveTwitterScoreCalculator
+import articlestreamer.shared.twitter.service.TwitterService
 import com.holdenkarau.spark.testing.{DataFrameSuiteBase, SharedSparkContext}
-import twitter4j.{Twitter, TwitterFactory}
-import twitter4j.auth.AccessToken
-
 import org.mockito.Mockito._
-import org.mockito.ArgumentMatchers._
+import twitter4j.{Twitter, TwitterFactory}
 
 /**
   * Created by sam on 16/10/2016.
@@ -34,7 +32,9 @@ class ArticleProcessorSpec extends BaseSpec with SharedSparkContext with DataFra
     val twitterService: TwitterService = mock(classOf[TwitterService])
     //when(twitterService.getTweetsDetails())
 
-    val processor = new ArticleProcessor(config, consumer, twitterService, ssProvider)
+    val scoreCalculator = mock(classOf[NaiveTwitterScoreCalculator])
+
+    val processor = new ArticleProcessor(config, consumer, twitterService, scoreCalculator, ssProvider)
     //processor.run()
   }
 
