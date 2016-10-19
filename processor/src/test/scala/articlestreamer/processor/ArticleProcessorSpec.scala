@@ -10,6 +10,7 @@ import twitter4j.{Twitter, TwitterFactory}
 import twitter4j.auth.AccessToken
 
 import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers._
 
 /**
   * Created by sam on 16/10/2016.
@@ -31,6 +32,7 @@ class ArticleProcessorSpec extends BaseSpec with SharedSparkContext with DataFra
     //when(consumer.poll(any(), any())).thenReturn()
 
     val twitterService: TwitterService = mock(classOf[TwitterService])
+    //when(twitterService.getTweetsDetails())
 
     val processor = new ArticleProcessor(config, consumer, twitterService, ssProvider)
     //processor.run()

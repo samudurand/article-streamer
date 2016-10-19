@@ -1,7 +1,8 @@
 package articlestreamer.processor
 
 import articlestreamer.processor.kafka.KafkaConsumerWrapper
-import articlestreamer.processor.marshalling.ArticleMarshaller
+import articlestreamer.processor.marshalling.TwitterMarshaller
+import articlestreamer.processor.marshalling.TwitterMarshaller.unmarshallTwitterArticle
 import articlestreamer.processor.model.TweetPopularity
 import articlestreamer.processor.service.TwitterService
 import articlestreamer.processor.spark.SparkSessionProvider
@@ -18,7 +19,7 @@ import org.apache.spark.sql.Dataset
 class ArticleProcessor(config: ConfigLoader,
                        consumer: KafkaConsumerWrapper,
                        twitterService: TwitterService,
-                       sparkSessionProvider: SparkSessionProvider) extends ArticleMarshaller {
+                       sparkSessionProvider: SparkSessionProvider) {
 
   Logger.getLogger("org").setLevel(Level.WARN)
 
@@ -33,6 +34,7 @@ class ArticleProcessor(config: ConfigLoader,
 
     val articles = recordsDs.map { record =>
       val maybeArticle = unmarshallTwitterArticle(record)
+      //val maybeArticle: Option[TwitterArticle] = None
       if (maybeArticle.isEmpty) {
         System.err.println(s"Could not parse record $record into an article.")
       }
@@ -42,7 +44,8 @@ class ArticleProcessor(config: ConfigLoader,
     .map(_.get)
     .collect().toList
 
-    val updatedArticles = processScores(articles)
+//    val updatedArticles = processScores(articles)
+    val updatedArticles = List[TwitterArticle]()
 
     updatedArticles.sortBy(a => a.score)
       .foreach(a => println(s"Article ${a.originalId} \nScore : ${a.score} \nContent : ${a.content} \n"))

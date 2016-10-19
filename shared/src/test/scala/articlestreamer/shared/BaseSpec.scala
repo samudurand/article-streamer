@@ -1,6 +1,5 @@
 package articlestreamer.shared
 
-import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FlatSpec, Matchers}
 
 /**

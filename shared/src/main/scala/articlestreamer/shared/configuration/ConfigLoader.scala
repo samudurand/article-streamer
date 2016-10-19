@@ -5,7 +5,7 @@ import java.io.{File, PrintWriter}
 import com.typesafe.config.ConfigFactory
 import collection.JavaConversions._
 
-case class TwitterSearchConfig(mainTag: String,
+final case class TwitterSearchConfig(mainTag: String,
                                minimumScore: Int,
                                relatedTags: List[String],
                                articleCloseWords: List[String],

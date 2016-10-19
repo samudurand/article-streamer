@@ -9,7 +9,7 @@ import articlestreamer.aggregator.scoring.TwitterScoreCalculator
 import articlestreamer.aggregator.twitter.{TwitterStreamer, TwitterStreamerFactory}
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.model.TwitterArticle
-import articlestreamer.shared.{AdditionalMatchers, BaseSpec}
+import articlestreamer.shared.BaseSpec
 import org.apache.kafka.clients.producer.{ProducerRecord, RecordMetadata}
 import org.json4s._
 import org.json4s.jackson.Serialization

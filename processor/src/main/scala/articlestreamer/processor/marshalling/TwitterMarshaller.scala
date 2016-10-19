@@ -2,12 +2,11 @@ package articlestreamer.processor.marshalling
 
 import articlestreamer.shared.exception.exceptions._
 import articlestreamer.shared.model.TwitterArticle
-
-import org.json4s._
+import org.json4s.NoTypeHints
 import org.json4s.jackson.Serialization
-import org.json4s.jackson.Serialization.read
+import org.json4s.jackson.Serialization._
 
-trait ArticleMarshaller {
+object TwitterMarshaller extends Serializable {
 
   def unmarshallTwitterArticle(articleJson: String): Option[TwitterArticle] = {
     implicit val formats = Serialization.formats(NoTypeHints)
