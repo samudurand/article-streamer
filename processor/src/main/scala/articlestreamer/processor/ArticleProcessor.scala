@@ -7,7 +7,6 @@ import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.exception.exceptions._
 import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.scoring.TwitterScoreCalculator
-import articlestreamer.shared.twitter.service.TwitterService
 
 import scala.concurrent.duration._
 import org.apache.log4j.{Level, Logger}
@@ -15,7 +14,6 @@ import org.apache.spark.sql.Dataset
 
 class ArticleProcessor(config: ConfigLoader,
                        consumer: KafkaConsumerWrapper,
-                       twitterService: TwitterService,
                        scoreCalculator: TwitterScoreCalculator,
                        sparkSessionProvider: SparkSessionProvider) {
 
@@ -55,18 +53,13 @@ class ArticleProcessor(config: ConfigLoader,
 
   private def processScores(articles: List[TwitterArticle]): List[TwitterArticle] = {
     try {
+
       val articlesById = articles.map(article => (article.originalId.toLong, article)).toMap
 
-      val updatedArticles = articlesById
+      articlesById
         .grouped(config.tweetsBatchSize)
         .flatMap(articleGroup => scoreCalculator.updateScores(articleGroup))
         .toList
-
-      if (updatedArticles.size != articles.size) {
-        System.err.println("Something went wrong. Could not update the score of every article.")
-      }
-
-      updatedArticles
 
     } catch {
       case ex: Throwable =>
