@@ -1,5 +1,7 @@
 package articlestreamer.shared.twitter.service
 
+import java.util.function.Consumer
+
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.exception.exceptions._
 import articlestreamer.shared.model.TweetPopularity
@@ -7,34 +9,38 @@ import articlestreamer.shared.twitter.TwitterAuthorizationConfig
 import twitter4j.auth.AccessToken
 import twitter4j.{ResponseList, Status, Twitter, TwitterFactory}
 
-import scala.collection.JavaConversions._
+import scala.collection.mutable
 
 class TwitterService(config: ConfigLoader, twitterFactory: TwitterFactory) {
 
-  val authorizationConfig = TwitterAuthorizationConfig.getTwitterConfig(config)
+  private val authorizationConfig = TwitterAuthorizationConfig.getTwitterConfig(config)
 
-  val twitter: Twitter  = twitterFactory.getInstance()
+  private val twitter: Twitter  = twitterFactory.getInstance()
   twitter.setOAuthConsumer(authorizationConfig.getOAuthConsumerKey, authorizationConfig.getOAuthConsumerSecret)
 
-  val accessToken: AccessToken = new AccessToken(authorizationConfig.getOAuthAccessToken, authorizationConfig.getOAuthAccessTokenSecret)
+  private val accessToken: AccessToken = new AccessToken(authorizationConfig.getOAuthAccessToken, authorizationConfig.getOAuthAccessTokenSecret)
   twitter.setOAuthAccessToken(accessToken)
 
-  def getTweetsDetails(ids: List[Long]): Map[Long, Option[TweetPopularity]] = {
+  def getTweetsPopularities(ids: List[Long]): Map[Long, Option[TweetPopularity]] = {
     try {
 
       val responseList: ResponseList[Status] = twitter.lookup(ids:_*)
 
-      val popularities = responseList
-        .map(status => (status.getId, Some(TweetPopularity(status.getRetweetCount, status.getFavoriteCount))))
-        .toMap
+      // Use of foreach instead of scala added functions to allow mocking
+      var popularities: mutable.Map[Long, Option[TweetPopularity]] = mutable.Map()
+      responseList.forEach(new Consumer[Status]() {
+          override def accept(status: Status): Unit = {
+            popularities += status.getId -> Some(TweetPopularity(status.getRetweetCount, status.getFavoriteCount))
+          }
+        })
 
       val originalNum = ids.size
       val retrievedNum = responseList.size()
       if (retrievedNum != originalNum) {
         println(s"WARN : Only $retrievedNum on $originalNum tweets could be retrieved.")
-        addMissingPopularities(ids, popularities)
+        addMissingPopularities(ids, popularities.toMap)
       } else {
-        popularities
+        popularities.toMap
       }
 
     } catch {

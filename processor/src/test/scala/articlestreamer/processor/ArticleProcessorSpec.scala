@@ -13,7 +13,6 @@ import org.hamcrest.Matchers.{any => _, _}
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito._
 import org.mockito.ArgumentMatchers._
-import org.scalatest.BeforeAndAfter
 import twitter4j.{Twitter, TwitterFactory}
 
 import scala.io.Source
@@ -21,7 +20,7 @@ import scala.io.Source
 /**
   * Created by sam on 16/10/2016.
   */
-class ArticleProcessorSpec extends BaseSpec with BeforeAndAfter with SharedSparkContext with DataFrameSuiteBase {
+class ArticleProcessorSpec extends BaseSpec with SharedSparkContext with DataFrameSuiteBase {
 
   class TestConfig extends ConfigLoader
   val config = new TestConfig

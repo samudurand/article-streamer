@@ -47,7 +47,7 @@ class NaiveTwitterScoreCalculator(configLoader: ConfigLoader, twitterService: Tw
   }
 
   override def updateScores(articlesById: Map[Long, TwitterArticle]): Traversable[TwitterArticle] = {
-    twitterService.getTweetsDetails(articlesById.keys.toList).map {
+    twitterService.getTweetsPopularities(articlesById.keys.toList).map {
       case (id, Some(details: TweetPopularity)) => {
         val article = articlesById(id)
         val updatedScore = calculateTweetScore(article, details)

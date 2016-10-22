@@ -13,7 +13,7 @@ import org.mockito.ArgumentMatchers._
 import org.scalatest.BeforeAndAfter
 
 
-class NaiveTwitterScoreCalculatorSpec extends BaseSpec with BeforeAndAfter {
+class NaiveTwitterScoreCalculatorSpec extends BaseSpec {
 
   class TestConfigLoader extends ConfigLoader
 
@@ -78,7 +78,7 @@ class NaiveTwitterScoreCalculatorSpec extends BaseSpec with BeforeAndAfter {
     val articles = Map(1l -> TwitterArticle("id1", "1", null, List(), "", Some(0)),
                        2l -> TwitterArticle("id2", "2", null, List(), "", Some(0)))
     val notPopular = TweetPopularity(0, 0)
-    when(twitterService.getTweetsDetails(any()))
+    when(twitterService.getTweetsPopularities(any()))
       .thenReturn(Map(1l -> Some(notPopular), 2l -> Some(notPopular)))
 
     val updateArticles = scoreCalculator.updateScores(articles)
@@ -91,7 +91,7 @@ class NaiveTwitterScoreCalculatorSpec extends BaseSpec with BeforeAndAfter {
                        2l -> TwitterArticle("id2", "2", null, List(), "", None))
     val notPopular = TweetPopularity(0, 0)
     val popular = TweetPopularity(100, 100)
-    when(twitterService.getTweetsDetails(any()))
+    when(twitterService.getTweetsPopularities(any()))
       .thenReturn(Map(1l -> Some(notPopular), 2l -> Some(popular)))
 
     val updatedArticles = scoreCalculator.updateScores(articles).toList
@@ -109,7 +109,7 @@ class NaiveTwitterScoreCalculatorSpec extends BaseSpec with BeforeAndAfter {
     val quitePopular = TweetPopularity(0, 10)
     val veryPopular = TweetPopularity(0, 1000)
 
-    when(twitterService.getTweetsDetails(any()))
+    when(twitterService.getTweetsPopularities(any()))
       .thenReturn(Map(1l -> Some(quitePopular), 2l -> Some(notPopular), 3l -> Some(veryPopular)))
 
     val updatedArticles = scoreCalculator.updateScores(articles).toList
@@ -128,7 +128,7 @@ class NaiveTwitterScoreCalculatorSpec extends BaseSpec with BeforeAndAfter {
     val quitePopular = TweetPopularity(20, 0)
     val veryPopular = TweetPopularity(500, 0)
 
-    when(twitterService.getTweetsDetails(any()))
+    when(twitterService.getTweetsPopularities(any()))
       .thenReturn(Map(1l -> Some(quitePopular), 2l -> Some(notPopular), 3l -> Some(veryPopular)))
 
     val updatedArticles = scoreCalculator.updateScores(articles).toList
@@ -147,7 +147,7 @@ class NaiveTwitterScoreCalculatorSpec extends BaseSpec with BeforeAndAfter {
     val popular2 = TweetPopularity(20, 10)
     val popular3 = TweetPopularity(100, 1)
 
-    when(twitterService.getTweetsDetails(any()))
+    when(twitterService.getTweetsPopularities(any()))
       .thenReturn(Map(1l -> Some(popular2), 2l -> Some(popular1), 3l -> Some(popular3)))
 
     val updatedArticles = scoreCalculator.updateScores(articles).toList
@@ -164,7 +164,7 @@ class NaiveTwitterScoreCalculatorSpec extends BaseSpec with BeforeAndAfter {
 
     val popular = TweetPopularity(100, 1)
 
-    when(twitterService.getTweetsDetails(any()))
+    when(twitterService.getTweetsPopularities(any()))
       .thenReturn(Map(2l -> Some(popular), 1l -> None, 3l -> None))
 
     val updatedArticles = scoreCalculator.updateScores(articles).toList

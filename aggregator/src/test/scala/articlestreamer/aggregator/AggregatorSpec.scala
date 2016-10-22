@@ -18,9 +18,8 @@ import org.mockito.ArgumentCaptor
 import twitter4j.{Status, URLEntity}
 import org.mockito.Mockito._
 import org.mockito.ArgumentMatchers._
-import org.scalatest.BeforeAndAfter
 
-class AggregatorSpec extends BaseSpec with BeforeAndAfter {
+class AggregatorSpec extends BaseSpec {
 
   val df: DateFormat = new SimpleDateFormat("dd-MM-yyyy")
   df.setTimeZone(TimeZone.getDefault)
