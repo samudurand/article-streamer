@@ -59,7 +59,7 @@ class TwitterService(config: ConfigLoader, twitterFactory: TwitterFactory) {
     popularities ++ missingPopularities
   }
 
-  def getTweetDetails(tweetId: Long): Option[TweetPopularity] = {
+  def getTweetPopularity(tweetId: Long): Option[TweetPopularity] = {
     try {
       val status: Status = twitter.showStatus(tweetId)
       Some(TweetPopularity(status.getRetweetCount, status.getFavoriteCount))

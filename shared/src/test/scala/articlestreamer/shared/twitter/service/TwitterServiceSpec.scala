@@ -9,8 +9,6 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Mockito._
 import org.mockito.ArgumentMatchers._
 import org.mockito.AdditionalAnswers._
-import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.Answer
 import twitter4j._
 
 class TwitterServiceSpec extends BaseSpec {
@@ -82,6 +80,25 @@ class TwitterServiceSpec extends BaseSpec {
     val results = twitterService.getTweetsPopularities(tweetsIds)
 
     results shouldBe empty
+  }
+
+  it should "retrieve a tweet details" in {
+    val status = buildStatus(1l, 10, 20)
+    when(twitter.showStatus(1l)).thenReturn(status)
+
+    val twitterService = new TwitterService(config, factory)
+    val result = twitterService.getTweetPopularity(1l)
+
+    result shouldBe Some(TweetPopularity(10, 20))
+  }
+
+  it should "fail to retrieve a tweet popularity" in {
+    when(twitter.showStatus(1l)).thenThrow(new RuntimeException)
+
+    val twitterService = new TwitterService(config, factory)
+    val result = twitterService.getTweetPopularity(1l)
+
+    result shouldBe None
   }
 
   def buildStatus(id: Long, rtCount: Int, favCount: Int): Status = {
