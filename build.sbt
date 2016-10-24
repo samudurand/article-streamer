@@ -1,7 +1,11 @@
 import com.heroku.sbt.HerokuPlugin.autoImport._
+import scoverage.ScoverageKeys._
 
 javaOptions ++= Seq("-Xms512M", "-Xmx2048M", "-XX:MaxPermSize=2048M", "-XX:+CMSClassUnloadingEnabled")
 parallelExecution in Test := false
+
+addCommandAlias("build-agg", ";project aggregator;clean;coverage;test;coverageReport")
+addCommandAlias("build-proc", ";project processor;clean;coverage;test;coverageReport")
 
 lazy val root = (project in file(".")).
   settings(Commons.settings: _*).
@@ -21,7 +25,7 @@ lazy val root = (project in file(".")).
     herokuProcessTypes in Compile := Map(
       "worker" -> "java -jar target/scala-2.11/article-streamer-assembly-1.0.0.jar")
 
-  ) dependsOn (aggregator) aggregate(aggregator)
+  ) dependsOn (aggregator % "test->test;compile->compile") aggregate(aggregator)
 
 lazy val aggregator = (project in file("aggregator")).
   settings(Commons.settings: _*).
@@ -34,9 +38,13 @@ lazy val aggregator = (project in file("aggregator")).
 
     libraryDependencies ++= Dependencies.commonDependencies,
     libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
-    libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion
+    libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion,
 
-  ) dependsOn shared
+    coverageEnabled := true,
+    coverageMinimum := 99,
+    coverageFailOnMinimum := true
+
+  ) dependsOn (shared % "test->test;compile->compile")
 
 lazy val processor = (project in file("processor")).
   settings(Commons.settings: _*).
@@ -51,9 +59,13 @@ lazy val processor = (project in file("processor")).
     libraryDependencies += "org.apache.spark" %% "spark-hive"       % "2.0.0" % "test",
 //    libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka-0-10" % "2.0.0",
     libraryDependencies += "org.scalaj"       %% "scalaj-http"      % "2.3.0",
-    libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion
+    libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion,
 
-  ) dependsOn shared
+    coverageEnabled := true,
+    coverageMinimum := 99,
+    coverageFailOnMinimum := true
+
+  ) dependsOn (shared % "test->test;compile->compile")
 
 lazy val shared = (project in file("shared")).
   settings(Commons.settings: _*).

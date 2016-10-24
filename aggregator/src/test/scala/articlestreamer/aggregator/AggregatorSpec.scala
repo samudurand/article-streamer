@@ -2,22 +2,21 @@ package articlestreamer.aggregator
 
 import java.text.{DateFormat, SimpleDateFormat}
 import java.util.TimeZone
-import java.util.concurrent.Future
 
 import articlestreamer.aggregator.kafka.KafkaProducerWrapper
 import articlestreamer.aggregator.twitter.{TwitterStreamer, TwitterStreamerFactory}
+import articlestreamer.shared.BaseSpec
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.model.TwitterArticle
-import articlestreamer.shared.BaseSpec
 import articlestreamer.shared.scoring.TwitterScoreCalculator
-import org.apache.kafka.clients.producer.{ProducerRecord, RecordMetadata}
+import org.apache.kafka.clients.producer.ProducerRecord
 import org.json4s._
 import org.json4s.jackson.Serialization
 import org.json4s.jackson.Serialization.read
 import org.mockito.ArgumentCaptor
-import twitter4j.{Status, URLEntity}
-import org.mockito.Mockito._
 import org.mockito.ArgumentMatchers._
+import org.mockito.Mockito._
+import twitter4j.{Status, URLEntity}
 
 class AggregatorSpec extends BaseSpec {
 
