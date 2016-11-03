@@ -7,10 +7,10 @@ import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.exception.exceptions._
 import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.scoring.TwitterScoreCalculator
-
-import scala.concurrent.duration._
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.Dataset
+
+import scala.concurrent.duration._
 
 class ArticleProcessor(config: ConfigLoader,
                        consumer: KafkaConsumerWrapper,
@@ -22,27 +22,30 @@ class ArticleProcessor(config: ConfigLoader,
   def run() {
 
     val records = getRecordsFromSource
+    val articles = parseArticles(records)
+    val updatedArticles = processScores(articles)
 
+    updatedArticles.sortBy(a => a.score)
+      .foreach(a => println(s"Article ${a.originalId} \nScore : ${a.score} \nContent : ${a.content} \n"))
+  }
+
+  def parseArticles(records: List[String]): List[TwitterArticle] = {
     val sparkSession = sparkSessionProvider.getSparkSession()
     import sparkSession.implicits._
 
     val recordsDs: Dataset[String] = sparkSession.createDataset(records)
 
-    val articles = recordsDs.map { record =>
-      val maybeArticle = unmarshallTwitterArticle(record)
-      if (maybeArticle.isEmpty) {
-        System.err.println(s"Could not parse record $record into an article.")
+    recordsDs
+      .map { record =>
+        val maybeArticle = unmarshallTwitterArticle(record)
+        if (maybeArticle.isEmpty) {
+          System.err.println(s"Could not parse record $record into an article.")
+        }
+        maybeArticle
       }
-      maybeArticle
-    }
-    .filter(_.isDefined)
-    .map(_.get)
-    .collect().toList
-
-    val updatedArticles = processScores(articles)
-
-    updatedArticles.sortBy(a => a.score)
-      .foreach(a => println(s"Article ${a.originalId} \nScore : ${a.score} \nContent : ${a.content} \n"))
+      .filter(_.isDefined)
+      .map(_.get)
+      .collect().toList
   }
 
   private def getRecordsFromSource: List[String] = {
