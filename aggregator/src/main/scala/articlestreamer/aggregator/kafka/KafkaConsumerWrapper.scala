@@ -6,29 +6,24 @@ import java.util.Properties
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.kafka.KafkaConsumerFactory
 import org.apache.kafka.clients.CommonClientConfigs
-import org.apache.kafka.clients.consumer.{ConsumerConfig, KafkaConsumer}
+import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.config.SslConfigs
 
-import scala.collection.JavaConversions._
 import scala.concurrent.duration.Duration
 
-class KafkaConsumerWrapper(config: ConfigLoader) {
+class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaConsumerFactory[String, AnyRef]) {
 
-  val topic = config.kafkaMainTopic
+  private val topic = config.kafkaMainTopic
 
-  private val consumer = new KafkaConsumer[String, AnyRef](KafkaConsumerWrapper.getProperties(config))
-
+  private val consumer = factory.getConsumer(KafkaConsumerWrapper.getProperties(config))
   consumer.subscribe(util.Arrays.asList(topic))
 
   def poll(duration: Duration, count: Int): Unit = {
     val millis = duration.toMillis
-    val res = (1 to count)
-      .flatMap( _ => {
-        val l = consumer.poll(millis)
-        println("new record : " + l.mkString)
-        l
-      })
-      .foreach(total => println("total : " + total))
+    for(x <- 1 to count) {
+      val l = consumer.poll(millis)
+      println("new record : " + l.toString)
+    }
   }
 
   def stopConsumer() = {
