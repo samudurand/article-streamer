@@ -44,14 +44,17 @@ class AggregatorSpec extends BaseSpec {
   "Every received tweet" should "be converted to an article and send to kafka" in {
     when(scoreCalculator.calculateBaseScore(any())).thenReturn(10)
 
+    val uRLEntity = mock(classOf[URLEntity])
+    when(uRLEntity.getURL).thenReturn("http://anyurl.com")
+
     val tweetHandler = captureTweetHandler()
 
     val status = mock(classOf[Status])
     val date = df.parse("01-01-2000")
-    when(status.getCreatedAt()).thenReturn(date)
-    when(status.getURLEntities()).thenReturn(List[URLEntity]().toArray)
-    when(status.getId()).thenReturn(1000l)
-    when(status.getText()).thenReturn("some content")
+    when(status.getCreatedAt).thenReturn(date)
+    when(status.getURLEntities).thenReturn(List[URLEntity](uRLEntity).toArray)
+    when(status.getId).thenReturn(1000l)
+    when(status.getText).thenReturn("some content")
 
     val captor: ArgumentCaptor[ProducerRecord[String, String]]  = ArgumentCaptor.forClass(classOf[ProducerRecord[String, String]])
     when(kafkaWrapper.send(captor.capture())).thenReturn(null)
@@ -63,6 +66,7 @@ class AggregatorSpec extends BaseSpec {
     recordSent.content shouldBe "some content"
     recordSent.originalId shouldBe "1000"
     recordSent.score shouldBe Some(10)
+    recordSent.links shouldBe List("http://anyurl.com")
   }
 
   def captureTweetHandler(): (Status) => Unit = {

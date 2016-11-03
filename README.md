@@ -49,3 +49,13 @@ Stop the Aggregator
 
 ```$ heroku ps:scale worker=0``` 
 
+# Testing
+
+To run the aggregator tests and generate the coverage report
+
+```$ sbt "project aggregator" clean coverage test coverageReport```
+
+To run the processor tests and generate the coverage report
+
+```$ sbt "project processor" clean coverage test coverageReport```
+  
