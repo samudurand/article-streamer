@@ -33,7 +33,7 @@ class AggregatorSpec extends BaseSpec {
 
   "Aggregator when started" should "begin streaming" in {
     val factory = mock(classOf[TwitterStreamerFactory])
-    when(factory.getStreamer(any(), any(), any()))thenReturn(streamer)
+    when(factory.getStreamer(any(), any(), any())).thenReturn(streamer)
 
     val aggregator = new Aggregator(config, kafkaWrapper, scoreCalculator, factory)
     aggregator.run()

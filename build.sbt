@@ -42,7 +42,8 @@ lazy val aggregator = (project in file("aggregator")).
 
     coverageEnabled := true,
     coverageMinimum := 99,
-    coverageFailOnMinimum := true
+    coverageFailOnMinimum := true,
+    coverageExcludedPackages := ".*BasicConsumer;.*MainApp"
 
   ) dependsOn (shared % "test->test;compile->compile")
 
