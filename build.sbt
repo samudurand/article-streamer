@@ -1,8 +1,10 @@
 import com.heroku.sbt.HerokuPlugin.autoImport._
+import sbt.Keys._
 import scoverage.ScoverageKeys._
 
 javaOptions ++= Seq("-Xms512M", "-Xmx2048M", "-XX:MaxPermSize=2048M", "-XX:+CMSClassUnloadingEnabled")
 parallelExecution in Test := false
+cleanKeepFiles ++= Seq("resolution-cache", "streams").map(target.value / _)
 
 addCommandAlias("build-agg", ";project aggregator;clean;coverage;test;coverageReport")
 addCommandAlias("build-proc", ";project processor;clean;coverage;test;coverageReport")
@@ -40,9 +42,6 @@ lazy val aggregator = (project in file("aggregator")).
     libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
     libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion,
 
-    coverageEnabled := true,
-    coverageMinimum := 99,
-    coverageFailOnMinimum := true,
     coverageExcludedPackages := ".*BasicConsumer;.*MainApp"
 
   ) dependsOn (shared % "test->test;compile->compile")
@@ -60,11 +59,7 @@ lazy val processor = (project in file("processor")).
     libraryDependencies += "org.apache.spark" %% "spark-hive"       % "2.0.0" % "test",
 //    libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka-0-10" % "2.0.0",
     libraryDependencies += "org.scalaj"       %% "scalaj-http"      % "2.3.0",
-    libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion,
-
-    coverageEnabled := true,
-    coverageMinimum := 99,
-    coverageFailOnMinimum := true
+    libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion
 
   ) dependsOn (shared % "test->test;compile->compile")
 
@@ -76,4 +71,5 @@ lazy val shared = (project in file("shared")).
     libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
     libraryDependencies ++= Dependencies.commonDependencies,
     libraryDependencies += "org.twitter4j" % "twitter4j-stream" % Dependencies.twitter4JVersion
+
   )

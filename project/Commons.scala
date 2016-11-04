@@ -1,5 +1,6 @@
 import sbt._
 import Keys._
+import scoverage.ScoverageKeys._
 
 object Commons {
   val appVersion = "1.0.0"
@@ -10,6 +11,12 @@ object Commons {
 
   val settings: Seq[Def.Setting[_]] = Seq(
     version := appVersion,
-    scalaVersion := scalaV
+    scalaVersion := scalaV,
+
+    coverageEnabled := true,
+    coverageMinimum := 95,
+    coverageFailOnMinimum := true,
+
+    cleanKeepFiles ++= Seq("resolution-cache", "streams").map(target.value / _)
   )
 }

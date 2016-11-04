@@ -3,14 +3,15 @@ package articlestreamer.aggregator.kafka
 import java.util.Properties
 
 import articlestreamer.shared.configuration.ConfigLoader
+import articlestreamer.shared.kafka.KafkaProducerFactory
 import org.apache.kafka.clients.CommonClientConfigs
-import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
+import org.apache.kafka.clients.producer.{ProducerConfig, ProducerRecord}
 import org.apache.kafka.common.config.SslConfigs
 
 
-class KafkaProducerWrapper(config: ConfigLoader) {
+class KafkaProducerWrapper(config: ConfigLoader, factory: KafkaProducerFactory[String, String]) {
 
-  private val producer = new KafkaProducer[String, String](KafkaProducerWrapper.getProperties(config))
+  private val producer = factory.getProducer(KafkaProducerWrapper.getProperties(config))
 
   def send(record: ProducerRecord[String, String]) = producer.send(record, new RecordCallback)
 
