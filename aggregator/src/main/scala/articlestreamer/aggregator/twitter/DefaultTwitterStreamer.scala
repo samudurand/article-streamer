@@ -10,7 +10,7 @@ case class DefaultTwitterStreamer(config: ConfigLoader,
 
   val stream = new TwitterStreamFactory(TwitterAuthorizationConfig.getTwitterConfig(config)).getInstance
 
-  def simpleStatusListener = new StatusListener() {
+  def statusListener = new StatusListener() {
     def onStatus(status: Status) = onStatusFct(status)
     def onDeletionNotice(statusDeletionNotice: StatusDeletionNotice) {}
     def onTrackLimitationNotice(numberOfLimitedStatuses: Int) {println("limitation : " + numberOfLimitedStatuses)}
@@ -21,7 +21,7 @@ case class DefaultTwitterStreamer(config: ConfigLoader,
 
   override def startStreaming() = {
     println("Twitter Streamer : Starting streaming")
-    stream.addListener(simpleStatusListener)
+    stream.addListener(statusListener)
     stream.filter(new FilterQuery().track(config.twitterSearchConfig.mainTag))
     println("Twitter Streamer : Streaming started")
   }

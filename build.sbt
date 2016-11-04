@@ -44,7 +44,7 @@ lazy val aggregator = (project in file("aggregator")).
     libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
     libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion,
 
-    coverageExcludedPackages := ".*BasicConsumer;.*MainApp"
+    coverageExcludedPackages := ".*BasicConsumer;.*MainApp;.*DefaultTwitterStreamer"
 
   ) dependsOn (shared % "test->test;compile->compile")
 
