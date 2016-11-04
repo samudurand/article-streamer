@@ -21,9 +21,12 @@ class KafkaProducerWrapper(config: ConfigLoader, factory: KafkaProducerFactory[S
 
 }
 
-object KafkaProducerWrapper extends ConfigLoader {
+object KafkaProducerWrapper {
 
-  def getProperties(configLoader: ConfigLoader): Properties = {
+  def getProperties(config: ConfigLoader): Properties = {
+
+    import config._
+
     val properties = new Properties()
     properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBrokers)
     properties.put(ProducerConfig.ACKS_CONFIG, "all")

@@ -4,7 +4,7 @@ import java.text.{DateFormat, SimpleDateFormat}
 import java.util.TimeZone
 
 import articlestreamer.aggregator.kafka.KafkaProducerWrapper
-import articlestreamer.aggregator.twitter.{TwitterStreamer, TwitterStreamerFactory}
+import articlestreamer.aggregator.twitter.{TwitterStreamer, DefaultTwitterStreamerFactory}
 import articlestreamer.shared.BaseSpec
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.model.TwitterArticle
@@ -32,7 +32,7 @@ class AggregatorSpec extends BaseSpec {
   val streamer = mock(classOf[TwitterStreamer])
 
   "Aggregator when started" should "begin streaming" in {
-    val factory = mock(classOf[TwitterStreamerFactory])
+    val factory = mock(classOf[DefaultTwitterStreamerFactory])
     when(factory.getStreamer(any(), any(), any())).thenReturn(streamer)
 
     val aggregator = new Aggregator(config, kafkaWrapper, scoreCalculator, factory)
@@ -71,7 +71,7 @@ class AggregatorSpec extends BaseSpec {
 
   def captureTweetHandler(): (Status) => Unit = {
     val captor = ArgumentCaptor.forClass(classOf[(Status) => Unit])
-    val factory = mock(classOf[TwitterStreamerFactory])
+    val factory = mock(classOf[DefaultTwitterStreamerFactory])
     when(factory.getStreamer(any(), captor.capture(), any())).thenReturn(streamer)
 
     val aggregator = new Aggregator(config, kafkaWrapper, scoreCalculator, factory)

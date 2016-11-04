@@ -1,7 +1,7 @@
 package articlestreamer.aggregator
 
 import articlestreamer.aggregator.kafka.KafkaProducerWrapper
-import articlestreamer.aggregator.twitter.TwitterStreamerFactory
+import articlestreamer.aggregator.twitter.DefaultTwitterStreamerFactory
 import articlestreamer.shared.configuration.DefaultConfigLoader
 import articlestreamer.shared.kafka.KafkaProducerFactory
 import articlestreamer.shared.scoring.NaiveTwitterScoreCalculator
@@ -20,7 +20,7 @@ object MainApp extends App {
     lazy val config = wire[DefaultConfigLoader]
     lazy val producerFactory = wire[KafkaProducerFactory[String, String]]
     lazy val producer = wire[KafkaProducerWrapper]
-    lazy val streamFactory = new TwitterStreamerFactory
+    lazy val streamFactory = new DefaultTwitterStreamerFactory
     lazy val twitterService = wire[TwitterService]
     lazy val scoreCalculator = wire[NaiveTwitterScoreCalculator]
 

@@ -3,9 +3,11 @@ import sbt.Keys._
 import scoverage.ScoverageKeys._
 
 javaOptions ++= Seq("-Xms512M", "-Xmx2048M", "-XX:MaxPermSize=2048M", "-XX:+CMSClassUnloadingEnabled")
-parallelExecution in Test := false
+
+// Prevent reloading dependencies after each `clean`
 cleanKeepFiles ++= Seq("resolution-cache", "streams").map(target.value / _)
 
+// Build with tests and coverage
 addCommandAlias("build-agg", ";project aggregator;clean;coverage;test;coverageReport")
 addCommandAlias("build-proc", ";project processor;clean;coverage;test;coverageReport")
 

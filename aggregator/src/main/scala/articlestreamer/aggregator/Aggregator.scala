@@ -4,7 +4,7 @@ import java.sql.Timestamp
 import java.util.UUID
 
 import articlestreamer.aggregator.kafka.KafkaProducerWrapper
-import articlestreamer.aggregator.twitter.TwitterStreamerFactory
+import articlestreamer.aggregator.twitter.{DefaultTwitterStreamerFactory, TwitterStreamerFactory}
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.scoring.TwitterScoreCalculator
