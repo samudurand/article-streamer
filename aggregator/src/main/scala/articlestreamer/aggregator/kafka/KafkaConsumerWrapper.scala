@@ -22,7 +22,7 @@ class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaConsumerFactory[S
     val millis = duration.toMillis
     for(x <- 1 to count) {
       val l = consumer.poll(millis)
-      println("new record : " + l.toString)
+      println(s"new ${l.count()} records : ${l.records(topic)}")
     }
   }
 

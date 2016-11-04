@@ -5,6 +5,7 @@ import articlestreamer.processor.marshalling.TwitterMarshaller.unmarshallTwitter
 import articlestreamer.processor.spark.SparkSessionProvider
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.exception.exceptions._
+import articlestreamer.shared.marshalling.CustomJsonFormats
 import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.scoring.TwitterScoreCalculator
 import org.apache.log4j.{Level, Logger}

@@ -1,8 +1,6 @@
 package articlestreamer.shared.model
 
-import java.sql.Timestamp
-import java.time.LocalDate
-import java.util.UUID
+import java.sql.Date
 
 import articlestreamer.shared.model.ArticleSource.ArticleSource
 
@@ -19,7 +17,7 @@ sealed trait Article
 class BaseArticle(id: String,
                   source: ArticleSource,
                   originalId: String,
-                  publicationDate: Timestamp,
+                  publicationDate: Date,
                   score: Option[Int]) extends Article
 
 /**
@@ -29,7 +27,7 @@ class BaseArticle(id: String,
  */
 case class TwitterArticle(id: String,
                           originalId: String,
-                          publicationDate: Timestamp,
+                          publicationDate: Date,
                           links: Seq[String],
                           content: String,
                           score: Option[Int])

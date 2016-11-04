@@ -1,23 +1,22 @@
 package articlestreamer.aggregator
 
-import java.sql.Timestamp
+import java.sql.Date
 import java.util.UUID
 
 import articlestreamer.aggregator.kafka.KafkaProducerWrapper
-import articlestreamer.aggregator.twitter.{DefaultTwitterStreamerFactory, TwitterStreamerFactory}
+import articlestreamer.aggregator.twitter.TwitterStreamerFactory
 import articlestreamer.shared.configuration.ConfigLoader
+import articlestreamer.shared.marshalling.CustomJsonFormats
 import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.scoring.TwitterScoreCalculator
 import org.apache.kafka.clients.producer._
-import org.json4s._
-import org.json4s.jackson.Serialization
 import org.json4s.jackson.Serialization.write
 import twitter4j.Status
 
 class Aggregator(config: ConfigLoader,
                  producer: KafkaProducerWrapper,
                  scoreCalculator: TwitterScoreCalculator,
-                 streamer: TwitterStreamerFactory) {
+                 streamer: TwitterStreamerFactory) extends CustomJsonFormats {
 
   def run() {
 
@@ -42,8 +41,6 @@ class Aggregator(config: ConfigLoader,
 
       val article = convertToArticle(status)
 
-      implicit val formats = Serialization.formats(NoTypeHints)
-
       val record = new ProducerRecord[String, String](
         config.kafkaMainTopic,
         s"tweet${status.getId}",
@@ -62,7 +59,7 @@ class Aggregator(config: ConfigLoader,
     val article = TwitterArticle(
       UUID.randomUUID().toString,
       String.valueOf(status.getId),
-      new Timestamp(status.getCreatedAt.getTime),
+      new Date(status.getCreatedAt.getTime),
       urls,
       status.getText,
       None)
