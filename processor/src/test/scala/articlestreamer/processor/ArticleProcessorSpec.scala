@@ -43,17 +43,31 @@ class ArticleProcessorSpec extends BaseSpec with SharedSparkContext with DataFra
 
   it should "retrieve articles and update scores" in {
     val tweet1 = Source.fromURL(getClass.getResource("/data/twitter-article.json")).mkString
-    when(consumer.poll(any(), any())).thenReturn(List(tweet1))
+    val tweet2 = Source.fromURL(getClass.getResource("/data/twitter-article-2.json")).mkString
+    when(consumer.poll(any(), any())).thenReturn(List(tweet1, tweet2))
 
+    val article = TwitterArticle("", "", null, List(), "", Some(10))
+    val article2 = TwitterArticle("", "", null, List(), "", Some(20))
     val mapCaptor: ArgumentCaptor[Map[Long, TwitterArticle]] = ArgumentCaptor.forClass(classOf[Map[Long, TwitterArticle]])
-    when(scoreCalculator.updateScores(mapCaptor.capture())).thenReturn(List())
+    when(scoreCalculator.updateScores(mapCaptor.capture())).thenReturn(List(article, article2))
 
     val processor = new ArticleProcessor(config, consumer, scoreCalculator, ssProvider)
     processor.run()
 
     val processedArticles = mapCaptor.getValue
-    processedArticles should have size 1
+    processedArticles should have size 2
     processedArticles(789070025009336320l).id shouldBe "00000000-0000-0000-0000-000000000001"
+    processedArticles(789070025044436320l).id shouldBe "00000000-0000-0000-0000-000000000002"
+  }
+
+  it should "fail to retrieve any scores" in {
+    val tweet1 = Source.fromURL(getClass.getResource("/data/twitter-article.json")).mkString
+    when(consumer.poll(any(), any())).thenReturn(List(tweet1))
+
+    when(scoreCalculator.updateScores(any())).thenThrow(new RuntimeException())
+
+    val processor = new ArticleProcessor(config, consumer, scoreCalculator, ssProvider)
+    processor.run()
   }
 
   def extractArticles[T](captor: ArgumentCaptor[Map[Long, T]]): Iterable[T] = {

@@ -25,7 +25,7 @@ class ArticleProcessor(config: ConfigLoader,
     val articles = parseArticles(records)
     val updatedArticles = processScores(articles)
 
-    updatedArticles.sortBy(a => a.score)
+    updatedArticles.sortBy(a => a.score.get)
       .foreach(a => println(s"Article ${a.originalId} \nScore : ${a.score} \nContent : ${a.content} \n"))
   }
 

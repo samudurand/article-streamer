@@ -61,9 +61,11 @@ lazy val processor = (project in file("processor")).
     libraryDependencies += "org.apache.spark" %% "spark-hive"       % "2.0.0" % "test",
 //    libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka-0-10" % "2.0.0",
     libraryDependencies += "org.scalaj"       %% "scalaj-http"      % "2.3.0",
-    libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion
+    libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion,
 
-  ) dependsOn (shared % "test->test;compile->compile")
+    coverageExcludedPackages := ".*OnDemandSparkSessionProvider;.*MainApp"
+
+) dependsOn (shared % "test->test;compile->compile")
 
 lazy val shared = (project in file("shared")).
   settings(Commons.settings: _*).
