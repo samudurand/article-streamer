@@ -37,6 +37,7 @@ class ArticleProcessor(config: ConfigLoader,
 
     recordsDs
       .map { record =>
+        println("parsing article : " + record.mkString)
         val maybeArticle = unmarshallTwitterArticle(record)
         if (maybeArticle.isEmpty) {
           System.err.println(s"Could not parse record $record into an article.")
@@ -57,6 +58,7 @@ class ArticleProcessor(config: ConfigLoader,
   private def processScores(articles: List[TwitterArticle]): List[TwitterArticle] = {
     try {
 
+      println("articles :  " + articles.mkString)
       val articlesById = articles.map(article => (article.originalId.toLong, article)).toMap
 
       articlesById

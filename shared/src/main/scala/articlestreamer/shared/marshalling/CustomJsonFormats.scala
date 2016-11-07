@@ -4,6 +4,7 @@ import java.sql.Date
 import java.text.SimpleDateFormat
 import java.util.TimeZone
 
+import articlestreamer.shared.exception.exceptions._
 import org.json4s.{CustomSerializer, NoTypeHints, native}
 import org.json4s.JsonAST.{JNull, JString}
 
@@ -14,7 +15,16 @@ trait CustomJsonFormats {
 
   case object DateSerializer extends CustomSerializer[java.sql.Date](format => (
     {
-      case JString(s) => new Date(df.parse(s).getTime)
+      case JString(s) => {
+        try {
+          new Date(df.parse(s).getTime)
+        } catch {
+          case ex: Throwable => {
+            System.err.println(s"Error while parsing date : ${ex.getStackTraceAsString}")
+            null
+          }
+        }
+      }
       case JNull => null
     },
     {

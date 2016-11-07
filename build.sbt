@@ -4,6 +4,9 @@ import scoverage.ScoverageKeys._
 
 javaOptions ++= Seq("-Xms512M", "-Xmx2048M", "-XX:MaxPermSize=2048M", "-XX:+CMSClassUnloadingEnabled")
 
+// Necessary for using
+parallelExecution in Test := false
+
 // Prevent reloading dependencies after each `clean`
 cleanKeepFiles ++= Seq("resolution-cache", "streams").map(target.value / _)
 
@@ -15,6 +18,9 @@ lazy val root = (project in file(".")).
   settings(Commons.settings: _*).
   settings(
     name := "article-streamer",
+
+    // Necessary for using
+    parallelExecution in Test := false,
 
     // sbt-assembly for FatJar generation
     mainClass in assembly <<= (mainClass in assembly in aggregator),
@@ -53,6 +59,7 @@ lazy val processor = (project in file("processor")).
   settings(
     name := "processor",
 
+    // Necessary for using
     parallelExecution in Test := false,
 
     libraryDependencies ++= Dependencies.commonDependencies,
@@ -64,6 +71,7 @@ lazy val processor = (project in file("processor")).
 //    libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka-0-10" % "2.0.0",
     libraryDependencies += "org.scalaj"       %% "scalaj-http"      % "2.3.0",
     libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion,
+    libraryDependencies += "com.holdenkarau" %% "spark-testing-base" % "2.0.0_0.4.7" % "test",
 
     coverageExcludedPackages := ".*OnDemandSparkSessionProvider;.*MainApp"
 
@@ -73,6 +81,9 @@ lazy val shared = (project in file("shared")).
   settings(Commons.settings: _*).
   settings(
     name := "shared",
+
+    // Necessary for using
+    parallelExecution in Test := false,
 
     libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
     libraryDependencies ++= Dependencies.commonDependencies,

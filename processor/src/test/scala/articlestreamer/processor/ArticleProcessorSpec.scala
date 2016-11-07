@@ -1,18 +1,18 @@
 package articlestreamer.processor
 
+import java.sql.Date
+
 import articlestreamer.processor.kafka.KafkaConsumerWrapper
 import articlestreamer.processor.spark.SparkSessionProvider
 import articlestreamer.shared.BaseSpec
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.scoring.{NaiveTwitterScoreCalculator, TwitterScoreCalculator}
-import articlestreamer.shared.twitter.service.TwitterService
 import com.holdenkarau.spark.testing.{DataFrameSuiteBase, SharedSparkContext}
-import org.hamcrest.Matchers
-import org.hamcrest.Matchers.{any => _, _}
+import org.hamcrest.Matchers.{any => _}
 import org.mockito.ArgumentCaptor
-import org.mockito.Mockito._
 import org.mockito.ArgumentMatchers._
+import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import twitter4j.{Twitter, TwitterFactory}
 
@@ -47,8 +47,8 @@ class ArticleProcessorSpec extends BaseSpec with SharedSparkContext with DataFra
     val tweet2 = Source.fromURL(getClass.getResource("/data/twitter-article-2.json")).mkString
     when(consumer.poll(any(), any())).thenReturn(List(tweet1, tweet2))
 
-    val article = TwitterArticle("00000000-0000-0000-0000-000000000001", "789070025009336320", null, List(), "", Some(10))
-    val article2 = TwitterArticle("00000000-0000-0000-0000-000000000002", "789070025044436320", null, List(), "", Some(20))
+    val article = TwitterArticle("00000000-0000-0000-0000-000000000001", "789070025009336320", new Date(123456789l), List(), "", Some(10))
+    val article2 = TwitterArticle("00000000-0000-0000-0000-000000000002", "789070025044436320", new Date(123456789l), List(), "", Some(20))
     val mapCaptor: ArgumentCaptor[Map[Long, TwitterArticle]] = ArgumentCaptor.forClass(classOf[Map[Long, TwitterArticle]])
     when(scoreCalculator.updateScores(mapCaptor.capture())).thenReturn(List(article, article2))
 

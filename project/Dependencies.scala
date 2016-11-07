@@ -16,7 +16,6 @@ object Dependencies {
 
     "org.scalatest" % "scalatest_2.11" % "3.0.0" % "test",
     "org.mockito" % "mockito-core" % "2.2.1" % "test",
-    "com.holdenkarau" %% "spark-testing-base" % "2.0.0_0.4.7" % "test",
     "org.hamcrest" % "hamcrest-all" % "1.3" % "test"
 
   )
