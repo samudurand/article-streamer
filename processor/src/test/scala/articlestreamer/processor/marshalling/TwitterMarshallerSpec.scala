@@ -1,11 +1,9 @@
 package articlestreamer.processor.marshalling
 
-import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.TimeZone
 
 import articlestreamer.shared.BaseSpec
-import articlestreamer.shared.marshalling.CustomJsonFormats
 
 import scala.io.Source
 
