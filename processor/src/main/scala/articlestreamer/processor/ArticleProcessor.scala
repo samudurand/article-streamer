@@ -35,7 +35,7 @@ class ArticleProcessor(config: ConfigLoader,
 
     val recordsDs: Dataset[String] = sparkSession.createDataset(records)
 
-    val temp = recordsDs
+    recordsDs
       .map { record =>
         val maybeArticle = unmarshallTwitterArticle(record)
         if (maybeArticle.isEmpty) {
@@ -43,10 +43,6 @@ class ArticleProcessor(config: ConfigLoader,
         }
         maybeArticle
       }
-
-      val temp2 = temp.collect()
-
-      temp
       .filter(_.isDefined)
       .map(_.get)
       .collect().toList
