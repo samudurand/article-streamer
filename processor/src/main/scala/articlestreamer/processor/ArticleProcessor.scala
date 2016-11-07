@@ -37,7 +37,6 @@ class ArticleProcessor(config: ConfigLoader,
 
     recordsDs
       .map { record =>
-        println("parsing article : " + record.mkString)
         val maybeArticle = unmarshallTwitterArticle(record)
         if (maybeArticle.isEmpty) {
           System.err.println(s"Could not parse record $record into an article.")

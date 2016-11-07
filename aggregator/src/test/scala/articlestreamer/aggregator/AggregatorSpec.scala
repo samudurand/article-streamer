@@ -59,7 +59,6 @@ class AggregatorSpec extends BaseSpec with CustomJsonFormats {
 
     tweetHandler(status)
 
-    implicit val formats = Serialization.formats(NoTypeHints)
     val recordSent: TwitterArticle = read[TwitterArticle](captor.getValue().value())
     recordSent.content shouldBe "some content"
     recordSent.originalId shouldBe "1000"
