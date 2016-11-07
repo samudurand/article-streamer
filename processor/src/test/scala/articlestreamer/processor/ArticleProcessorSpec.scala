@@ -13,6 +13,7 @@ import org.hamcrest.Matchers.{any => _, _}
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito._
 import org.mockito.ArgumentMatchers._
+import org.scalatest.BeforeAndAfter
 import twitter4j.{Twitter, TwitterFactory}
 
 import scala.io.Source
@@ -20,7 +21,7 @@ import scala.io.Source
 /**
   * Created by sam on 16/10/2016.
   */
-class ArticleProcessorSpec extends BaseSpec with SharedSparkContext with DataFrameSuiteBase {
+class ArticleProcessorSpec extends BaseSpec with SharedSparkContext with DataFrameSuiteBase  with BeforeAndAfter {
 
   class TestConfig extends ConfigLoader
   val config = new TestConfig
@@ -46,8 +47,8 @@ class ArticleProcessorSpec extends BaseSpec with SharedSparkContext with DataFra
     val tweet2 = Source.fromURL(getClass.getResource("/data/twitter-article-2.json")).mkString
     when(consumer.poll(any(), any())).thenReturn(List(tweet1, tweet2))
 
-    val article = TwitterArticle("", "", null, List(), "", Some(10))
-    val article2 = TwitterArticle("", "", null, List(), "", Some(20))
+    val article = TwitterArticle("00000000-0000-0000-0000-000000000001", "789070025009336320", null, List(), "", Some(10))
+    val article2 = TwitterArticle("00000000-0000-0000-0000-000000000002", "789070025044436320", null, List(), "", Some(20))
     val mapCaptor: ArgumentCaptor[Map[Long, TwitterArticle]] = ArgumentCaptor.forClass(classOf[Map[Long, TwitterArticle]])
     when(scoreCalculator.updateScores(mapCaptor.capture())).thenReturn(List(article, article2))
 

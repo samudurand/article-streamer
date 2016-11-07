@@ -9,9 +9,10 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Mockito._
 import org.mockito.ArgumentMatchers._
 import org.mockito.AdditionalAnswers._
+import org.scalatest.BeforeAndAfter
 import twitter4j._
 
-class TwitterServiceSpec extends BaseSpec {
+class TwitterServiceSpec extends BaseSpec  with BeforeAndAfter{
 
   class TestConfig extends ConfigLoader
   val config = new TestConfig

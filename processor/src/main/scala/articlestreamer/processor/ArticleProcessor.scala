@@ -5,7 +5,6 @@ import articlestreamer.processor.marshalling.TwitterMarshaller.unmarshallTwitter
 import articlestreamer.processor.spark.SparkSessionProvider
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.exception.exceptions._
-import articlestreamer.shared.marshalling.CustomJsonFormats
 import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.scoring.TwitterScoreCalculator
 import org.apache.log4j.{Level, Logger}
@@ -36,7 +35,7 @@ class ArticleProcessor(config: ConfigLoader,
 
     val recordsDs: Dataset[String] = sparkSession.createDataset(records)
 
-    recordsDs
+    val temp = recordsDs
       .map { record =>
         val maybeArticle = unmarshallTwitterArticle(record)
         if (maybeArticle.isEmpty) {
@@ -44,6 +43,10 @@ class ArticleProcessor(config: ConfigLoader,
         }
         maybeArticle
       }
+
+      val temp2 = temp.collect()
+
+      temp
       .filter(_.isDefined)
       .map(_.get)
       .collect().toList

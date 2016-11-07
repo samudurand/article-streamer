@@ -12,7 +12,7 @@ object TwitterMarshaller extends Serializable with CustomJsonFormats {
     try {
       Some(read[TwitterArticle](articleJson))
     } catch {
-      case ex: Exception => {
+      case ex: Throwable => {
         System.err.println(s"Failed to parse article, exception thrown. \n ${ex.getStackTraceAsString}")
         None
       }

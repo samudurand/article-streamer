@@ -4,9 +4,10 @@ import java.text.{DateFormat, SimpleDateFormat}
 import java.util.TimeZone
 
 import articlestreamer.aggregator.kafka.KafkaProducerWrapper
-import articlestreamer.aggregator.twitter.{TwitterStreamer, DefaultTwitterStreamerFactory}
+import articlestreamer.aggregator.twitter.{DefaultTwitterStreamerFactory, TwitterStreamer}
 import articlestreamer.shared.BaseSpec
 import articlestreamer.shared.configuration.ConfigLoader
+import articlestreamer.shared.marshalling.CustomJsonFormats
 import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.scoring.TwitterScoreCalculator
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -18,10 +19,7 @@ import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import twitter4j.{Status, URLEntity}
 
-class AggregatorSpec extends BaseSpec {
-
-  val df: DateFormat = new SimpleDateFormat("dd-MM-yyyy")
-  df.setTimeZone(TimeZone.getDefault)
+class AggregatorSpec extends BaseSpec with CustomJsonFormats {
 
   class TestConfig extends ConfigLoader
 
@@ -50,7 +48,7 @@ class AggregatorSpec extends BaseSpec {
     val tweetHandler = captureTweetHandler()
 
     val status = mock(classOf[Status])
-    val date = df.parse("01-01-2000")
+    val date = df.parse("01-01-2000 00:00:00")
     when(status.getCreatedAt).thenReturn(date)
     when(status.getURLEntities).thenReturn(List[URLEntity](uRLEntity).toArray)
     when(status.getId).thenReturn(1000l)

@@ -7,8 +7,9 @@ import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfter
 
-class KafkaProducerWrapperSpec extends BaseSpec {
+class KafkaProducerWrapperSpec extends BaseSpec with BeforeAndAfter {
 
   class TestConfig extends ConfigLoader
 

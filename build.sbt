@@ -53,6 +53,8 @@ lazy val processor = (project in file("processor")).
   settings(
     name := "processor",
 
+    parallelExecution in Test := false,
+
     libraryDependencies ++= Dependencies.commonDependencies,
     libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
     libraryDependencies += "org.apache.spark" %% "spark-core"       % "2.0.0",

@@ -6,13 +6,14 @@ import articlestreamer.shared.kafka.KafkaConsumerFactory
 import org.apache.kafka.clients.consumer.{ConsumerRecords, KafkaConsumer}
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfter
 
 import scala.concurrent.duration._
 
 /**
   * Created by sam on 03/11/2016.
   */
-class KafkaConsumerWrapperSpec extends BaseSpec {
+class KafkaConsumerWrapperSpec extends BaseSpec with BeforeAndAfter {
 
   class TestConfig extends ConfigLoader
 
