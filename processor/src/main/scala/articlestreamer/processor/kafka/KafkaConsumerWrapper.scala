@@ -1,22 +1,22 @@
 package articlestreamer.processor.kafka
 
 import java.util
-import java.util.{UUID, Properties}
+import java.util.{Properties, UUID}
 
 import articlestreamer.shared.configuration.ConfigLoader
-import com.typesafe.config.ConfigFactory
+import articlestreamer.shared.kafka.KafkaConsumerFactory
 import org.apache.kafka.clients.CommonClientConfigs
-import org.apache.kafka.clients.consumer.{ConsumerRecord, ConsumerConfig, KafkaConsumer}
+import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecord}
 import org.apache.kafka.common.config.SslConfigs
 
-import scala.collection.JavaConversions._
+import scala.collection.mutable
 import scala.concurrent.duration.Duration
 
-class KafkaConsumerWrapper(config: ConfigLoader) {
+class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaConsumerFactory[String, String]) {
 
   val topic = config.kafkaMainTopic
 
-  private val consumer = new KafkaConsumer[String, String](KafkaConsumerWrapper.getProperties(config))
+  private val consumer = factory.getConsumer(KafkaConsumerWrapper.getProperties(config))
 
   consumer.subscribe(util.Arrays.asList(topic))
 
@@ -26,18 +26,17 @@ class KafkaConsumerWrapper(config: ConfigLoader) {
 
     val millis = duration.toMillis
 
-    val values: List[String] = (1 to count)
-      .flatMap( _ => {
-        consumer.poll(millis)
-      })
-      .foldLeft(List[String]()) ((values: List[String], record: ConsumerRecord[String, String]) => {
-        // TODO at the moment elements are added to beginning of list, thus the list is in opposite order
-        record.value() :: values
-      })
+    val values = new mutable.ListBuffer[String]()
+    for(i <- 1 to count) {
+      val recordsIterator: util.Iterator[ConsumerRecord[String, String]] = consumer.poll(millis).iterator()
+      while(recordsIterator.hasNext) {
+        values += recordsIterator.next().value()
+      }
+    }
 
     println("Polling Completed.")
 
-    values
+    values.toList
   }
 
 //  /**

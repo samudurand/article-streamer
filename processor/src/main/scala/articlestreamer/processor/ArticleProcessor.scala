@@ -22,11 +22,20 @@ class ArticleProcessor(config: ConfigLoader,
   def run() {
 
     val records = getRecordsFromSource
-    val articles = parseArticles(records)
-    val updatedArticles = processScores(articles)
 
-    updatedArticles.sortBy(a => a.score.get)
-      .foreach(a => println(s"Article ${a.originalId} \nScore : ${a.score} \nContent : ${a.content} \n"))
+    if (records.nonEmpty) {
+      println(s"Preparing ${records.length} articles for processing")
+
+      val articles = parseArticles(records)
+
+      println(s"Processing ${articles.length} articles")
+      val updatedArticles = processScores(articles)
+
+      updatedArticles.sortBy(a => a.score.get)
+        .foreach(a => println(s"Article ${a.originalId} \nScore : ${a.score} \nContent : ${a.content} \n"))
+    } else {
+      println("No article recovered, terminating program")
+    }
   }
 
   def parseArticles(records: List[String]): List[TwitterArticle] = {
