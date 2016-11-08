@@ -3,9 +3,9 @@ package articlestreamer.aggregator
 import java.sql.Date
 import java.util.UUID
 
-import articlestreamer.aggregator.filters.TwitterStatusMethods
 import articlestreamer.aggregator.kafka.KafkaProducerWrapper
 import articlestreamer.aggregator.twitter.TwitterStreamerFactory
+import articlestreamer.aggregator.twitter.utils.TwitterStatusMethods
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.marshalling.CustomJsonFormats
 import articlestreamer.shared.model.TwitterArticle
@@ -50,7 +50,7 @@ class Aggregator(config: ConfigLoader,
 
         producer.send(record)
       } else {
-        println(s"Tweet ${status.getId} ignored : '${status.getText}'")
+        println(s"Tweet ${status.getId} ignored : '${status.getText.mkString}'")
       }
     }
   }

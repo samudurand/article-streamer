@@ -1,4 +1,4 @@
-package articlestreamer.aggregator.filters
+package articlestreamer.aggregator.twitter.utils
 
 import articlestreamer.shared.BaseSpec
 import org.mockito.Mockito._

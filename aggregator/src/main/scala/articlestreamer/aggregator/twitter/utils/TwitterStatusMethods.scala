@@ -1,4 +1,4 @@
-package articlestreamer.aggregator.filters
+package articlestreamer.aggregator.twitter.utils
 
 import twitter4j.Status
 

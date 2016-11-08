@@ -1,10 +1,10 @@
-package articlestreamer.aggregator.filters
+package articlestreamer.aggregator.twitter.utils
 
 import articlestreamer.shared.BaseSpec
 import org.mockito.Mockito._
 import twitter4j.{Status, URLEntity}
 
-class StatusFilterSpec extends BaseSpec with TwitterStatusMethods {
+class TwitterStatusMethodSpec extends BaseSpec with TwitterStatusMethods {
 
   "Status with at least one page url" should "be identified as a potential article" in {
     val urlPage = buildEntity("http://thenextweb.com/e-dash-display")
@@ -35,6 +35,12 @@ class StatusFilterSpec extends BaseSpec with TwitterStatusMethods {
     val status = mock(classOf[Status])
     when(status.getURLEntities).thenReturn(urls)
 
+    status.isPotentialArticle shouldBe false
+  }
+
+  "Status with no urls" should "be rejected" in {
+    val status = mock(classOf[Status])
+    when(status.getURLEntities).thenReturn(Array[URLEntity]())
     status.isPotentialArticle shouldBe false
   }
 
