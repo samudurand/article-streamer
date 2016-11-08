@@ -12,7 +12,7 @@ class RecordCallback extends Callback {
     }
   }
   
-  def handleException(exception: Exception): Unit = {
+  private def handleException(exception: Exception): Unit = {
     Console.err.println(s"Error while attempting to send message : $exception")
   }
 }
