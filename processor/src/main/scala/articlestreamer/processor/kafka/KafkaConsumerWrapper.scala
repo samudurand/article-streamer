@@ -4,7 +4,7 @@ import java.util
 import java.util.{Properties, UUID}
 
 import articlestreamer.shared.configuration.ConfigLoader
-import articlestreamer.shared.kafka.KafkaConsumerFactory
+import articlestreamer.shared.kafka.KafkaFactory
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecord}
 import org.apache.kafka.common.config.SslConfigs
@@ -12,7 +12,7 @@ import org.apache.kafka.common.config.SslConfigs
 import scala.collection.mutable
 import scala.concurrent.duration.Duration
 
-class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaConsumerFactory[String, String]) {
+class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, String]) {
 
   val topic = config.kafkaMainTopic
 

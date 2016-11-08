@@ -4,7 +4,7 @@ import java.util
 
 import articlestreamer.shared.BaseSpec
 import articlestreamer.shared.configuration.ConfigLoader
-import articlestreamer.shared.kafka.KafkaConsumerFactory
+import articlestreamer.shared.kafka.KafkaFactory
 import org.apache.kafka.clients.consumer.{ConsumerRecord, ConsumerRecords, KafkaConsumer}
 import org.apache.kafka.common.TopicPartition
 import org.mockito.ArgumentMatchers._
@@ -18,7 +18,7 @@ class KafkaConsumerWrapperSpec extends BaseSpec with BeforeAndAfter {
   class TestConfig extends ConfigLoader
 
   var consumer: KafkaConsumer[String, String] = _
-  val factory = mock(classOf[KafkaConsumerFactory[String, String]])
+  val factory = mock(classOf[KafkaFactory[String, String]])
   var consumerWrapper: KafkaConsumerWrapper = _
 
   before {

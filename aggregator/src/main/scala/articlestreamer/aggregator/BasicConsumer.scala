@@ -2,7 +2,7 @@ package articlestreamer.aggregator
 
 import articlestreamer.aggregator.kafka.KafkaConsumerWrapper
 import articlestreamer.shared.configuration.{ConfigLoader, DefaultConfigLoader}
-import articlestreamer.shared.kafka.KafkaConsumerFactory
+import articlestreamer.shared.kafka.KafkaFactory
 import com.softwaremill.macwire._
 
 import scala.concurrent.duration._
@@ -15,7 +15,7 @@ object BasicConsumer extends App {
   override def main(args: Array[String]) {
 
     val config = wire[DefaultConfigLoader]
-    val factory = wire[KafkaConsumerFactory[String, AnyRef]]
+    val factory = wire[KafkaFactory[String, AnyRef]]
     val consumer = wire[KafkaConsumerWrapper]
 
     println("Starting polling")
