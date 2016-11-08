@@ -92,7 +92,7 @@ trait ConfigLoader {
 
     //spin off a thread to read process output.
     val outputReaderThread = new Thread(new Runnable(){
-      def run : Unit = {
+      def run() : Unit = {
         var ln : String = null
         while({ln = ins.readLine; ln != null})
           func(ln)

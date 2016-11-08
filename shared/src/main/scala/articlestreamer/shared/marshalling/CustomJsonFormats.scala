@@ -15,7 +15,7 @@ trait CustomJsonFormats {
 
   case object DateSerializer extends CustomSerializer[java.sql.Date](format => (
     {
-      case JString(s) => {
+      case JString(s) =>
         try {
           new Date(df.parse(s).getTime)
         } catch {
@@ -24,7 +24,6 @@ trait CustomJsonFormats {
             null
           }
         }
-      }
       case JNull => null
     },
     {

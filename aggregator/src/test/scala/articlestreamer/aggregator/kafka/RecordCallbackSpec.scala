@@ -18,6 +18,7 @@ class RecordCallbackSpec extends BaseSpec {
 
   //At the moment purely for coverage purpose
   "If successfully sends record" should "log it" in {
+    //noinspection ScalaDeprecation
     val metadata = new RecordMetadata(new TopicPartition("", 0), 0l, 1l)
     recordCallback.onCompletion(metadata, null)
   }

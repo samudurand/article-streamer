@@ -36,7 +36,7 @@ class KafkaConsumerWrapperSpec extends BaseSpec with BeforeAndAfter {
     val values = consumerWrapper.poll(1 second, 3)
 
     verify(consumer, times(3)).poll(anyLong())
-    values should have length(6)
+    values should have length 6
     values shouldBe List(r1.value(), r2.value(), r1.value(), r2.value(), r1.value(), r2.value())
   }
 

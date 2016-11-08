@@ -16,6 +16,7 @@ addCommandAlias("test-proc", ";project processor;clean;coverage;test;coverageRep
 addCommandAlias("test-shared", ";project shared;clean;coverage;test;coverageReport")
 addCommandAlias("test-all", ";test-agg;test-proc;test-shared")
 
+//noinspection ScalaUnnecessaryParentheses
 lazy val root = (project in file(".")).
   settings(Commons.settings: _*).
   settings(

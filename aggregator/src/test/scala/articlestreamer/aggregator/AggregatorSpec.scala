@@ -54,7 +54,7 @@ class AggregatorSpec extends BaseSpec with CustomJsonFormats {
 
     tweetHandler(status)
 
-    val recordSent: TwitterArticle = read[TwitterArticle](captor.getValue().value())
+    val recordSent: TwitterArticle = read[TwitterArticle](captor.getValue.value())
     recordSent.content shouldBe "some content"
     recordSent.originalId shouldBe "1000"
     recordSent.score shouldBe Some(10)
@@ -68,7 +68,7 @@ class AggregatorSpec extends BaseSpec with CustomJsonFormats {
 
     val aggregator = new Aggregator(config, kafkaWrapper, scoreCalculator, factory)
     aggregator.run()
-    captor.getValue()
+    captor.getValue
   }
 
 }
