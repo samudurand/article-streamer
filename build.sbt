@@ -1,9 +1,29 @@
 import com.heroku.sbt.HerokuPlugin.autoImport._
+import sbt.Keys._
+import scoverage.ScoverageKeys._
 
+javaOptions ++= Seq("-Xms512M", "-Xmx2048M", "-XX:MaxPermSize=2048M", "-XX:+CMSClassUnloadingEnabled")
+
+// Necessary for using
+parallelExecution in Test := false
+
+// Prevent reloading dependencies after each `clean`
+cleanKeepFiles ++= Seq("resolution-cache", "streams").map(target.value / _)
+
+// Test with coverage
+addCommandAlias("test-agg", ";project aggregator;clean;coverage;test;coverageReport")
+addCommandAlias("test-proc", ";project processor;clean;coverage;test;coverageReport")
+addCommandAlias("test-shared", ";project shared;clean;coverage;test;coverageReport")
+addCommandAlias("test-all", ";test-agg;test-proc;test-shared")
+
+//noinspection ScalaUnnecessaryParentheses
 lazy val root = (project in file(".")).
   settings(Commons.settings: _*).
   settings(
     name := "article-streamer",
+
+    // Necessary for using
+    parallelExecution in Test := false,
 
     // sbt-assembly for FatJar generation
     mainClass in assembly <<= (mainClass in assembly in aggregator),
@@ -18,7 +38,7 @@ lazy val root = (project in file(".")).
     herokuProcessTypes in Compile := Map(
       "worker" -> "java -jar target/scala-2.11/article-streamer-assembly-1.0.0.jar")
 
-  ) dependsOn (aggregator) aggregate(aggregator)
+  ) dependsOn (aggregator % "test->test;compile->compile") aggregate(aggregator)
 
 lazy val aggregator = (project in file("aggregator")).
   settings(Commons.settings: _*).
@@ -31,31 +51,47 @@ lazy val aggregator = (project in file("aggregator")).
 
     libraryDependencies ++= Dependencies.commonDependencies,
     libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
-    libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion
+    libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion,
 
-  ) dependsOn shared
+    coverageExcludedPackages := ".*BasicConsumer;.*MainApp;.*DefaultTwitterStreamer"
+
+  ) dependsOn (shared % "test->test;compile->compile")
 
 lazy val processor = (project in file("processor")).
   settings(Commons.settings: _*).
   settings(
     name := "processor",
 
+    // Necessary for using
+    parallelExecution in Test := false,
+
     libraryDependencies ++= Dependencies.commonDependencies,
     libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
     libraryDependencies += "org.apache.spark" %% "spark-core"       % "2.0.0",
     libraryDependencies += "org.apache.spark" %% "spark-sql"        % "2.0.0",
     libraryDependencies += "org.apache.spark" %% "spark-streaming"  % "2.0.0",
+    libraryDependencies += "org.apache.spark" %% "spark-hive"       % "2.0.0" % "test",
 //    libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka-0-10" % "2.0.0",
     libraryDependencies += "org.scalaj"       %% "scalaj-http"      % "2.3.0",
-    libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion
+    libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion,
+    libraryDependencies += "com.holdenkarau" %% "spark-testing-base" % "2.0.0_0.4.7" % "test",
 
-  ) dependsOn shared
+    coverageExcludedPackages := ".*OnDemandSparkSessionProvider;.*MainApp"
+
+) dependsOn (shared % "test->test;compile->compile")
 
 lazy val shared = (project in file("shared")).
   settings(Commons.settings: _*).
   settings(
     name := "shared",
 
+    // Necessary for using
+    parallelExecution in Test := false,
+
+    libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
     libraryDependencies ++= Dependencies.commonDependencies,
-    libraryDependencies += "org.twitter4j" % "twitter4j-stream" % Dependencies.twitter4JVersion
-  )
+    libraryDependencies += "org.twitter4j" % "twitter4j-stream" % Dependencies.twitter4JVersion,
+
+    coverageExcludedPackages := ".*ConfigLoader"
+
+)

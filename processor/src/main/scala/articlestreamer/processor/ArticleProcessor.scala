@@ -1,153 +1,83 @@
 package articlestreamer.processor
 
-import articlestreamer.processor.marshalling.ArticleMarshaller
 import articlestreamer.processor.kafka.KafkaConsumerWrapper
-import articlestreamer.processor.model.TweetPopularity
-import articlestreamer.processor.service.TwitterService
+import articlestreamer.processor.marshalling.TwitterMarshaller.unmarshallTwitterArticle
+import articlestreamer.processor.spark.SparkSessionProvider
 import articlestreamer.shared.configuration.ConfigLoader
-import articlestreamer.shared.configuration.ConfigLoader.tweetsBatchSize
 import articlestreamer.shared.exception.exceptions._
-import articlestreamer.shared.model.{TwitterArticle, Article}
-import com.typesafe.config.ConfigFactory
+import articlestreamer.shared.model.TwitterArticle
+import articlestreamer.shared.scoring.TwitterScoreCalculator
+import org.apache.log4j.{Level, Logger}
+import org.apache.spark.sql.Dataset
 
 import scala.concurrent.duration._
 
-//import org.apache.kafka.common.serialization.{StringDeserializer, StringSerializer}
-import org.apache.spark.SparkContext
-import org.apache.spark.SparkContext._
-import org.apache.spark.SparkConf
-import org.apache.spark._
-
-import org.apache.log4j.{Level, Logger}
-
-import org.apache.spark.sql.{Dataset, SparkSession}
-
-object ArticleProcessor extends ArticleMarshaller with TwitterService {
-
-  private val appConfig = ConfigFactory.load()
-  val topic = appConfig.getString("kafka.topic")
-  val streamingTimeout = appConfig.getLong("spark.streamingTimeout")
+class ArticleProcessor(config: ConfigLoader,
+                       consumer: KafkaConsumerWrapper,
+                       scoreCalculator: TwitterScoreCalculator,
+                       sparkSessionProvider: SparkSessionProvider) {
 
   Logger.getLogger("org").setLevel(Level.WARN)
 
-  def main(args: Array[String]) {
+  def run() {
 
     val records = getRecordsFromSource
 
-    val config = new SparkConf()
-      .setAppName("Spark App")
-      .setMaster("local[2]")
-      .set("spark.streaming.stopGracefullyOnShutdown","true")
+    if (records.nonEmpty) {
+      println(s"Preparing ${records.length} articles for processing")
 
-    val sparkSession = SparkSession
-      .builder()
-      .config(config)
-      .getOrCreate()
+      val articles = parseArticles(records)
 
+      println(s"Processing ${articles.length} articles")
+      val updatedArticles = processScores(articles)
+
+      updatedArticles.sortBy(a => a.score.get)
+        .foreach(a => println(s"Article ${a.originalId} \nScore : ${a.score} \nContent : ${a.content} \n"))
+    } else {
+      println("No article recovered, terminating program")
+    }
+  }
+
+  def parseArticles(records: List[String]): List[TwitterArticle] = {
+    val sparkSession = sparkSessionProvider.getSparkSession()
     import sparkSession.implicits._
 
     val recordsDs: Dataset[String] = sparkSession.createDataset(records)
 
-    val articles = recordsDs.map { record =>
-      val maybeArticle = unmarshallTwitterArticle(record)
-      if (maybeArticle.isEmpty) {
-        System.err.println(s"Could not parse record $record into an article.")
+    recordsDs
+      .map { record =>
+        val maybeArticle = unmarshallTwitterArticle(record)
+        if (maybeArticle.isEmpty) {
+          System.err.println(s"Could not parse record $record into an article.")
+        }
+        maybeArticle
       }
-      maybeArticle
-    }
-    .filter(_.isDefined)
-    .map(_.get)
-    .collect()
-    .toList
-
-    val updatedArticles = processScores(articles)
-
-    updatedArticles.sortBy(a => a.score)
-      .foreach(a => println(s"Article ${a.originalId} \nScore : ${a.score} \nContent : ${a.content} \n"))
-
-//    val ssc = new StreamingContext(config, Seconds(1))
-//
-//    val consumerStrategy = Subscribe[String, String](Set(topic), KafkaConsumerWrapper.properties.asScala.toMap)
-//    val messages = KafkaUtils.createDirectStream[String, String](ssc, PreferConsistent, consumerStrategy)
-//
-//    messages.foreachRDD { message =>
-//      println(message.count())
-//    }
-//
-//    ssc.start()
-//    ssc.awaitTerminationOrTimeout(streamingTimeout)
-
-//    val conf = new SparkConf().setMaster("local[2]").setAppName("NetworkWordCount")
-//    val ssc = new StreamingContext(conf, Seconds(1))
-
-//
-
-//
-//    var offsetRanges = Array[OffsetRange]()
-//
-//    directKafkaStream.transform { rdd =>
-//      offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
-//      rdd
-////    }.map {
-////      ...
-//    }.foreachRDD { rdd =>
-//      for (o <- offsetRanges) {
-//        println(s"${o.topic} ${o.partition} ${o.fromOffset} ${o.untilOffset}")
-//      }
-//    }
-
-//    val logFile = "YOUR_SPARK_HOME/README.md" // Should be some file on your system
-//    val conf = new SparkConf().setAppName("Simple Application")
-//    val sc = new SparkContext(conf)
-//    val logData = sc.textFile(logFile, 2).cache()
-//    val numAs = logData.filter(line => line.contains("a")).count()
-//    val numBs = logData.filter(line => line.contains("b")).count()
-//    println("Lines with a: %s, Lines with b: %s".format(numAs, numBs))
+      .filter(_.isDefined)
+      .map(_.get)
+      .collect().toList
   }
 
   private def getRecordsFromSource: List[String] = {
-    val kafkaConsumer = new KafkaConsumerWrapper
-    val recordsValues: List[String] = kafkaConsumer.poll(10 seconds, 1)
-    kafkaConsumer.stopConsumer()
+    val recordsValues: List[String] = consumer.poll(10 seconds, 1)
+    consumer.stopConsumer()
     recordsValues
   }
 
   private def processScores(articles: List[TwitterArticle]): List[TwitterArticle] = {
     try {
+
       val articlesById = articles.map(article => (article.originalId.toLong, article)).toMap
 
-      val updatedArticles = articlesById
-        .grouped(tweetsBatchSize)
-        .flatMap(articleGroup => updateScore(articleGroup))
+      articlesById
+        .grouped(config.tweetsBatchSize)
+        .flatMap(articleGroup => scoreCalculator.updateScores(articleGroup))
         .toList
-
-      if (updatedArticles.size != articles.size) {
-        System.err.println("Something went wrong. Could not update the score of every article.")
-      }
-
-      updatedArticles
 
     } catch {
       case ex: Throwable =>
         ex.printNeatStackTrace()
         List()
     }
-  }
-
-  private def updateScore(articlesById: Map[Long, TwitterArticle]): Iterable[TwitterArticle] = {
-    getTweetsDetails(articlesById.keys.toList).map {
-      case (id, Some(details)) => {
-        val article = articlesById(id)
-        val updatedScore = calculateTweetScore(article, details)
-        article.copy(score = Some(updatedScore))
-      }
-      case (id, None) => articlesById(id)
-    }
-  }
-
-  // Calculate a naive score
-  private def calculateTweetScore(article: TwitterArticle, popularity: TweetPopularity): Int = {
-    article.score.getOrElse(0) + popularity.retweetCount + popularity.favoriteCount * 2
   }
 
 }

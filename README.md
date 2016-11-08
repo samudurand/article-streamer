@@ -49,3 +49,22 @@ Stop the Aggregator
 
 ```$ heroku ps:scale worker=0``` 
 
+# Testing
+
+To run the tests and generate the coverage reports
+
+```
+// Aggregator
+$ sbt test-agg
+
+// Processor
+$ sbt test-proc
+
+// Shared entities
+$ sbt test-shared
+
+// All at once
+$ sbt test-all
+
+```
+  

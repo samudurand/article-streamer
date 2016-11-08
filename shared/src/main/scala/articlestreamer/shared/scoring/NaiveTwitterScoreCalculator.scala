@@ -1,11 +1,14 @@
-package articlestreamer.aggregator.scoring
+package articlestreamer.shared.scoring
 
 import articlestreamer.shared.configuration.ConfigLoader
-import articlestreamer.shared.model.TwitterArticle
+import articlestreamer.shared.model.{TweetPopularity, TwitterArticle}
+import articlestreamer.shared.twitter.service.TwitterService
 
-trait TwitterScoreCalculator extends ScoreCalculator[TwitterArticle] {
+class NaiveTwitterScoreCalculator(configLoader: ConfigLoader, twitterService: TwitterService) extends TwitterScoreCalculator {
 
-  val config = ConfigLoader.twitterSearchConfig
+  import configLoader._
+
+  val config = twitterSearchConfig
 
   val VALUE_RELATED_TAGS = 100
 
@@ -29,7 +32,7 @@ trait TwitterScoreCalculator extends ScoreCalculator[TwitterArticle] {
   )
 
   override def calculateBaseScore(article: TwitterArticle): Int = {
-    val score = 1
+    val score = 0
 
     wordsAndValues.foldLeft(score) { case (acc, (words, value)) =>
       acc + value * countOccurrences(words, article.content)
@@ -40,7 +43,20 @@ trait TwitterScoreCalculator extends ScoreCalculator[TwitterArticle] {
    * Count the occurrences of the words from the list in the text
    */
   private def countOccurrences(wordsToSearch: List[String], toAnalyse: String): Int = {
-    wordsToSearch.foldLeft(0)((acc, word) => acc + s"""\b$word\b""".r.findAllIn(toAnalyse).length)
+    wordsToSearch.foldLeft(0)((acc, word) => acc + s"""\\b$word\\b""".r.findAllIn(toAnalyse).length)
   }
 
+  override def updateScores(articlesById: Map[Long, TwitterArticle]): Traversable[TwitterArticle] = {
+    twitterService.getTweetsPopularities(articlesById.keys.toList).map {
+      case (id, Some(details: TweetPopularity)) =>
+        val article = articlesById(id)
+        val updatedScore = calculateTweetScore(article, details)
+        article.copy(score = Some(updatedScore))
+      case (id, None) => articlesById(id)
+    }
+  }
+
+  private def calculateTweetScore(article: TwitterArticle, popularity: TweetPopularity): Int = {
+    article.score.getOrElse(0) + popularity.retweetCount + popularity.favoriteCount * 2
+  }
 }

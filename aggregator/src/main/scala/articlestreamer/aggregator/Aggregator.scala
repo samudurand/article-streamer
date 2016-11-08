@@ -1,27 +1,26 @@
 package articlestreamer.aggregator
 
-import java.sql.Timestamp
+import java.sql.Date
 import java.util.UUID
 
 import articlestreamer.aggregator.kafka.KafkaProducerWrapper
-import articlestreamer.aggregator.scoring.TwitterScoreCalculator
-import articlestreamer.aggregator.twitter.TwitterStreamer
+import articlestreamer.aggregator.twitter.TwitterStreamerFactory
 import articlestreamer.shared.configuration.ConfigLoader
+import articlestreamer.shared.marshalling.CustomJsonFormats
 import articlestreamer.shared.model.TwitterArticle
-import com.typesafe.config.ConfigFactory
+import articlestreamer.shared.scoring.TwitterScoreCalculator
 import org.apache.kafka.clients.producer._
-import org.json4s._
-import org.json4s.jackson.Serialization
 import org.json4s.jackson.Serialization.write
 import twitter4j.Status
 
-object Aggregator extends App with TwitterScoreCalculator {
+class Aggregator(config: ConfigLoader,
+                 producer: KafkaProducerWrapper,
+                 scoreCalculator: TwitterScoreCalculator,
+                 streamer: TwitterStreamerFactory) extends CustomJsonFormats {
 
-  override def main(args: Array[String]) {
+  def run() {
 
-    val producer = new KafkaProducerWrapper
-
-    val twitterStreamer = TwitterStreamer(tweetHandler(producer), stopHandler(producer))
+    val twitterStreamer = streamer.getStreamer(config, tweetHandler(producer), stopHandler(producer))
 
     println("Starting streaming")
     twitterStreamer.startStreaming()
@@ -35,21 +34,19 @@ object Aggregator extends App with TwitterScoreCalculator {
     })
   }
 
-  def tweetHandler(producer: KafkaProducerWrapper): (Status) => Unit = {
+  private def tweetHandler(producer: KafkaProducerWrapper): (Status) => Unit = {
     (status: Status) => {
 
       println(s"Status received: ${status.getCreatedAt}")
 
-      val appConfig = ConfigFactory.load()
-      val topic = ConfigLoader.kafkaMainTopic
-
       val article = convertToArticle(status)
 
-      implicit val formats = Serialization.formats(NoTypeHints)
+      val record = new ProducerRecord[String, String](
+        config.kafkaMainTopic,
+        s"tweet${status.getId}",
+        write(article))
 
-      val record = new ProducerRecord[String, String](topic, s"tweet${status.getId}", write(article))
       producer.send(record)
-
     }
   }
 
@@ -59,15 +56,20 @@ object Aggregator extends App with TwitterScoreCalculator {
       urlEntity => urlEntity.getURL
     }.toList
 
-    val publicationDate = new Timestamp(status.getCreatedAt.getTime)
+    val article = TwitterArticle(
+      UUID.randomUUID().toString,
+      String.valueOf(status.getId),
+      new Date(status.getCreatedAt.getTime),
+      urls,
+      status.getText,
+      None)
 
-    val article = TwitterArticle(UUID.randomUUID().toString, String.valueOf(status.getId), publicationDate, urls, status.getText, None)
-    val baseScore = calculateBaseScore(article)
+    val baseScore = scoreCalculator.calculateBaseScore(article)
     article.copy(score = Some(baseScore))
 
   }
 
-  def stopHandler(producer: KafkaProducerWrapper): () => Unit = {
+  private def stopHandler(producer: KafkaProducerWrapper): () => Unit = {
     () => producer.stopProducer()
   }
 

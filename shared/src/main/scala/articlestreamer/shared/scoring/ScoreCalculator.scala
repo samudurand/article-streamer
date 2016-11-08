@@ -1,4 +1,4 @@
-package articlestreamer.aggregator.scoring
+package articlestreamer.shared.scoring
 
 import articlestreamer.shared.model.Article
 

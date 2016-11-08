@@ -1,23 +1,24 @@
 package articlestreamer.shared.configuration
 
 import java.io.{File, PrintWriter}
-import collection.JavaConversions._
 
 import com.typesafe.config.ConfigFactory
 
-case class TwitterSearchConfig(mainTag: String,
-                        minimumScore: Int,
-                        relatedTags: List[String],
-                        articleCloseWords: List[String],
-                        articleRelatedWords: List[String],
-                        subjectCloseWords: List[String],
-                        subjectRelatedWords: List[String],
-                        articleUnrelatedWords: List[String],
-                        subjectUnrelatedWords: List[String])
+import scala.collection.JavaConversions._
 
-object ConfigLoader {
+final case class TwitterSearchConfig(mainTag: String,
+                               minimumScore: Int,
+                               relatedTags: List[String],
+                               articleCloseWords: List[String],
+                               articleRelatedWords: List[String],
+                               subjectCloseWords: List[String],
+                               subjectRelatedWords: List[String],
+                               articleUnrelatedWords: List[String],
+                               subjectUnrelatedWords: List[String])
 
-  private val appConfig = ConfigFactory.load()
+trait ConfigLoader {
+
+  val appConfig = ConfigFactory.load()
 
   val twitterOuathConsumerKey = appConfig.getString("twitter.oauth.oauthConsumerKey")
   val twitterOauthConsumerSecret = appConfig.getString("twitter.oauth.oauthConsumerSecret")
@@ -38,8 +39,8 @@ object ConfigLoader {
   )
 
   /**
-   * Size of the tweets batch when querying for tweet info
-   */
+    * Size of the tweets batch when querying for tweet info
+    */
   val tweetsBatchSize = appConfig.getInt("twitter.tweetsBatchSize")
 
   val kafkaBrokers = appConfig.getString("kafka.brokers")
@@ -48,12 +49,8 @@ object ConfigLoader {
   val kafkaSSLMode = appConfig.getBoolean("kafka.sslProtocol")
 
   var kafkaTrustStore = ""
-  if (kafkaSSLMode) {
-    kafkaTrustStore = appConfig.getString("kafka.security.storeLocation")
-    setupTrustStore(kafkaTrustStore)
-  }
 
-  private def setupTrustStore(kafkaTrustStore: String) = {
+  protected def setupTrustStore(kafkaTrustStore: String) = {
 
     val kafkaTrustStore = appConfig.getString("kafka.security.storeLocation")
 
@@ -95,7 +92,7 @@ object ConfigLoader {
 
     //spin off a thread to read process output.
     val outputReaderThread = new Thread(new Runnable(){
-      def run : Unit = {
+      def run() : Unit = {
         var ln : String = null
         while({ln = ins.readLine; ln != null})
           func(ln)
@@ -111,4 +108,5 @@ object ConfigLoader {
 
     ins.close()
   }
+
 }
