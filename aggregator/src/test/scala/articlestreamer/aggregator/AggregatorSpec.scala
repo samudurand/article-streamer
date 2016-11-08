@@ -68,7 +68,7 @@ class AggregatorSpec extends BaseSpec with CustomJsonFormats {
 
     val aggregator = new Aggregator(config, kafkaWrapper, scoreCalculator, factory)
     aggregator.run()
-    captor.getValue
+    captor.getValue()
   }
 
 }
