@@ -3,7 +3,6 @@ package articlestreamer.aggregator.kafka
 import articlestreamer.shared.BaseSpec
 import org.apache.kafka.clients.producer.RecordMetadata
 import org.apache.kafka.common.TopicPartition
-import org.mockito.Mockito.mock
 
 /**
   * Created by sam on 04/11/2016.

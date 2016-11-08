@@ -5,8 +5,8 @@ import java.text.SimpleDateFormat
 import java.util.TimeZone
 
 import articlestreamer.shared.exception.exceptions._
-import org.json4s.{CustomSerializer, NoTypeHints, native}
 import org.json4s.JsonAST.{JNull, JString}
+import org.json4s.{CustomSerializer, NoTypeHints, native}
 
 trait CustomJsonFormats {
 

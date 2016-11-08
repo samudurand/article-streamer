@@ -3,7 +3,8 @@ package articlestreamer.shared.configuration
 import java.io.{File, PrintWriter}
 
 import com.typesafe.config.ConfigFactory
-import collection.JavaConversions._
+
+import scala.collection.JavaConversions._
 
 final case class TwitterSearchConfig(mainTag: String,
                                minimumScore: Int,

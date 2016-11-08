@@ -1,7 +1,6 @@
 package articlestreamer.shared.twitter
 
 import articlestreamer.shared.configuration.ConfigLoader
-import com.typesafe.config.ConfigFactory
 
 object TwitterAuthorizationConfig {
 

@@ -5,10 +5,10 @@ import java.util
 import articlestreamer.shared.BaseSpec
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.model.TweetPopularity
-import org.mockito.ArgumentCaptor
-import org.mockito.Mockito._
-import org.mockito.ArgumentMatchers._
 import org.mockito.AdditionalAnswers._
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers._
+import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import twitter4j._
 

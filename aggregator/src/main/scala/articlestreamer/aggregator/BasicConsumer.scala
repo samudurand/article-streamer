@@ -1,7 +1,7 @@
 package articlestreamer.aggregator
 
 import articlestreamer.aggregator.kafka.KafkaConsumerWrapper
-import articlestreamer.shared.configuration.{ConfigLoader, DefaultConfigLoader}
+import articlestreamer.shared.configuration.DefaultConfigLoader
 import articlestreamer.shared.kafka.KafkaFactory
 import com.softwaremill.macwire._
 

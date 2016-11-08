@@ -66,7 +66,6 @@ class ArticleProcessor(config: ConfigLoader,
   private def processScores(articles: List[TwitterArticle]): List[TwitterArticle] = {
     try {
 
-      println("articles :  " + articles.mkString)
       val articlesById = articles.map(article => (article.originalId.toLong, article)).toMap
 
       articlesById

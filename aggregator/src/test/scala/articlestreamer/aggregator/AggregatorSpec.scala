@@ -1,8 +1,5 @@
 package articlestreamer.aggregator
 
-import java.text.{DateFormat, SimpleDateFormat}
-import java.util.TimeZone
-
 import articlestreamer.aggregator.kafka.KafkaProducerWrapper
 import articlestreamer.aggregator.twitter.{DefaultTwitterStreamerFactory, TwitterStreamer}
 import articlestreamer.shared.BaseSpec
@@ -11,8 +8,6 @@ import articlestreamer.shared.marshalling.CustomJsonFormats
 import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.scoring.TwitterScoreCalculator
 import org.apache.kafka.clients.producer.ProducerRecord
-import org.json4s._
-import org.json4s.jackson.Serialization
 import org.json4s.jackson.Serialization.read
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers._

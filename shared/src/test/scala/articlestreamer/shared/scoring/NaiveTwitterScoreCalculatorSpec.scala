@@ -1,15 +1,11 @@
 package articlestreamer.shared.scoring
 
-import java.sql.Timestamp
-
 import articlestreamer.shared.BaseSpec
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.model.{TweetPopularity, TwitterArticle}
 import articlestreamer.shared.twitter.service.TwitterService
-import org.hamcrest.CoreMatchers
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito._
 import org.mockito.ArgumentMatchers._
+import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 
 
