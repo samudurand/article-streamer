@@ -2,7 +2,7 @@ package articlestreamer.aggregator.kafka
 
 import articlestreamer.shared.BaseSpec
 import articlestreamer.shared.configuration.ConfigLoader
-import articlestreamer.shared.kafka.KafkaProducerFactory
+import articlestreamer.shared.kafka.KafkaFactory
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers._
@@ -14,7 +14,7 @@ class KafkaProducerWrapperSpec extends BaseSpec with BeforeAndAfter {
   class TestConfig extends ConfigLoader
 
   var producer: KafkaProducer[String, String] = _
-  val factory = mock(classOf[KafkaProducerFactory[String, String]])
+  val factory = mock(classOf[KafkaFactory[String, String]])
   var producerWrapper: KafkaProducerWrapper = _
 
   before {

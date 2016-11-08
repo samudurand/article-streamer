@@ -13,6 +13,8 @@ cleanKeepFiles ++= Seq("resolution-cache", "streams").map(target.value / _)
 // Test with coverage
 addCommandAlias("test-agg", ";project aggregator;clean;coverage;test;coverageReport")
 addCommandAlias("test-proc", ";project processor;clean;coverage;test;coverageReport")
+addCommandAlias("test-shared", ";project shared;clean;coverage;test;coverageReport")
+addCommandAlias("test-all", ";test-agg;test-proc;test-shared")
 
 lazy val root = (project in file(".")).
   settings(Commons.settings: _*).
@@ -87,6 +89,8 @@ lazy val shared = (project in file("shared")).
 
     libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
     libraryDependencies ++= Dependencies.commonDependencies,
-    libraryDependencies += "org.twitter4j" % "twitter4j-stream" % Dependencies.twitter4JVersion
+    libraryDependencies += "org.twitter4j" % "twitter4j-stream" % Dependencies.twitter4JVersion,
 
-  )
+    coverageExcludedPackages := ".*ConfigLoader"
+
+)
