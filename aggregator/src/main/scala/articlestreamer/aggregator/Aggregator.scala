@@ -3,6 +3,7 @@ package articlestreamer.aggregator
 import java.sql.Date
 import java.util.UUID
 
+import articlestreamer.aggregator.filters.TwitterStatusMethods
 import articlestreamer.aggregator.kafka.KafkaProducerWrapper
 import articlestreamer.aggregator.twitter.TwitterStreamerFactory
 import articlestreamer.shared.configuration.ConfigLoader
@@ -16,7 +17,7 @@ import twitter4j.Status
 class Aggregator(config: ConfigLoader,
                  producer: KafkaProducerWrapper,
                  scoreCalculator: TwitterScoreCalculator,
-                 streamer: TwitterStreamerFactory) extends CustomJsonFormats {
+                 streamer: TwitterStreamerFactory) extends CustomJsonFormats with TwitterStatusMethods {
 
   def run() {
 
@@ -39,21 +40,25 @@ class Aggregator(config: ConfigLoader,
 
       println(s"Status received: ${status.getCreatedAt}")
 
-      val article = convertToArticle(status)
+      if (status.isPotentialArticle) {
+        val article = convertToArticle(status)
 
-      val record = new ProducerRecord[String, String](
-        config.kafkaMainTopic,
-        s"tweet${status.getId}",
-        write(article))
+        val record = new ProducerRecord[String, String](
+          config.kafkaMainTopic,
+          s"tweet${status.getId}",
+          write(article))
 
-      producer.send(record)
+        producer.send(record)
+      } else {
+        println(s"Tweet ${status.getId} ignored : '${status.getText}'")
+      }
     }
   }
 
   private def convertToArticle(status: Status): TwitterArticle = {
 
     val urls: List[String] = status.getURLEntities.map{
-      urlEntity => urlEntity.getURL
+      urlEntity => urlEntity.getExpandedURL
     }.toList
 
     val article = TwitterArticle(

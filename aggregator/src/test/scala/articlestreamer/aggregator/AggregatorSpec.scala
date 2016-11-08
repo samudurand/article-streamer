@@ -38,7 +38,7 @@ class AggregatorSpec extends BaseSpec with CustomJsonFormats {
     when(scoreCalculator.calculateBaseScore(any())).thenReturn(10)
 
     val uRLEntity = mock(classOf[URLEntity])
-    when(uRLEntity.getURL).thenReturn("http://anyurl.com")
+    when(uRLEntity.getExpandedURL).thenReturn("http://anyurl.com")
 
     val tweetHandler = captureTweetHandler()
 
