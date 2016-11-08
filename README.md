@@ -51,11 +51,20 @@ Stop the Aggregator
 
 # Testing
 
-To run the aggregator tests and generate the coverage report
+To run the tests and generate the coverage reports
 
-```$ sbt "project aggregator" clean coverage test coverageReport```
+```
+// Aggregator
+$ sbt test-agg
 
-To run the processor tests and generate the coverage report
+// Processor
+$ sbt test-proc
 
-```$ sbt "project processor" clean coverage test coverageReport```
+// Shared entities
+$ sbt test-shared
+
+// All at once
+$ sbt test-all
+
+```
   
