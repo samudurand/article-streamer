@@ -14,7 +14,7 @@ case class DefaultTwitterStreamer(config: ConfigLoader,
   def statusListener = new StatusListener() {
     def onStatus(status: Status) = onStatusFct(status)
     def onDeletionNotice(statusDeletionNotice: StatusDeletionNotice) {}
-    def onTrackLimitationNotice(numberOfLimitedStatuses: Int) {logger.error("limitation : " + numberOfLimitedStatuses)}
+    def onTrackLimitationNotice(numberOfLimitedStatuses: Int) {logger.error(s"Limitation hit : $numberOfLimitedStatuses")}
     def onException(ex: Exception) { logger.error("Error while streaming tweets", ex) }
     def onScrubGeo(arg0: Long, arg1: Long) {}
     def onStallWarning(warning: StallWarning) {}

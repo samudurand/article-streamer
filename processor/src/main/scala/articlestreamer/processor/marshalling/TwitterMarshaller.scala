@@ -1,6 +1,5 @@
 package articlestreamer.processor.marshalling
 
-import articlestreamer.shared.exception.exceptions._
 import articlestreamer.shared.marshalling.CustomJsonFormats
 import articlestreamer.shared.model.TwitterArticle
 import com.typesafe.scalalogging.LazyLogging
@@ -14,7 +13,7 @@ object TwitterMarshaller extends Serializable with CustomJsonFormats with LazyLo
       Some(read[TwitterArticle](articleJson))
     } catch {
       case ex: Throwable =>
-        logger.error("Failed to parse article, exception thrown.",ex)
+        logger.error("Failed to parse article, exception thrown.", ex)
         None
     }
   }

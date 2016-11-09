@@ -4,11 +4,9 @@ import articlestreamer.processor.kafka.KafkaConsumerWrapper
 import articlestreamer.processor.marshalling.TwitterMarshaller.unmarshallTwitterArticle
 import articlestreamer.processor.spark.SparkSessionProvider
 import articlestreamer.shared.configuration.ConfigLoader
-import articlestreamer.shared.exception.exceptions._
 import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.scoring.TwitterScoreCalculator
 import com.typesafe.scalalogging.LazyLogging
-import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.Dataset
 
 import scala.concurrent.duration._
