@@ -8,9 +8,9 @@ import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.scoring.TwitterScoreCalculator
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.spark.sql.Dataset
-import scala.language.postfixOps
 
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 class ArticleProcessor(config: ConfigLoader,
                        consumer: KafkaConsumerWrapper,

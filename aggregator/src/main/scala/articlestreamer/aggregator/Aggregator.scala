@@ -41,7 +41,7 @@ class Aggregator(config: ConfigLoader,
 
       logger.info(s"Status received: ${status.getCreatedAt}")
 
-      if (status.isPotentialArticle) {
+      if (!status.isRetweet && status.isPotentialArticle) {
         val article = convertToArticle(status)
 
         val record = new ProducerRecord[String, String](
