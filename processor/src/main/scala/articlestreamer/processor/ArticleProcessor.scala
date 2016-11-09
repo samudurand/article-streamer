@@ -4,7 +4,7 @@ import articlestreamer.processor.kafka.KafkaConsumerWrapper
 import articlestreamer.processor.marshalling.TwitterMarshaller.unmarshallTwitterArticle
 import articlestreamer.processor.spark.SparkSessionProvider
 import articlestreamer.shared.configuration.ConfigLoader
-import articlestreamer.shared.model.{Article, MaybeArticle, TwitterArticle}
+import articlestreamer.shared.model.{MaybeArticle, TwitterArticle}
 import articlestreamer.shared.scoring.TwitterScoreCalculator
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.spark.sql.Dataset
