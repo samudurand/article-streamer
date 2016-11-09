@@ -21,4 +21,4 @@ project/plugins/project/
 .scala_dependencies
 .worksheet
 
-# Created by .ignore support plugin (hsz.mobi)
+/logs/

@@ -5,13 +5,14 @@ import java.util.Properties
 
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.kafka.KafkaFactory
+import com.typesafe.scalalogging.LazyLogging
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.config.SslConfigs
 
 import scala.concurrent.duration.Duration
 
-class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, AnyRef]) {
+class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, AnyRef]) extends LazyLogging {
 
   private val topic = config.kafkaMainTopic
 
@@ -22,7 +23,7 @@ class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, A
     val millis = duration.toMillis
     for(x <- 1 to count) {
       val l = consumer.poll(millis)
-      println(s"new ${l.count()} records : ${l.records(topic)}")
+      logger.info(s"new ${l.count()} records : ${l.records(topic)}")
     }
   }
 

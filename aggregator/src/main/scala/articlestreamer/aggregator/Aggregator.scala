@@ -10,6 +10,7 @@ import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.marshalling.CustomJsonFormats
 import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.scoring.TwitterScoreCalculator
+import com.typesafe.scalalogging.LazyLogging
 import org.apache.kafka.clients.producer._
 import org.json4s.jackson.Serialization.write
 import twitter4j.Status
@@ -17,19 +18,19 @@ import twitter4j.Status
 class Aggregator(config: ConfigLoader,
                  producer: KafkaProducerWrapper,
                  scoreCalculator: TwitterScoreCalculator,
-                 streamer: TwitterStreamerFactory) extends CustomJsonFormats with TwitterStatusMethods {
+                 streamer: TwitterStreamerFactory) extends CustomJsonFormats with TwitterStatusMethods with LazyLogging {
 
   def run() {
 
     val twitterStreamer = streamer.getStreamer(config, tweetHandler(producer), stopHandler(producer))
 
-    println("Starting streaming")
+    logger.info("Starting streaming")
     twitterStreamer.startStreaming()
 
     sys.addShutdownHook({
-      println("Stopping streaming")
+      logger.info("Stopping streaming")
       twitterStreamer.stop()
-      println("Streaming stopped")
+      logger.info("Streaming stopped")
 
       producer.stopProducer()
     })
@@ -38,7 +39,7 @@ class Aggregator(config: ConfigLoader,
   private def tweetHandler(producer: KafkaProducerWrapper): (Status) => Unit = {
     (status: Status) => {
 
-      println(s"Status received: ${status.getCreatedAt}")
+      logger.info(s"Status received: ${status.getCreatedAt}")
 
       if (status.isPotentialArticle) {
         val article = convertToArticle(status)
@@ -50,7 +51,7 @@ class Aggregator(config: ConfigLoader,
 
         producer.send(record)
       } else {
-        println(s"Tweet ${status.getId} ignored : '${status.getText.mkString}'")
+        logger.warn(s"Tweet ${status.getId} ignored : '${status.getText.mkString}'")
       }
     }
   }
