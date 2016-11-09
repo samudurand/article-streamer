@@ -87,6 +87,28 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     verify(kafkaWrapper, never()).send(any())
   }
 
+  "All retweets" should "be ignored" in {
+    val uRLEntity = mock(classOf[URLEntity])
+    when(uRLEntity.getExpandedURL).thenReturn("http://anyurl.com")
+
+    val tweetHandler = captureTweetHandler()
+
+    val status = mock(classOf[Status])
+    val date = df.parse("01-01-2000 00:00:00")
+    when(status.getCreatedAt).thenReturn(date)
+    when(status.getURLEntities).thenReturn(Array[URLEntity](uRLEntity))
+    when(status.getId).thenReturn(1000l)
+    when(status.getText).thenReturn("some content")
+    when(status.isRetweet).thenReturn(true)
+
+    val captor: ArgumentCaptor[ProducerRecord[String, String]]  = ArgumentCaptor.forClass(classOf[ProducerRecord[String, String]])
+    when(kafkaWrapper.send(captor.capture())).thenReturn(null)
+
+    tweetHandler(status)
+
+    verify(kafkaWrapper, never()).send(any())
+  }
+
   def captureTweetHandler(): (Status) => Unit = {
     val captor = ArgumentCaptor.forClass(classOf[(Status) => Unit])
     val factory = mock(classOf[DefaultTwitterStreamerFactory])
