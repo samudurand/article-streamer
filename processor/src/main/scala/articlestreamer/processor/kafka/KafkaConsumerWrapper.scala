@@ -5,6 +5,7 @@ import java.util.{Properties, UUID}
 
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.kafka.KafkaFactory
+import com.typesafe.scalalogging.LazyLogging
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecord}
 import org.apache.kafka.common.config.SslConfigs
@@ -12,7 +13,7 @@ import org.apache.kafka.common.config.SslConfigs
 import scala.collection.mutable
 import scala.concurrent.duration.Duration
 
-class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, String]) {
+class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, String]) extends LazyLogging {
 
   val topic = config.kafkaMainTopic
 
@@ -22,7 +23,7 @@ class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, S
 
   def poll(duration: Duration, count: Int): List[String] = {
 
-    println("Polling started.")
+    logger.info("Polling started.")
 
     val millis = duration.toMillis
 
@@ -34,39 +35,13 @@ class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, S
       }
     }
 
-    println("Polling Completed.")
+    logger.info("Polling Completed.")
 
     values.toList
   }
 
-//  /**
-//   * Process the records and return (num processing successful, num processing failed)
-//   */
-//  type RecordHandler = Iterator[ConsumerRecord[String, AnyRef]] => (Int, Int)
-//
-//  private val consumer = new KafkaConsumer[String, AnyRef](KafkaConsumerWrapper.properties)
-//
-//  consumer.subscribe(util.Arrays.asList(KafkaConsumerWrapper.topic))
-//
-//  def poll(duration: Duration, count: Int, processing: RecordHandler): Unit = {
-//    val millis = duration.toMillis
-//
-//    (1 to count).foreach { _ =>
-//      val records = consumer.poll(millis)
-//      val totalRecords = records.count()
-//      println(s"retrieved ${} records")
-//      Future {
-//        processing(records.iterator())
-//      } onComplete {
-//        case Success(processingResults) => println(s"Finished to process $totalRecords. " +
-//          s"Successes : ${processingResults._1}, failures: ${processingResults._2}.")
-//        case Failure(ex: Exception) => System.err.println(ex)
-//      }
-//    }
-//  }
-
   def stopConsumer() = {
-    println("Stopping consumer.")
+    logger.info("Stopping consumer.")
     consumer.close()
   }
 

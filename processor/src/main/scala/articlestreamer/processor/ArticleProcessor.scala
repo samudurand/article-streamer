@@ -7,6 +7,7 @@ import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.exception.exceptions._
 import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.scoring.TwitterScoreCalculator
+import com.typesafe.scalalogging.LazyLogging
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.Dataset
 
@@ -15,26 +16,24 @@ import scala.concurrent.duration._
 class ArticleProcessor(config: ConfigLoader,
                        consumer: KafkaConsumerWrapper,
                        scoreCalculator: TwitterScoreCalculator,
-                       sparkSessionProvider: SparkSessionProvider) {
-
-  Logger.getLogger("org").setLevel(Level.WARN)
+                       sparkSessionProvider: SparkSessionProvider) extends LazyLogging {
 
   def run() {
 
     val records = getRecordsFromSource
 
     if (records.nonEmpty) {
-      println(s"Preparing ${records.length} articles for processing")
+      logger.info(s"Preparing ${records.length} articles for processing")
 
       val articles = parseArticles(records)
 
-      println(s"Processing ${articles.length} articles")
+      logger.info(s"Processing ${articles.length} articles")
       val updatedArticles = processScores(articles)
 
       updatedArticles.sortBy(a => a.score.get)
-        .foreach(a => println(s"Article ${a.originalId} \nScore : ${a.score} \nContent : ${a.content} \n"))
+        .foreach(a => logger.info(s"Article ${a.originalId} \nScore : ${a.score} \nContent : ${a.content} \n"))
     } else {
-      println("No article recovered, terminating program")
+      logger.info("No article recovered, terminating program")
     }
   }
 
@@ -48,7 +47,8 @@ class ArticleProcessor(config: ConfigLoader,
       .map { record =>
         val maybeArticle = unmarshallTwitterArticle(record)
         if (maybeArticle.isEmpty) {
-          System.err.println(s"Could not parse record $record into an article.")
+          //TODO At the moment uses simple print for serialization purpose, need to store those errors somewhere else
+          println(s"Could not parse record $record into an article.")
         }
         maybeArticle
       }
@@ -75,7 +75,7 @@ class ArticleProcessor(config: ConfigLoader,
 
     } catch {
       case ex: Throwable =>
-        ex.printNeatStackTrace()
+        logger.error("Error while processing scores.", ex)
         List()
     }
   }

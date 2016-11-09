@@ -67,7 +67,7 @@ lazy val processor = (project in file("processor")).
 
     libraryDependencies ++= Dependencies.commonDependencies,
     libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
-    libraryDependencies += "org.apache.spark" %% "spark-core"       % "2.0.0",
+    libraryDependencies += "org.apache.spark" %% "spark-core"       % "2.0.0" exclude("org.slf4j","slf4j-log4j12"),
     libraryDependencies += "org.apache.spark" %% "spark-sql"        % "2.0.0",
     libraryDependencies += "org.apache.spark" %% "spark-streaming"  % "2.0.0",
     libraryDependencies += "org.apache.spark" %% "spark-hive"       % "2.0.0" % "test",
