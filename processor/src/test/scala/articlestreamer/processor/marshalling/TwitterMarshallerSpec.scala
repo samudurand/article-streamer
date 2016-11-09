@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat
 import java.util.TimeZone
 
 import articlestreamer.shared.BaseSpec
+import articlestreamer.shared.model.TweetAuthor
 
 import scala.io.Source
 
@@ -26,6 +27,7 @@ class TwitterMarshallerSpec extends BaseSpec {
       'publicationDate (df.parse("2016-10-20 11:45:28.000")),
       'links (List("https://t.co/C5m0dEKan9")),
       'content ("Well done! Tough challenge to master #Spark https://t.co/C5m0dEKan9"),
+      'author (TweetAuthor(1234, "user1", 0)),
       'score (Some(0))
     )
   }
@@ -39,7 +41,7 @@ class TwitterMarshallerSpec extends BaseSpec {
     articleTweet.get should have('score (None))
   }
 
-  it should "fail to unmarshall" in {
+  it should "fail to unmarshall a tweet with missing data" in {
     val articleJson = Source.fromURL(getClass.getResource("/data/twitter-article-bad-formatting.json")).mkString
 
     val articleTweet = unmarshallTwitterArticle(articleJson)

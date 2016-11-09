@@ -30,5 +30,12 @@ case class TwitterArticle(id: String,
                           publicationDate: Date,
                           links: Seq[String],
                           content: String,
+                          author: TweetAuthor,
                           score: Option[Int])
   extends BaseArticle(id, ArticleSource.Twitter, originalId, publicationDate, score)
+
+case class TweetAuthor(id: Long,
+                       displayName: String,
+                       followersCount: Int)
+
+case class MaybeArticle(article: Option[TwitterArticle])

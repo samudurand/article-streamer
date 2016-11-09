@@ -13,7 +13,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
-import twitter4j.{Status, URLEntity}
+import twitter4j.{Status, URLEntity, User}
 
 class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats {
 
@@ -55,6 +55,8 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     when(status.getURLEntities).thenReturn(List[URLEntity](uRLEntity).toArray)
     when(status.getId).thenReturn(1000l)
     when(status.getText).thenReturn("some content")
+    val user = mock(classOf[User])
+    when(status.getUser).thenReturn(user)
 
     val captor: ArgumentCaptor[ProducerRecord[String, String]]  = ArgumentCaptor.forClass(classOf[ProducerRecord[String, String]])
     when(kafkaWrapper.send(captor.capture())).thenReturn(null)
@@ -78,6 +80,8 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     when(status.getURLEntities).thenReturn(Array[URLEntity]())
     when(status.getId).thenReturn(1000l)
     when(status.getText).thenReturn("some content")
+    val user = mock(classOf[User])
+    when(status.getUser).thenReturn(user)
 
     val captor: ArgumentCaptor[ProducerRecord[String, String]]  = ArgumentCaptor.forClass(classOf[ProducerRecord[String, String]])
     when(kafkaWrapper.send(captor.capture())).thenReturn(null)
@@ -100,6 +104,8 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     when(status.getId).thenReturn(1000l)
     when(status.getText).thenReturn("some content")
     when(status.isRetweet).thenReturn(true)
+    val user = mock(classOf[User])
+    when(status.getUser).thenReturn(user)
 
     val captor: ArgumentCaptor[ProducerRecord[String, String]]  = ArgumentCaptor.forClass(classOf[ProducerRecord[String, String]])
     when(kafkaWrapper.send(captor.capture())).thenReturn(null)

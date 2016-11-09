@@ -1,0 +1,3 @@
+Datasets and options :
+
+- Datasets of Option[CaseClass] always deserialize as Datasets of Some(CaseClass(null, null..)) , Some... . The difference Some/None is lost

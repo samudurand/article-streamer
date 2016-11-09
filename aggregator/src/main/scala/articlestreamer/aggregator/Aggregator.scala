@@ -8,7 +8,7 @@ import articlestreamer.aggregator.twitter.TwitterStreamerFactory
 import articlestreamer.aggregator.twitter.utils.TwitterStatusMethods
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.marshalling.CustomJsonFormats
-import articlestreamer.shared.model.TwitterArticle
+import articlestreamer.shared.model.{TweetAuthor, TwitterArticle}
 import articlestreamer.shared.scoring.TwitterScoreCalculator
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.kafka.clients.producer._
@@ -58,6 +58,8 @@ class Aggregator(config: ConfigLoader,
 
   private def convertToArticle(status: Status): TwitterArticle = {
 
+    val author = status.getUser
+
     val urls: List[String] = status.getURLEntities.map{
       urlEntity => urlEntity.getExpandedURL
     }.toList
@@ -68,6 +70,7 @@ class Aggregator(config: ConfigLoader,
       new Date(status.getCreatedAt.getTime),
       urls,
       status.getText,
+      TweetAuthor(author.getId, author.getScreenName, author.getFollowersCount),
       None)
 
     val baseScore = scoreCalculator.calculateBaseScore(article)

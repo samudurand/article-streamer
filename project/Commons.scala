@@ -19,7 +19,6 @@ object Commons {
 
     // Flags for style checking
     scalacOptions ++= Seq(
-      "-Xfatal-warnings",
       "-feature",
       "-deprecation",
       "-unchecked",

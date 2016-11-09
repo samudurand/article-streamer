@@ -32,7 +32,7 @@ class NaiveTwitterScoreCalculatorSpec extends BaseSpec  with BeforeAndAfter{
 
   "A tweet with no words of any import" should "get a 0 base score" in {
     val content = "other1 other2 other3"
-    val article = TwitterArticle("", "", null, null, content, null)
+    val article = TwitterArticle("", "", null, null, content, null, null)
     val score = scoreCalculator.calculateBaseScore(article)
 
     score shouldBe 0
@@ -40,7 +40,7 @@ class NaiveTwitterScoreCalculatorSpec extends BaseSpec  with BeforeAndAfter{
 
   "A tweet with no content" should "get a 0 base score" in {
     val content = ""
-    val article = TwitterArticle("", "", null, null, content, null)
+    val article = TwitterArticle("", "", null, null, content, null, null)
     val score = scoreCalculator.calculateBaseScore(article)
 
     score shouldBe 0
@@ -48,7 +48,7 @@ class NaiveTwitterScoreCalculatorSpec extends BaseSpec  with BeforeAndAfter{
 
   "A tweet with close words" should "get a good base score" in {
     val content = "related4 close1 other close2 related3"
-    val article = TwitterArticle("", "", null, null, content, null)
+    val article = TwitterArticle("", "", null, null, content, null, null)
     val score = scoreCalculator.calculateBaseScore(article)
 
     score shouldBe 2200
@@ -56,7 +56,7 @@ class NaiveTwitterScoreCalculatorSpec extends BaseSpec  with BeforeAndAfter{
 
   "A tweet with somewhat interesting words" should "get an average base score" in {
     val content = "related4 other some related3 other"
-    val article = TwitterArticle("", "", null, null, content, null)
+    val article = TwitterArticle("", "", null, null, content, null, null)
     val score = scoreCalculator.calculateBaseScore(article)
 
     score shouldBe 200
@@ -64,15 +64,15 @@ class NaiveTwitterScoreCalculatorSpec extends BaseSpec  with BeforeAndAfter{
 
   "A tweet with unrelated words" should "get a bad score" in {
     val content = "unrelated1 other some unrelated2 related3"
-    val article = TwitterArticle("", "", null, null, content, null)
+    val article = TwitterArticle("", "", null, null, content, null, null)
     val score = scoreCalculator.calculateBaseScore(article)
 
     score should be < 0
   }
 
   "Tweets not popular" should "keep a base score" in {
-    val articles = Map(1l -> TwitterArticle("id1", "1", null, List(), "", Some(0)),
-                       2l -> TwitterArticle("id2", "2", null, List(), "", Some(0)))
+    val articles = Map(1l -> TwitterArticle("id1", "1", null, List(), "", null, Some(0)),
+                       2l -> TwitterArticle("id2", "2", null, List(), "", null, Some(0)))
     val notPopular = TweetPopularity(0, 0)
     when(twitterService.getTweetsPopularities(any()))
       .thenReturn(Map(1l -> Some(notPopular), 2l -> Some(notPopular)))
@@ -83,8 +83,8 @@ class NaiveTwitterScoreCalculatorSpec extends BaseSpec  with BeforeAndAfter{
   }
 
   "Tweets with no initial scores" should "should get at least a 0 score" in {
-    val articles = Map(1l -> TwitterArticle("id1", "1", null, List(), "", None),
-                       2l -> TwitterArticle("id2", "2", null, List(), "", None))
+    val articles = Map(1l -> TwitterArticle("id1", "1", null, List(), "", null, None),
+                       2l -> TwitterArticle("id2", "2", null, List(), "", null, None))
     val notPopular = TweetPopularity(0, 0)
     val popular = TweetPopularity(100, 100)
     when(twitterService.getTweetsPopularities(any()))
@@ -97,9 +97,9 @@ class NaiveTwitterScoreCalculatorSpec extends BaseSpec  with BeforeAndAfter{
   }
 
   "Tweets favorited" should "get an improved score" in {
-    val articles = Map(1l -> TwitterArticle("id1", "1", null, List(), "", Some(0)),
-                       2l -> TwitterArticle("id2", "2", null, List(), "", Some(0)),
-                       3l -> TwitterArticle("id3", "3", null, List(), "", Some(100)))
+    val articles = Map(1l -> TwitterArticle("id1", "1", null, List(), "", null, Some(0)),
+                       2l -> TwitterArticle("id2", "2", null, List(), "", null, Some(0)),
+                       3l -> TwitterArticle("id3", "3", null, List(), "", null, Some(100)))
 
     val notPopular = TweetPopularity(0, 0)
     val quitePopular = TweetPopularity(0, 10)
@@ -116,9 +116,9 @@ class NaiveTwitterScoreCalculatorSpec extends BaseSpec  with BeforeAndAfter{
   }
 
   "Tweets retweeted" should "get an improved score" in {
-    val articles = Map(1l -> TwitterArticle("id1", "1", null, List(), "", Some(0)),
-                       2l -> TwitterArticle("id2", "2", null, List(), "", Some(0)),
-                       3l -> TwitterArticle("id3", "3", null, List(), "", Some(100)))
+    val articles = Map(1l -> TwitterArticle("id1", "1", null, List(), "", null, Some(0)),
+                       2l -> TwitterArticle("id2", "2", null, List(), "", null, Some(0)),
+                       3l -> TwitterArticle("id3", "3", null, List(), "", null, Some(100)))
 
     val notPopular = TweetPopularity(0, 0)
     val quitePopular = TweetPopularity(20, 0)
@@ -135,9 +135,9 @@ class NaiveTwitterScoreCalculatorSpec extends BaseSpec  with BeforeAndAfter{
   }
 
   "Tweets retweeted and favorited" should "get an even more improved score" in {
-    val articles = Map(1l -> TwitterArticle("id1", "1", null, List(), "", Some(0)),
-                       2l -> TwitterArticle("id2", "2", null, List(), "", Some(0)),
-                       3l -> TwitterArticle("id3", "3", null, List(), "", Some(100)))
+    val articles = Map(1l -> TwitterArticle("id1", "1", null, List(), "", null, Some(0)),
+                       2l -> TwitterArticle("id2", "2", null, List(), "", null, Some(0)),
+                       3l -> TwitterArticle("id3", "3", null, List(), "", null, Some(100)))
 
     val popular1 = TweetPopularity(1, 1000)
     val popular2 = TweetPopularity(20, 10)
@@ -154,9 +154,9 @@ class NaiveTwitterScoreCalculatorSpec extends BaseSpec  with BeforeAndAfter{
   }
 
   "Tweets for which the popularity is not retrievable" should "keep the base score" in {
-    val articles = Map(1l -> TwitterArticle("id1", "1", null, List(), "", Some(10)),
-                       2l -> TwitterArticle("id2", "2", null, List(), "", Some(50)),
-                       3l -> TwitterArticle("id3", "3", null, List(), "", Some(100)))
+    val articles = Map(1l -> TwitterArticle("id1", "1", null, List(), "", null, Some(10)),
+                       2l -> TwitterArticle("id2", "2", null, List(), "", null, Some(50)),
+                       3l -> TwitterArticle("id3", "3", null, List(), "", null, Some(100)))
 
     val popular = TweetPopularity(100, 1)
 
