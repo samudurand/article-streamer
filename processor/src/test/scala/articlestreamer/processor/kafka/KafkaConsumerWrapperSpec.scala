@@ -12,6 +12,7 @@ import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 class KafkaConsumerWrapperSpec extends BaseSpec with BeforeAndAfter {
 

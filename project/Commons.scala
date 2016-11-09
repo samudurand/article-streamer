@@ -17,6 +17,21 @@ object Commons {
     coverageMinimum := 95,
     coverageFailOnMinimum := true,
 
+    // Flags for style checking
+    scalacOptions ++= Seq(
+      "-Xfatal-warnings",
+      "-feature",
+      "-deprecation",
+      "-unchecked",
+      "-Xlint",
+      "-Xfuture",
+      "-Ywarn-unused",
+      "-Ywarn-unused-import",
+      "-Ywarn-numeric-widen"
+    ),
+
+    addCompilerPlugin("com.github.ghik" %% "silencer-plugin" % "0.5"),
+
     cleanKeepFiles ++= Seq("resolution-cache", "streams").map(target.value / _)
   )
 }

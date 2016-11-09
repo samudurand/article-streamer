@@ -20,7 +20,7 @@ class Aggregator(config: ConfigLoader,
                  scoreCalculator: TwitterScoreCalculator,
                  streamer: TwitterStreamerFactory) extends CustomJsonFormats with TwitterStatusMethods with LazyLogging {
 
-  def run() {
+  def run() = {
 
     val twitterStreamer = streamer.getStreamer(config, tweetHandler(producer), stopHandler(producer))
 

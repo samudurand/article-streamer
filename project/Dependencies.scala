@@ -15,6 +15,7 @@ object Dependencies {
     "com.softwaremill.macwire" %% "proxy" % "2.2.4",
     "ch.qos.logback" % "logback-classic" % "1.1.7",
     "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0",
+    "com.github.ghik" %% "silencer-lib" % "0.5",
 
     "org.scalatest" % "scalatest_2.11" % "3.0.0" % "test",
     "org.mockito" % "mockito-core" % "2.2.1" % "test",

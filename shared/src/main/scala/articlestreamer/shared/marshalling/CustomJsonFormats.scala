@@ -5,10 +5,11 @@ import java.text.SimpleDateFormat
 import java.util.TimeZone
 
 import articlestreamer.shared.exception.exceptions._
+import com.typesafe.scalalogging.LazyLogging
 import org.json4s.JsonAST.{JNull, JString}
 import org.json4s.{CustomSerializer, NoTypeHints, native}
 
-trait CustomJsonFormats {
+trait CustomJsonFormats extends LazyLogging {
 
   val df: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
   df.setTimeZone(TimeZone.getTimeZone("GMT"))
@@ -20,7 +21,7 @@ trait CustomJsonFormats {
           new Date(df.parse(s).getTime)
         } catch {
           case ex: Throwable => {
-            System.err.println(s"Error while parsing date : ${ex.getStackTraceAsString}")
+            logger.error(s"Error while parsing date : ${ex.getStackTraceAsString}")
             null
           }
         }

@@ -88,7 +88,6 @@ trait ConfigLoader {
     val commands = cmd.split(" ")
     val proc = new ProcessBuilder(commands: _*).redirectErrorStream(true).start()
     val ins = new java.io.BufferedReader(new java.io.InputStreamReader(proc.getInputStream))
-    val sb = new StringBuilder
 
     //spin off a thread to read process output.
     val outputReaderThread = new Thread(new Runnable(){

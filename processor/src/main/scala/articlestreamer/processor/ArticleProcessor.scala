@@ -8,6 +8,7 @@ import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.scoring.TwitterScoreCalculator
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.spark.sql.Dataset
+import scala.language.postfixOps
 
 import scala.concurrent.duration._
 
@@ -16,7 +17,7 @@ class ArticleProcessor(config: ConfigLoader,
                        scoreCalculator: TwitterScoreCalculator,
                        sparkSessionProvider: SparkSessionProvider) extends LazyLogging {
 
-  def run() {
+  def run() = {
 
     val records = getRecordsFromSource
 

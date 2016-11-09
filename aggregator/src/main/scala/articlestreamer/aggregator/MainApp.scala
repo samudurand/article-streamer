@@ -14,19 +14,15 @@ import twitter4j.TwitterFactory
   */
 object MainApp extends App {
 
-  override def main(args: Array[String]) {
+  lazy val twitterFactory = wire[TwitterFactory]
+  lazy val config = wire[DefaultConfigLoader]
+  lazy val producerFactory = wire[KafkaFactory[String, String]]
+  lazy val producer = wire[KafkaProducerWrapper]
+  lazy val streamFactory = new DefaultTwitterStreamerFactory
+  lazy val twitterService = wire[TwitterService]
+  lazy val scoreCalculator = wire[NaiveTwitterScoreCalculator]
 
-    lazy val twitterFactory = wire[TwitterFactory]
-    lazy val config = wire[DefaultConfigLoader]
-    lazy val producerFactory = wire[KafkaFactory[String, String]]
-    lazy val producer = wire[KafkaProducerWrapper]
-    lazy val streamFactory = new DefaultTwitterStreamerFactory
-    lazy val twitterService = wire[TwitterService]
-    lazy val scoreCalculator = wire[NaiveTwitterScoreCalculator]
-
-    val aggregator = wire[Aggregator]
-    aggregator.run()
-
-  }
+  val aggregator = wire[Aggregator]
+  aggregator.run()
 
 }

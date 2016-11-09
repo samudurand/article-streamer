@@ -9,6 +9,7 @@ import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 /**
   * Created by sam on 03/11/2016.

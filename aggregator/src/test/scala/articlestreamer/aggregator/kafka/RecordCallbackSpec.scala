@@ -1,6 +1,7 @@
 package articlestreamer.aggregator.kafka
 
 import articlestreamer.shared.BaseSpec
+import com.github.ghik.silencer.silent
 import org.apache.kafka.clients.producer.RecordMetadata
 import org.apache.kafka.common.TopicPartition
 
@@ -19,7 +20,7 @@ class RecordCallbackSpec extends BaseSpec {
   //At the moment purely for coverage purpose
   "If successfully sends record" should "log it" in {
     //noinspection ScalaDeprecation
-    val metadata = new RecordMetadata(new TopicPartition("", 0), 0l, 1l)
+    val metadata = new RecordMetadata(new TopicPartition("", 0), 0l, 1l) : @silent
     recordCallback.onCompletion(metadata, null)
   }
 

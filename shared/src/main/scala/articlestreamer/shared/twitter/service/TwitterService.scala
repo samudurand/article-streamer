@@ -3,15 +3,15 @@ package articlestreamer.shared.twitter.service
 import java.util.function.Consumer
 
 import articlestreamer.shared.configuration.ConfigLoader
-import articlestreamer.shared.exception.exceptions._
 import articlestreamer.shared.model.TweetPopularity
 import articlestreamer.shared.twitter.TwitterAuthorizationConfig
+import com.typesafe.scalalogging.LazyLogging
 import twitter4j.auth.AccessToken
 import twitter4j.{ResponseList, Status, Twitter, TwitterFactory}
 
 import scala.collection.mutable
 
-class TwitterService(config: ConfigLoader, twitterFactory: TwitterFactory) {
+class TwitterService(config: ConfigLoader, twitterFactory: TwitterFactory) extends LazyLogging {
 
   private val authorizationConfig = TwitterAuthorizationConfig.getTwitterConfig(config)
 
@@ -27,7 +27,7 @@ class TwitterService(config: ConfigLoader, twitterFactory: TwitterFactory) {
       val responseList: ResponseList[Status] = twitter.lookup(ids:_*)
 
       // Use of foreach instead of scala added functions to allow mocking
-      var popularities: mutable.Map[Long, Option[TweetPopularity]] = mutable.Map()
+      val popularities: mutable.Map[Long, Option[TweetPopularity]] = mutable.Map()
       responseList.forEach(new Consumer[Status]() {
           override def accept(status: Status): Unit = {
             popularities += status.getId -> Some(TweetPopularity(status.getRetweetCount, status.getFavoriteCount))
@@ -37,7 +37,7 @@ class TwitterService(config: ConfigLoader, twitterFactory: TwitterFactory) {
       val originalNum = ids.size
       val retrievedNum = responseList.size()
       if (retrievedNum != originalNum) {
-        println(s"WARN : Only $retrievedNum on $originalNum tweets could be retrieved.")
+        logger.warn(s"Only $retrievedNum on $originalNum tweets could be retrieved.")
         addMissingPopularities(ids, popularities.toMap)
       } else {
         popularities.toMap
@@ -45,7 +45,7 @@ class TwitterService(config: ConfigLoader, twitterFactory: TwitterFactory) {
 
     } catch {
       case ex: Exception =>
-        ex.printNeatStackTrace()
+        logger.error("Error while getting tweets details", ex)
         Map()
     }
   }
@@ -65,7 +65,7 @@ class TwitterService(config: ConfigLoader, twitterFactory: TwitterFactory) {
       Some(TweetPopularity(status.getRetweetCount, status.getFavoriteCount))
     } catch {
       case ex: Exception =>
-        ex.printNeatStackTrace()
+        logger.error("Error while getting tweet popularity", ex)
         None
     }
   }
