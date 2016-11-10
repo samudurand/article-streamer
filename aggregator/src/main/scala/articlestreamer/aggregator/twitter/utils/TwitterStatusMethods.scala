@@ -19,7 +19,7 @@ trait TwitterStatusMethods extends URLEntitiesMethods {
       }
 
       // At least one of those links isn't a media
-      !links.forall(_.isMediaUrl)
+      !links.forall(link => link.isMediaUrl || link.isSocialNetworkURL)
     }
 
   }

@@ -7,7 +7,7 @@ import twitter4j.URLEntity
 /**
   * Created by sam on 08/11/2016.
   */
-class URLEntitiesUtilsSpec extends BaseSpec with URLEntitiesMethods {
+class URLEntitiesMethodsSpec extends BaseSpec with URLEntitiesMethods {
 
   "URL Entity" should "not contain an image url" in {
     val urlPage = buildEntity("http://thenextweb.com/e-dash-display")
@@ -40,6 +40,21 @@ class URLEntitiesUtilsSpec extends BaseSpec with URLEntitiesMethods {
 
     urlVideo.isMediaUrl shouldBe true
     urlImg.isMediaUrl shouldBe true
+  }
+
+  "URL Entity" should "contain a social network url" in {
+    val urlPage = buildEntity("http://www.facebook.com/62648/photos/352127.62868648/1222842638/?type=3&theater")
+    urlPage.isSocialNetworkURL shouldBe true
+  }
+
+  "URL Entity" should "contain a social network secured url" in {
+    val urlPage = buildEntity("https://www.facebook.com/62648/photos/352127.62868648/1222842638/?type=3&theater")
+    urlPage.isSocialNetworkURL shouldBe true
+  }
+
+  "URL Entity" should "not contain a social network url" in {
+    val urlPage = buildEntity("http://thenextweb.com/e-dash-display")
+    urlPage.isSocialNetworkURL shouldBe false
   }
 
   private def buildEntity(url: String): URLEntity = {

@@ -6,6 +6,7 @@ trait URLEntitiesMethods {
 
   val imgTypes = Array(".bmp", ".gif", ".img", ".jbg", ".jpe", ".jpeg", ".jpg", ".png", ".ppm", ".tiff")
   val videoTypes = Array(".avi", ".flv", ".mpg", ".mp2", ".mpeg", ".mpe", ".mpv", ".mov", ".mp4")
+  val socialNetworks = Array("www.instagram", "www.facebook", "www.flickr")
 
   implicit class URLEntitiesUtils(urlEntity: URLEntity) {
 
@@ -19,6 +20,12 @@ trait URLEntitiesMethods {
 
     def isMediaUrl: Boolean = {
       urlEntity.isImageUrl || urlEntity.isVideoUrl
+    }
+
+    def isSocialNetworkURL: Boolean = {
+      socialNetworks.exists(social =>
+        urlEntity.getExpandedURL.startsWith(s"https://$social")
+          || urlEntity.getExpandedURL.startsWith(s"http://$social"))
     }
 
   }
