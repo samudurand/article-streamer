@@ -17,7 +17,7 @@ class ArticleProcessor(config: ConfigLoader,
                        scoreCalculator: TwitterScoreCalculator,
                        sparkSessionProvider: SparkSessionProvider) extends LazyLogging {
 
-  def run() = {
+  def run(): List[TwitterArticle] = {
 
     val records = getRecordsFromSource
 
@@ -28,11 +28,13 @@ class ArticleProcessor(config: ConfigLoader,
 
       logger.info(s"Processing ${articles.length} articles")
       val updatedArticles = processScores(articles)
+      val sortedArticles = updatedArticles.sortBy(a => a.score.get)
 
-      updatedArticles.sortBy(a => a.score.get)
-        .foreach(a => logger.info(s"Article ${a.originalId} \nScore : ${a.score} \nContent : ${a.content} \n"))
+      sortedArticles.foreach(a => logger.info(s"Article ${a.originalId} \nScore : ${a.score} \nContent : ${a.content} \n"))
+      sortedArticles
     } else {
       logger.info("No article recovered, terminating program")
+      List()
     }
   }
 

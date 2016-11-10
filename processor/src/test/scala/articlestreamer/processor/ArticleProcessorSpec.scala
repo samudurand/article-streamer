@@ -48,14 +48,17 @@ class ArticleProcessorSpec extends BaseSpec with SharedSparkContext with DataFra
     when(consumer.poll(any(), any())).thenReturn(List(tweet1, tweet2))
 
     val article = TwitterArticle("00000000-0000-0000-0000-000000000001", "789070025009336320", new Date(123456789l),
-      List(), "", TweetAuthor(1234, "user1", 0), Some(10))
+      List(), "", TweetAuthor(1234, "user1", 0), Some(20))
     val article2 = TwitterArticle("00000000-0000-0000-0000-000000000002", "789070025044436320", new Date(123456789l),
-      List(), "", TweetAuthor(5678, "user2", 0), Some(20))
+      List(), "", TweetAuthor(5678, "user2", 0), Some(10))
     val mapCaptor: ArgumentCaptor[Map[Long, TwitterArticle]] = ArgumentCaptor.forClass(classOf[Map[Long, TwitterArticle]])
     when(scoreCalculator.updateScores(mapCaptor.capture())).thenReturn(List(article, article2))
 
     val processor = new ArticleProcessor(config, consumer, scoreCalculator, ssProvider)
-    processor.run()
+    val articles = processor.run()
+
+    articles should have length 2
+    articles shouldBe List(article2, article)
 
     val processedArticles = mapCaptor.getValue
     processedArticles should have size 2
@@ -70,7 +73,9 @@ class ArticleProcessorSpec extends BaseSpec with SharedSparkContext with DataFra
     when(scoreCalculator.updateScores(any())).thenThrow(new RuntimeException())
 
     val processor = new ArticleProcessor(config, consumer, scoreCalculator, ssProvider)
-    processor.run()
+    val articles = processor.run()
+
+    articles shouldBe empty
   }
 
   def extractArticles[T](captor: ArgumentCaptor[Map[Long, T]]): Iterable[T] = {
