@@ -1,5 +1,8 @@
 package articlestreamer.aggregator
 
+import java.text.SimpleDateFormat
+import java.util.TimeZone
+
 import articlestreamer.aggregator.kafka.KafkaProducerWrapper
 import articlestreamer.aggregator.twitter.{DefaultTwitterStreamerFactory, TwitterStreamer}
 import articlestreamer.shared.BaseSpec
@@ -16,6 +19,9 @@ import org.scalatest.BeforeAndAfter
 import twitter4j.{Status, URLEntity, User}
 
 class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats {
+
+  val df: SimpleDateFormat = new SimpleDateFormat(dformat)
+  df.setTimeZone(TimeZone.getTimeZone("GMT"))
 
   class TestConfig extends ConfigLoader
 

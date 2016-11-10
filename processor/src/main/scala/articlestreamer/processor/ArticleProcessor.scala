@@ -58,7 +58,7 @@ class ArticleProcessor(config: ConfigLoader,
   }
 
   private def getRecordsFromSource: List[String] = {
-    val recordsValues: List[String] = consumer.poll(10 seconds, 1)
+    val recordsValues: List[String] = consumer.poll(5 seconds, 10)
     consumer.stopConsumer()
     recordsValues
   }

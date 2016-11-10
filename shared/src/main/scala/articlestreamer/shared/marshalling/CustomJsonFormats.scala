@@ -11,13 +11,14 @@ import org.json4s.{CustomSerializer, NoTypeHints, native}
 
 trait CustomJsonFormats extends LazyLogging {
 
-  val df: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
-  df.setTimeZone(TimeZone.getTimeZone("GMT"))
+  val dformat: String = "yyyy-MM-dd hh:mm:ss"
 
   case object DateSerializer extends CustomSerializer[java.sql.Date](format => (
     {
       case JString(s) =>
         try {
+          val df: SimpleDateFormat = new SimpleDateFormat(dformat)
+          df.setTimeZone(TimeZone.getTimeZone("GMT"))
           new Date(df.parse(s).getTime)
         } catch {
           case ex: Throwable => {
@@ -28,7 +29,10 @@ trait CustomJsonFormats extends LazyLogging {
       case JNull => null
     },
     {
-      case d: Date => JString(df.format(d))
+      case d: Date =>
+        val df: SimpleDateFormat = new SimpleDateFormat(dformat)
+        df.setTimeZone(TimeZone.getTimeZone("GMT"))
+        JString(df.format(d))
     }
     )
   )
