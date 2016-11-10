@@ -37,5 +37,3 @@ case class TwitterArticle(id: String,
 case class TweetAuthor(id: Long,
                        displayName: String,
                        followersCount: Int)
-
-case class MaybeArticle(article: Option[TwitterArticle])

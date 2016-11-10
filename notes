@@ -1,3 +1,35 @@
+Dataframes
+
+- Dataset allow to use Options properly
+
 Datasets and options :
 
 - Datasets of Option[CaseClass] always deserialize as Datasets of Some(CaseClass(null, null..)) , Some... . The difference Some/None is lost
+
+    So instead of using map , use flatmap that will flatten the options
+
+    // With map will build Some() instead of None
+    recordsDs
+      .map { record =>
+        val maybeArticle = unmarshallArticle(record)
+        if (maybeArticle.isEmpty) {
+          println(s"Could not parse record $record into an article.")
+        }
+        maybeArticle
+      }
+      .filter(_.isDefined)
+      .map(_.get)
+      .collect().toList
+
+    //With flatMap behave properly
+
+    recordsDs
+      .flatMap { record =>
+        val maybeArticle = unmarshallTwitterArticle(record)
+        if (maybeArticle.isEmpty) {
+          //TODO At the moment uses simple print for serialization purpose, need to store those errors somewhere else
+          println(s"Could not parse record $record into an article.")
+        }
+        maybeArticle
+      }
+      .collect().toList
