@@ -1,7 +1,7 @@
 package articlestreamer.processor
 
 import articlestreamer.processor.kafka.KafkaConsumerWrapper
-import articlestreamer.processor.marshalling.TwitterMarshaller.unmarshallTwitterArticle
+import articlestreamer.processor.marshalling.RecordMarshaller.unmarshallRecord
 import articlestreamer.processor.spark.SparkSessionProvider
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.model.TwitterArticle
@@ -19,6 +19,7 @@ class ArticleProcessor(config: ConfigLoader,
 
   def run(): List[TwitterArticle] = {
 
+    /////change polling principle
     val records = getRecordsFromSource
 
     if (records.nonEmpty) {
@@ -47,12 +48,13 @@ class ArticleProcessor(config: ConfigLoader,
 
     recordsDs
       .flatMap { record =>
-        val maybeArticle = unmarshallTwitterArticle(record)
-        if (maybeArticle.isEmpty) {
+        val maybeRecord = unmarshallRecord(record)
+        if (maybeRecord.isEmpty) {
           //TODO At the moment uses simple print for serialization purpose, need to store those errors somewhere else
           println(s"Could not parse record $record into an article.")
+          None
         }
-        maybeArticle
+        Some[TwitterArticle](maybeRecord.get.article)
       }
       .collect().toList
   }

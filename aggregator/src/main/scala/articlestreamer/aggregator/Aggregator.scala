@@ -8,6 +8,7 @@ import articlestreamer.aggregator.twitter.TwitterStreamerFactory
 import articlestreamer.aggregator.twitter.utils.TwitterStatusMethods
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.marshalling.CustomJsonFormats
+import articlestreamer.shared.model.kafka.ArticleRecord
 import articlestreamer.shared.model.{TweetAuthor, TwitterArticle}
 import articlestreamer.shared.scoring.TwitterScoreCalculator
 import com.typesafe.scalalogging.LazyLogging
@@ -47,7 +48,7 @@ class Aggregator(config: ConfigLoader,
         val record = new ProducerRecord[String, String](
           config.kafkaMainTopic,
           s"tweet${status.getId}",
-          write(article))
+          write(ArticleRecord(article.publicationDate, article)))
 
         producer.send(record)
       } else {

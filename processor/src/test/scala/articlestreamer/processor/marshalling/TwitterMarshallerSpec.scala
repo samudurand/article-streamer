@@ -10,7 +10,7 @@ import scala.io.Source
 
 class TwitterMarshallerSpec extends BaseSpec {
 
-  import TwitterMarshaller._
+  import RecordMarshaller._
 
   val df: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
   df.setTimeZone(TimeZone.getTimeZone("GMT"))
@@ -18,7 +18,7 @@ class TwitterMarshallerSpec extends BaseSpec {
   "Marshaller" should "unmarshall a tweet" in {
     val articleJson = Source.fromURL(getClass.getResource("/data/twitter-article.json")).mkString
 
-    val articleTweet = unmarshallTwitterArticle(articleJson)
+    val articleTweet = unmarshallRecord(articleJson)
 
     articleTweet.isDefined shouldBe true
     articleTweet.get should have(
@@ -35,7 +35,7 @@ class TwitterMarshallerSpec extends BaseSpec {
   it should "unmarshall a tweet without score" in {
     val articleJson = Source.fromURL(getClass.getResource("/data/twitter-article-no-score.json")).mkString
 
-    val articleTweet = unmarshallTwitterArticle(articleJson)
+    val articleTweet = unmarshallRecord(articleJson)
 
     articleTweet.isDefined shouldBe true
     articleTweet.get should have('score (None))
@@ -44,7 +44,7 @@ class TwitterMarshallerSpec extends BaseSpec {
   it should "fail to unmarshall a tweet with missing data" in {
     val articleJson = Source.fromURL(getClass.getResource("/data/twitter-article-bad-formatting.json")).mkString
 
-    val articleTweet = unmarshallTwitterArticle(articleJson)
+    val articleTweet = unmarshallRecord(articleJson)
 
     articleTweet shouldBe None
   }

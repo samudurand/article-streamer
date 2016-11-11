@@ -2,15 +2,16 @@ package articlestreamer.processor.marshalling
 
 import articlestreamer.shared.marshalling.CustomJsonFormats
 import articlestreamer.shared.model.TwitterArticle
+import articlestreamer.shared.model.kafka.KafkaRecord
 import com.typesafe.scalalogging.LazyLogging
 import org.json4s.jackson.Serialization._
 
-object TwitterMarshaller extends Serializable with CustomJsonFormats with LazyLogging {
+object RecordMarshaller extends Serializable with CustomJsonFormats with LazyLogging {
 
-  def unmarshallTwitterArticle(articleJson: String): Option[TwitterArticle] = {
+  def unmarshallRecord(record: String): Option[KafkaRecord] = {
 
     try {
-      Some(read[TwitterArticle](articleJson))
+      Some(read[KafkaRecord](record))
     } catch {
       case ex: Throwable =>
         logger.error("Failed to parse article, exception thrown.", ex)
