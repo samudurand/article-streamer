@@ -7,7 +7,6 @@ import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.scoring.TwitterScoreCalculator
 import com.typesafe.scalalogging.LazyLogging
-import org.apache.spark.sql.Dataset
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
@@ -23,14 +22,13 @@ class ArticleProcessor(config: ConfigLoader,
     val records = getRecordsFromSource
 
     if (records.nonEmpty) {
-      logger.info(s"Preparing ${records.length} articles for processing")
+      //logger.info(s"Preparing ${records.length} articles for processing")
 
-      val articles = parseArticles(records)
+      //val articles = parseArticles(records)
 
-      logger.info(s"Processing ${articles.length} articles")
-      val updatedArticles = processScores(articles)
-      val sortedArticles = updatedArticles.sortBy(a => a.score.get)
+      logger.info(s"Processing ${records.length} articles")
 
+      val sortedArticles = processArticles(records)
       sortedArticles.foreach(a => logger.info(s"Article ${a.originalId} \nScore : ${a.score} \nContent : ${a.content} \n"))
       sortedArticles
     } else {
@@ -39,23 +37,34 @@ class ArticleProcessor(config: ConfigLoader,
     }
   }
 
-  def parseArticles(records: List[String]): List[TwitterArticle] = {
+  def processArticles(articles: List[TwitterArticle]): List[TwitterArticle] = {
     val sparkSession = sparkSessionProvider.getSparkSession()
 
     import sparkSession.implicits._
 
-    val recordsDs: Dataset[String] = sparkSession.createDataset(records)
+//    val temp = recordsDs
+//      .flatMap { record =>
+//        val maybeRecord = unmarshallRecord(record)
+//        if (maybeRecord.isEmpty) {
+//          //TODO At the moment uses simple print for serialization purpose, need to store those errors somewhere else
+//          println(s"Could not parse record $record into an article.")
+//          None
+//        }
+//        maybeRecord
+//      }
+//      .collect()
 
-    recordsDs
-      .flatMap { record =>
-        val maybeRecord = unmarshallRecord(record)
-        if (maybeRecord.isEmpty) {
-          //TODO At the moment uses simple print for serialization purpose, need to store those errors somewhere else
-          println(s"Could not parse record $record into an article.")
-          None
-        }
-        Some[TwitterArticle](maybeRecord.get.article)
+    // Grouped to fit twitter limitations
+    val groupedArticles = articles
+      .grouped(config.tweetsBatchSize).toList
+
+    val ds = sparkSession.createDataset(groupedArticles)
+    ds.flatMap { batch =>
+        val mappedBatch = batch.map( article => (article.originalId.toLong, article)).toMap
+        val updated = scoreCalculator.updateScores(mappedBatch)
+        updated
       }
+      .sort($"score")
       .collect().toList
   }
 
@@ -63,23 +72,6 @@ class ArticleProcessor(config: ConfigLoader,
     val recordsValues: List[String] = consumer.poll(5 seconds, 10)
     consumer.stopConsumer()
     recordsValues
-  }
-
-  private def processScores(articles: List[TwitterArticle]): List[TwitterArticle] = {
-    try {
-
-      val articlesById = articles.map(article => (article.originalId.toLong, article)).toMap
-
-      articlesById
-        .grouped(config.tweetsBatchSize)
-        .flatMap(articleGroup => scoreCalculator.updateScores(articleGroup))
-        .toList
-
-    } catch {
-      case ex: Throwable =>
-        logger.error("Error while processing scores.", ex)
-        List()
-    }
   }
 
 }
