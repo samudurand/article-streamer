@@ -3,8 +3,11 @@ package articlestreamer.processor.kafka
 import java.util
 import java.util.{Properties, UUID}
 
+import articlestreamer.processor.marshalling.RecordMarshaller
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.kafka.KafkaFactory
+import articlestreamer.shared.model.TwitterArticle
+import articlestreamer.shared.model.kafka.ArticleRecord
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecord}
@@ -13,7 +16,10 @@ import org.apache.kafka.common.config.SslConfigs
 import scala.collection.mutable
 import scala.concurrent.duration.Duration
 
-class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, String]) extends LazyLogging {
+/**
+  * This class uses Java style loops to avoid using the JavaCollections methods provided by scala (using those would complicate the Unit tests)
+  */
+class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, String]) extends LazyLogging with RecordMarshaller {
 
   val topic = config.kafkaMainTopic
 
@@ -21,18 +27,49 @@ class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, S
 
   consumer.subscribe(util.Arrays.asList(topic))
 
-  def poll(duration: Duration, count: Int): List[String] = {
+  def poll(duration: Duration, count: Int): List[TwitterArticle] = {
 
     logger.info("Polling started.")
 
     val millis = duration.toMillis
 
-    val values = new mutable.ListBuffer[String]()
-    for(i <- 1 to count) {
-      val recordsIterator: util.Iterator[ConsumerRecord[String, String]] = consumer.poll(millis).iterator()
-      while(recordsIterator.hasNext) {
-        values += recordsIterator.next().value()
+    val values = new mutable.ListBuffer[TwitterArticle]()
+    var endFound = false
+    var callAttempts = 0
+    while (!endFound && callAttempts < config.kafkaMaxAttempts) {
+
+      val records = consumer.poll(millis)
+
+      if (records.count() > 0) {
+        callAttempts = 0
+
+        val recordsIterator: util.Iterator[ConsumerRecord[String, String]] = records.iterator()
+        while (recordsIterator.hasNext) {
+
+          val maybeRecord = unmarshallRecord(recordsIterator.next().value())
+          if (maybeRecord.isEmpty) {
+
+            println(s"Could not parse record $maybeRecord into an article.")
+
+          } else {
+
+            val record = maybeRecord.get
+            if (record.endOfQueue) {
+              endFound = true
+            } else {
+              val article = record.article.get
+              values += article
+            }
+
+          }
+        }
+      } else {
+        callAttempts += 1
       }
+    }
+
+    if (callAttempts == config.kafkaMaxAttempts) {
+      logger.warn(s"Could not find the end of queue, polling stopped after ${config.kafkaMaxAttempts} attempts.")
     }
 
     logger.info("Polling Completed.")

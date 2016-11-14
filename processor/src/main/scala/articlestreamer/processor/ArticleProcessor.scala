@@ -1,7 +1,6 @@
 package articlestreamer.processor
 
 import articlestreamer.processor.kafka.KafkaConsumerWrapper
-import articlestreamer.processor.marshalling.RecordMarshaller.unmarshallRecord
 import articlestreamer.processor.spark.SparkSessionProvider
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.model.TwitterArticle
@@ -68,8 +67,8 @@ class ArticleProcessor(config: ConfigLoader,
       .collect().toList
   }
 
-  private def getRecordsFromSource: List[String] = {
-    val recordsValues: List[String] = consumer.poll(5 seconds, 10)
+  private def getRecordsFromSource: List[TwitterArticle] = {
+    val recordsValues: List[TwitterArticle] = consumer.poll(5 seconds, 10)
     consumer.stopConsumer()
     recordsValues
   }

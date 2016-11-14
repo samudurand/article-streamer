@@ -46,6 +46,11 @@ trait ConfigLoader {
   val kafkaBrokers = appConfig.getString("kafka.brokers")
   val kafkaMainTopic = appConfig.getString("kafka.topic")
 
+  /**
+    * Maximum polling attempts before stopping
+    */
+  val kafkaMaxAttempts = appConfig.getInt("kafka.maxAttempts")
+
   val kafkaSSLMode = appConfig.getBoolean("kafka.sslProtocol")
 
   var kafkaTrustStore = ""

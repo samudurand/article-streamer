@@ -2,7 +2,7 @@ package articlestreamer.shared.model.kafka
 
 import java.sql.Date
 
-import articlestreamer.shared.model.{Article, TwitterArticle}
+import articlestreamer.shared.model.TwitterArticle
 
 /**
   * A record containing an article or used as end of message queue
@@ -10,10 +10,10 @@ import articlestreamer.shared.model.{Article, TwitterArticle}
   * @param endOfQueue true if that message is the end of the message queue
   * @param article contains an article if it not the end of queue
   */
-abstract class KafkaRecord(date: Date,
-                       endOfQueue: Boolean,
-                       article: Option[TwitterArticle])
+abstract class KafkaRecord(val date: Date,
+                           val endOfQueue: Boolean,
+                           val article: Option[TwitterArticle])
 
-case class ArticleRecord(date: Date, article: TwitterArticle) extends KafkaRecord(date, false, Some(article))
+case class ArticleRecord(override val date: Date, override val article: Option[TwitterArticle]) extends KafkaRecord(date, false, article)
 
-case class EndOfQueueRecord(date: Date) extends KafkaRecord(date, true, None)
+case class EndOfQueueRecord(override val date: Date) extends KafkaRecord(date, true, None)
