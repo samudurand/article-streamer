@@ -34,7 +34,7 @@ class KafkaConsumerWrapperSpec extends BaseSpec with BeforeAndAfter {
     val r2 = new ConsumerRecord[String, String]("topic", 1, 0, "key2", "val2")
     prepareRecords(util.Arrays.asList(r1, r2))
 
-    val values = consumerWrapper.poll(1 second, 3)
+    val values = consumerWrapper.pullAll(1 second, 3)
 
     verify(consumer, times(3)).poll(anyLong())
     values should have length 6
@@ -45,7 +45,7 @@ class KafkaConsumerWrapperSpec extends BaseSpec with BeforeAndAfter {
     val r1 = new ConsumerRecord[String, String]("topic", 1, 0, "key", "val")
     prepareRecords(util.Arrays.asList(r1))
 
-    val values = consumerWrapper.poll(1 second, 0)
+    val values = consumerWrapper.pullAll(1 second, 0)
 
     verify(consumer, never).poll(anyLong())
     values shouldBe empty

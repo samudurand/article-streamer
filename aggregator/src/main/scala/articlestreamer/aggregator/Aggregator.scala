@@ -45,10 +45,12 @@ class Aggregator(config: ConfigLoader,
       if (!status.isRetweet && status.isPotentialArticle) {
         val article = convertToArticle(status)
 
+        val json = write(ArticleRecord(article.publicationDate, Some(article)))
+
         val record = new ProducerRecord[String, String](
           config.kafkaMainTopic,
           s"tweet${status.getId}",
-          write(ArticleRecord(article.publicationDate, article)))
+          json)
 
         producer.send(record)
       } else {

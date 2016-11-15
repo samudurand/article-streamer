@@ -17,13 +17,9 @@ class ArticleProcessor(config: ConfigLoader,
 
   def run(): List[TwitterArticle] = {
 
-    /////change polling principle
     val records = getRecordsFromSource
 
     if (records.nonEmpty) {
-      //logger.info(s"Preparing ${records.length} articles for processing")
-
-      //val articles = parseArticles(records)
 
       logger.info(s"Processing ${records.length} articles")
 
@@ -41,18 +37,6 @@ class ArticleProcessor(config: ConfigLoader,
 
     import sparkSession.implicits._
 
-//    val temp = recordsDs
-//      .flatMap { record =>
-//        val maybeRecord = unmarshallRecord(record)
-//        if (maybeRecord.isEmpty) {
-//          //TODO At the moment uses simple print for serialization purpose, need to store those errors somewhere else
-//          println(s"Could not parse record $record into an article.")
-//          None
-//        }
-//        maybeRecord
-//      }
-//      .collect()
-
     // Grouped to fit twitter limitations
     val groupedArticles = articles
       .grouped(config.tweetsBatchSize).toList
@@ -68,7 +52,7 @@ class ArticleProcessor(config: ConfigLoader,
   }
 
   private def getRecordsFromSource: List[TwitterArticle] = {
-    val recordsValues: List[TwitterArticle] = consumer.poll(5 seconds, 10)
+    val recordsValues: List[TwitterArticle] = consumer.pullAll(5 seconds, 10)
     consumer.stopConsumer()
     recordsValues
   }

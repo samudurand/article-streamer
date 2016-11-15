@@ -13,7 +13,7 @@ trait RecordMarshaller extends Serializable with CustomJsonFormats with LazyLogg
       Some(read[KafkaRecord](record))
     } catch {
       case ex: Throwable =>
-        logger.error("Failed to parse article, exception thrown.", ex)
+        logger.error(s"Failed to parse article, exception thrown. ${record.mkString}", ex)
         None
     }
   }

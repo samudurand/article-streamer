@@ -27,7 +27,7 @@ class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, S
 
   consumer.subscribe(util.Arrays.asList(topic))
 
-  def poll(duration: Duration, count: Int): List[TwitterArticle] = {
+  def pullAll(duration: Duration, count: Int): List[TwitterArticle] = {
 
     logger.info("Polling started.")
 
@@ -40,8 +40,11 @@ class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, S
 
       val records = consumer.poll(millis)
 
-      if (records.count() > 0) {
+      val count = records.count()
+      if (count > 0) {
         callAttempts = 0
+
+        logger.info(s"Parsing $count records into articles")
 
         val recordsIterator: util.Iterator[ConsumerRecord[String, String]] = records.iterator()
         while (recordsIterator.hasNext) {
@@ -49,7 +52,7 @@ class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, S
           val maybeRecord = unmarshallRecord(recordsIterator.next().value())
           if (maybeRecord.isEmpty) {
 
-            println(s"Could not parse record $maybeRecord into an article.")
+            logger.warn(s"Could not parse record $maybeRecord into an article.")
 
           } else {
 
