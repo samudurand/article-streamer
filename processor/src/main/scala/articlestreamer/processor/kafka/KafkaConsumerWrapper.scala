@@ -7,14 +7,14 @@ import articlestreamer.processor.marshalling.RecordMarshaller
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.kafka.KafkaFactory
 import articlestreamer.shared.model.TwitterArticle
-import articlestreamer.shared.model.kafka.ArticleRecord
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecord}
 import org.apache.kafka.common.config.SslConfigs
 
 import scala.collection.mutable
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration._
+import scala.language.postfixOps
 
 /**
   * This class uses Java style loops to avoid using the JavaCollections methods provided by scala (using those would complicate the Unit tests)
@@ -22,16 +22,17 @@ import scala.concurrent.duration.Duration
 class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, String]) extends LazyLogging with RecordMarshaller {
 
   val topic = config.kafkaMainTopic
+  val pollingTimeout = 1 seconds
 
   private val consumer = factory.getConsumer(KafkaConsumerWrapper.getProperties(config))
 
   consumer.subscribe(util.Arrays.asList(topic))
 
-  def pullAll(duration: Duration, count: Int): List[TwitterArticle] = {
+  def pullAll: List[TwitterArticle] = {
 
     logger.info("Polling started.")
 
-    val millis = duration.toMillis
+    val millis = pollingTimeout.toMillis
 
     val values = new mutable.ListBuffer[TwitterArticle]()
     var endFound = false

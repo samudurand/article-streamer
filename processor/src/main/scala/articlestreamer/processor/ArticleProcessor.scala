@@ -7,7 +7,6 @@ import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.scoring.TwitterScoreCalculator
 import com.typesafe.scalalogging.LazyLogging
 
-import scala.concurrent.duration._
 import scala.language.postfixOps
 
 class ArticleProcessor(config: ConfigLoader,
@@ -38,21 +37,21 @@ class ArticleProcessor(config: ConfigLoader,
     import sparkSession.implicits._
 
     // Grouped to fit twitter limitations
-    val groupedArticles = articles
-      .grouped(config.tweetsBatchSize).toList
-
-    val ds = sparkSession.createDataset(groupedArticles)
-    ds.flatMap { batch =>
+    val updatedArticles = articles
+      .grouped(config.tweetsBatchSize)
+      .flatMap { batch =>
         val mappedBatch = batch.map( article => (article.originalId.toLong, article)).toMap
         val updated = scoreCalculator.updateScores(mappedBatch)
         updated
-      }
-      .sort($"score")
+      }.toList
+
+    val ds = sparkSession.createDataset(updatedArticles)
+    ds.sort($"score")
       .collect().toList
   }
 
   private def getRecordsFromSource: List[TwitterArticle] = {
-    val recordsValues: List[TwitterArticle] = consumer.pullAll(5 seconds, 10)
+    val recordsValues: List[TwitterArticle] = consumer.pullAll
     consumer.stopConsumer()
     recordsValues
   }
