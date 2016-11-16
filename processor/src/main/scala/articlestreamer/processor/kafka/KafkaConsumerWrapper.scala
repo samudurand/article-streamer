@@ -9,7 +9,7 @@ import articlestreamer.shared.kafka.KafkaFactory
 import articlestreamer.shared.model.TwitterArticle
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.kafka.clients.CommonClientConfigs
-import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecord}
+import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecord, ConsumerRecords}
 import org.apache.kafka.common.config.SslConfigs
 
 import scala.collection.mutable
@@ -28,45 +28,27 @@ class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, S
 
   consumer.subscribe(util.Arrays.asList(topic))
 
-  def pullAll: List[TwitterArticle] = {
+  /**
+    * Pull all available messages from a kafka Topic. Stops once it finds an end-of-queue message or after several empty results.
+    * The number of attempts before stopping is configured by
+    * @return Records parsed as TwitterArticle
+    */
+  def pullAll(): List[TwitterArticle] = {
 
     logger.info("Polling started.")
 
     val millis = pollingTimeout.toMillis
 
-    val values = new mutable.ListBuffer[TwitterArticle]()
+    val articles = new mutable.ListBuffer[TwitterArticle]()
     var endFound = false
     var callAttempts = 0
     while (!endFound && callAttempts < config.kafkaMaxAttempts) {
-
       val records = consumer.poll(millis)
 
       val count = records.count()
       if (count > 0) {
         callAttempts = 0
-
-        logger.info(s"Parsing $count records into articles")
-
-        val recordsIterator: util.Iterator[ConsumerRecord[String, String]] = records.iterator()
-        while (recordsIterator.hasNext) {
-
-          val maybeRecord = unmarshallRecord(recordsIterator.next().value())
-          if (maybeRecord.isEmpty) {
-
-            logger.warn(s"Could not parse record $maybeRecord into an article.")
-
-          } else {
-
-            val record = maybeRecord.get
-            if (record.endOfQueue) {
-              endFound = true
-            } else {
-              val article = record.article.get
-              values += article
-            }
-
-          }
-        }
+        endFound = parseRecords(records, articles, count)
       } else {
         callAttempts += 1
       }
@@ -78,7 +60,35 @@ class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, S
 
     logger.info("Polling Completed.")
 
-    values.toList
+    articles.toList
+  }
+
+  private def parseRecords(records: ConsumerRecords[String, String], articles: mutable.ListBuffer[TwitterArticle], count: Int): Boolean = {
+    logger.info(s"Parsing $count records into articles")
+
+    var endFound = false
+    val recordsIterator: util.Iterator[ConsumerRecord[String, String]] = records.iterator()
+    while (recordsIterator.hasNext) {
+
+      val maybeRecord = unmarshallRecord(recordsIterator.next().value())
+      if (maybeRecord.isEmpty) {
+
+        logger.warn(s"Could not parse record $maybeRecord into an article.")
+
+      } else {
+
+        val record = maybeRecord.get
+        if (record.endOfQueue) {
+          endFound = true
+        } else {
+          val article = record.article.get
+          articles += article
+        }
+
+      }
+    }
+
+    endFound
   }
 
   def stopConsumer() = {
