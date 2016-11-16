@@ -1,6 +1,5 @@
 package articlestreamer.shared.model.kafka
 
-import java.lang
 import java.sql.Date
 
 import articlestreamer.shared.model.TwitterArticle

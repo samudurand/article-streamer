@@ -8,7 +8,7 @@ import articlestreamer.aggregator.twitter.{DefaultTwitterStreamerFactory, Twitte
 import articlestreamer.shared.BaseSpec
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.marshalling.CustomJsonFormats
-import articlestreamer.shared.model.TwitterArticle
+import articlestreamer.shared.model.kafka.KafkaRecord
 import articlestreamer.shared.scoring.TwitterScoreCalculator
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.json4s.jackson.Serialization.read
@@ -69,11 +69,15 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
 
     tweetHandler(status)
 
-    val recordSent: TwitterArticle = read[TwitterArticle](captor.getValue.value())
-    recordSent.content shouldBe "some content"
-    recordSent.originalId shouldBe "1000"
-    recordSent.score shouldBe Some(10)
-    recordSent.links shouldBe List("http://anyurl.com")
+    val recordSent = read[KafkaRecord](captor.getValue.value())
+    recordSent.endOfQueue shouldBe false
+    recordSent.date shouldBe date
+
+    val articleSent = recordSent.article.get
+    articleSent.content shouldBe "some content"
+    articleSent.originalId shouldBe "1000"
+    articleSent.score shouldBe Some(10)
+    articleSent.links shouldBe List("http://anyurl.com")
   }
 
   "Any tweet not potentially an article " should "be ignored" in {
