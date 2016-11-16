@@ -7,8 +7,6 @@ import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.scoring.TwitterScoreCalculator
 import com.typesafe.scalalogging.LazyLogging
 
-import scala.language.postfixOps
-
 class ArticleProcessor(config: ConfigLoader,
                        consumer: KafkaConsumerWrapper,
                        scoreCalculator: TwitterScoreCalculator,
@@ -41,8 +39,15 @@ class ArticleProcessor(config: ConfigLoader,
       .grouped(config.tweetsBatchSize)
       .flatMap { batch =>
         val mappedBatch = batch.map( article => (article.originalId.toLong, article)).toMap
-        val updated = scoreCalculator.updateScores(mappedBatch)
-        updated
+
+        try {
+          val updated = scoreCalculator.updateScores(mappedBatch)
+          updated
+        } catch {
+          case ex: Exception =>
+            logger.error("Error while updating scores.", ex)
+            List()
+        }
       }.toList
 
     val ds = sparkSession.createDataset(updatedArticles)
@@ -51,7 +56,7 @@ class ArticleProcessor(config: ConfigLoader,
   }
 
   private def getRecordsFromSource: List[TwitterArticle] = {
-    val recordsValues: List[TwitterArticle] = consumer.pullAll
+    val recordsValues: List[TwitterArticle] = consumer.pullAll()
     consumer.stopConsumer()
     recordsValues
   }

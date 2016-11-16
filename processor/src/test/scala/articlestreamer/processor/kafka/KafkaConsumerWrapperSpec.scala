@@ -1,5 +1,3 @@
-
-
 package articlestreamer.processor.kafka
 
 import java.util
@@ -15,7 +13,6 @@ import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 
 import scala.io.Source
-import scala.language.postfixOps
 
 class KafkaConsumerWrapperSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats {
 
