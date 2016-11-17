@@ -8,7 +8,7 @@ import articlestreamer.aggregator.twitter.TwitterStreamerFactory
 import articlestreamer.aggregator.twitter.utils.TwitterStatusMethods
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.marshalling.CustomJsonFormats
-import articlestreamer.shared.model.kafka.ArticleRecord
+import articlestreamer.shared.model.kafka.KafkaRecord
 import articlestreamer.shared.model.{TweetAuthor, TwitterArticle}
 import articlestreamer.shared.scoring.TwitterScoreCalculator
 import com.typesafe.scalalogging.LazyLogging
@@ -45,7 +45,7 @@ class Aggregator(config: ConfigLoader,
       if (!status.isRetweet && status.isPotentialArticle) {
         val article = convertToArticle(status)
 
-        val json = write(ArticleRecord(article.publicationDate, Some(article)))
+        val json = write(new KafkaRecord(article.publicationDate, article))
         val record = new ProducerRecord[String, String](
           config.kafkaMainTopic,
           s"tweet${status.getId}",
