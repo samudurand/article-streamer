@@ -54,6 +54,18 @@ class KafkaConsumerWrapperSpec extends BaseSpec with BeforeAndAfter {
     verify(consumer, times(1)).close()
   }
 
+  it should "print records" in {
+    val mockIter = mock(classOf[util.Iterator[ConsumerRecord[String, AnyRef]]])
+    when(mockIter.hasNext()).thenReturn(true).thenReturn(false)
+    when(mockIter.next()).thenReturn(new ConsumerRecord[String, AnyRef]("", 0, 0, "", "abc"))
+
+    val records = mock(classOf[ConsumerRecords[String, AnyRef]])
+    when(records.iterator()).thenReturn(mockIter)
+
+    val str = consumerWrapper.printRecords(records)
+    str shouldBe "abc"
+  }
+
   "Config" should "be tested with SSL" in {
     class Test2Config extends ConfigLoader {
       override val kafkaSSLMode: Boolean = true
