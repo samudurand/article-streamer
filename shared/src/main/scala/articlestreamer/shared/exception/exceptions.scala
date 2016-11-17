@@ -13,10 +13,6 @@ object exceptions {
       sw.toString
     }
 
-    def printNeatStackTrace() = {
-      System.err.println(getStackTraceAsString)
-    }
-
   }
 
 }

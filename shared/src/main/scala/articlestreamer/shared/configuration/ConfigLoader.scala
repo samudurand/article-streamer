@@ -3,6 +3,7 @@ package articlestreamer.shared.configuration
 import java.io.{File, PrintWriter}
 
 import com.typesafe.config.ConfigFactory
+import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.JavaConversions._
 
@@ -16,7 +17,7 @@ final case class TwitterSearchConfig(mainTag: String,
                                articleUnrelatedWords: List[String],
                                subjectUnrelatedWords: List[String])
 
-trait ConfigLoader {
+trait ConfigLoader extends LazyLogging {
 
   val appConfig = ConfigFactory.load()
 
@@ -81,11 +82,11 @@ trait ConfigLoader {
     keyWriter.println(privateKey)
     keyWriter.close()
 
-    exec(s"openssl pkcs12 -export -password pass:test1234 -out $kafkaTrustStore/store.pkcs12 -inkey $kafkaTrustStore/key.pem -certfile $kafkaTrustStore/ca.pem -in $kafkaTrustStore/cert.pem -caname 'CARoot' -name client")(println)
+    exec(s"openssl pkcs12 -export -password pass:test1234 -out $kafkaTrustStore/store.pkcs12 -inkey $kafkaTrustStore/key.pem -certfile $kafkaTrustStore/ca.pem -in $kafkaTrustStore/cert.pem -caname 'CARoot' -name client")(x => logger.debug(x))
 
-    exec(s"keytool -importkeystore -noprompt -srckeystore $kafkaTrustStore/store.pkcs12 -destkeystore $kafkaTrustStore/keystore.jks -srcstoretype pkcs12 -srcstorepass test1234 -srckeypass test1234 -destkeypass test1234 -deststorepass test1234 -alias client")(println)
+    exec(s"keytool -importkeystore -noprompt -srckeystore $kafkaTrustStore/store.pkcs12 -destkeystore $kafkaTrustStore/keystore.jks -srcstoretype pkcs12 -srcstorepass test1234 -srckeypass test1234 -destkeypass test1234 -deststorepass test1234 -alias client")(x => logger.debug(x))
 
-    exec(s"keytool -noprompt -keystore $kafkaTrustStore/truststore.jks -alias CARoot -import -file $kafkaTrustStore/ca.pem -storepass test1234")(println)
+    exec(s"keytool -noprompt -keystore $kafkaTrustStore/truststore.jks -alias CARoot -import -file $kafkaTrustStore/ca.pem -storepass test1234")(x => logger.debug(x))
 
   }
 

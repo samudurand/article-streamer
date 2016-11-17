@@ -10,10 +10,4 @@ class ExceptionUtilsSpec extends BaseSpec {
     ex.getStackTraceAsString should startWith regex "java.lang.RuntimeException"
   }
 
-  //For coverage purpose
-  "Utils" should "print neat stacktrace" in {
-    val ex = new RuntimeException
-    ex.printNeatStackTrace()
-  }
-
 }
