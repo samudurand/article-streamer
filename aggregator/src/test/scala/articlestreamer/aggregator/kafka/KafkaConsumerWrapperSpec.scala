@@ -37,7 +37,7 @@ class KafkaConsumerWrapperSpec extends BaseSpec with BeforeAndAfter {
 
   it should "poll 10 times" in {
     val mockIter = mock(classOf[util.Iterator[ConsumerRecord[String, AnyRef]]])
-    when(mockIter.hasNext).thenReturn(true).thenReturn(false)
+    when(mockIter.hasNext()).thenReturn(true).thenReturn(false)
     when(mockIter.next()).thenReturn(new ConsumerRecord[String, AnyRef]("", 0, 0, "", ""))
 
     val records = mock(classOf[ConsumerRecords[String, AnyRef]])
