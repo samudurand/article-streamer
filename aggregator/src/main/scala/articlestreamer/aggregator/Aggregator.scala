@@ -1,14 +1,14 @@
 package articlestreamer.aggregator
 
 import java.sql.Date
-import java.util.UUID
+import java.util.{Calendar, TimeZone, UUID}
 
 import articlestreamer.aggregator.kafka.KafkaProducerWrapper
 import articlestreamer.aggregator.twitter.TwitterStreamerFactory
 import articlestreamer.aggregator.twitter.utils.TwitterStatusMethods
+import articlestreamer.shared.Constants
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.marshalling.CustomJsonFormats
-import articlestreamer.shared.model.kafka.KafkaRecord
 import articlestreamer.shared.model.{TweetAuthor, TwitterArticle}
 import articlestreamer.shared.scoring.TwitterScoreCalculator
 import com.typesafe.scalalogging.LazyLogging
@@ -45,17 +45,26 @@ class Aggregator(config: ConfigLoader,
       if (!status.isRetweet && status.isPotentialArticle) {
         val article = convertToArticle(status)
 
-        val json = write(new KafkaRecord(article.publicationDate, article))
         val record = new ProducerRecord[String, String](
           config.kafkaMainTopic,
-          s"tweet${status.getId}",
-          json)
+          s"tweet-${status.getId}",
+          write(article))
 
         producer.send(record)
+        producer.send(endOfQueueRecord())
+
       } else {
         logger.warn(s"Tweet ${status.getId} ignored : '${status.getText.mkString}'")
       }
     }
+  }
+
+  private def endOfQueueRecord(): ProducerRecord[String, String] = {
+    val currenttime = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+    val currendDate = new Date(currenttime.getTime.getTime)
+    new ProducerRecord[String, String](
+      config.kafkaMainTopic,
+      Constants.END_OF_KEUE_KEY, "")
   }
 
   private def convertToArticle(status: Status): TwitterArticle = {

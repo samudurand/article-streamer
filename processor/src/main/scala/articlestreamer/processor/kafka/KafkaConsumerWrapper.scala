@@ -4,6 +4,7 @@ import java.util
 import java.util.{Properties, UUID}
 
 import articlestreamer.processor.marshalling.RecordMarshaller
+import articlestreamer.shared.Constants
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.kafka.KafkaFactory
 import articlestreamer.shared.model.TwitterArticle
@@ -56,6 +57,8 @@ class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, S
 
     if (callAttempts == config.kafkaMaxAttempts) {
       logger.warn(s"Could not find the end of queue, polling stopped after ${config.kafkaMaxAttempts} attempts.")
+    } else {
+      logger.warn(s"End of queue reached, polling stopped.")
     }
 
     logger.info("Polling Completed.")
@@ -69,22 +72,19 @@ class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, S
     var endFound = false
     val recordsIterator: util.Iterator[ConsumerRecord[String, String]] = records.iterator()
     while (recordsIterator.hasNext) {
+      val record = recordsIterator.next()
 
-      val maybeRecord = unmarshallRecord(recordsIterator.next().value())
-      if (maybeRecord.isEmpty) {
-
-        logger.warn(s"Could not parse record $maybeRecord into an article.")
-
+      if (record.key() == Constants.END_OF_KEUE_KEY) {
+        endFound = true
       } else {
 
-        val record = maybeRecord.get
-        if (record.endOfQueue) {
-          endFound = true
-        } else {
-          val article = record.article.get
-          articles += article
-        }
+        val maybeArticle = unmarshallArticle(record.value())
 
+        if (maybeArticle.isEmpty) {
+          logger.warn(s"Could not parse record $maybeArticle into an article.")
+        } else {
+          articles += maybeArticle.get
+        }
       }
     }
 

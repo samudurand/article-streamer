@@ -21,7 +21,10 @@ class ArticleProcessor(config: ConfigLoader,
       logger.info(s"Processing ${records.length} articles")
 
       val sortedArticles = processArticles(records)
-      sortedArticles.foreach(a => logger.info(s"Article ${a.originalId} \nScore : ${a.score} \nContent : ${a.content} \n"))
+      sortedArticles.foreach(a => logger.info(s"Article ${a.originalId} \n" +
+        s"Score : ${a.score} \n" +
+        s"Date : ${a.publicationDate} \n" +
+        s"Content : ${a.content} \n"))
       sortedArticles
     } else {
       logger.info("No article recovered, terminating program")
