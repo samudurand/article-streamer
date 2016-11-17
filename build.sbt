@@ -94,6 +94,6 @@ lazy val shared = (project in file("shared")).
     libraryDependencies ++= Dependencies.commonDependencies,
     libraryDependencies += "org.twitter4j" % "twitter4j-stream" % Dependencies.twitter4JVersion,
 
-    coverageExcludedPackages := ".*ConfigLoader"
+    coverageExcludedPackages := "articlestreamer\\.shared\\.model\\..*;.*ConfigLoader"
 
 )
