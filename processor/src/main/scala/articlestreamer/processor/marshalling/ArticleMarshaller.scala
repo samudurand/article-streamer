@@ -5,7 +5,7 @@ import articlestreamer.shared.model.TwitterArticle
 import com.typesafe.scalalogging.LazyLogging
 import org.json4s.jackson.Serialization._
 
-trait RecordMarshaller extends Serializable with CustomJsonFormats with LazyLogging {
+trait ArticleMarshaller extends Serializable with CustomJsonFormats with LazyLogging {
 
   def unmarshallArticle(article: String): Option[TwitterArticle] = {
 

@@ -3,7 +3,7 @@ package articlestreamer.processor.kafka
 import java.util
 import java.util.{Properties, UUID}
 
-import articlestreamer.processor.marshalling.RecordMarshaller
+import articlestreamer.processor.marshalling.ArticleMarshaller
 import articlestreamer.shared.Constants
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.kafka.KafkaFactory
@@ -20,7 +20,7 @@ import scala.language.postfixOps
 /**
   * This class uses Java style loops to avoid using the JavaCollections methods provided by scala (using those would complicate the Unit tests)
   */
-class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, String]) extends LazyLogging with RecordMarshaller {
+class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, String]) extends LazyLogging with ArticleMarshaller {
 
   val topic = config.kafkaMainTopic
   val pollingTimeout = 1 seconds
