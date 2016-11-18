@@ -23,4 +23,8 @@ object MainApp extends App {
   val processor = wire[ArticleProcessor]
   processor.run()
 
+  sys.addShutdownHook {
+    kafkaConsumerWrapper.stopConsumer()
+  }
+
 }

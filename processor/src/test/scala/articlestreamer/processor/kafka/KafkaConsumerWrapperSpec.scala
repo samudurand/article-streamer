@@ -2,7 +2,7 @@ package articlestreamer.processor.kafka
 
 import java.util
 
-import articlestreamer.shared.BaseSpec
+import articlestreamer.shared.{BaseSpec, Constants}
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.kafka.KafkaFactory
 import articlestreamer.shared.marshalling.CustomJsonFormats
@@ -89,13 +89,12 @@ class KafkaConsumerWrapperSpec extends BaseSpec with BeforeAndAfter with CustomJ
     val consRecords = new ConsumerRecords[String, String](mapRecords)
     val noRecords = new ConsumerRecords[String, String](new util.HashMap())
 
-    if (!includeEndOfQueue) {
-      when(consumer.poll(anyLong()))
-        .thenReturn(consRecords)
-        .thenReturn(noRecords)
-    } else {
-      val endOfQueue = Source.fromURL(getClass.getResource("/data/record-end-of-queue.json")).mkString
-      val endRecord = new ConsumerRecord[String, String]("topic", 1, 0, "key", endOfQueue)
+    when(consumer.poll(anyLong()))
+      .thenReturn(consRecords)
+      .thenReturn(noRecords)
+
+    if (includeEndOfQueue) {
+      val endRecord = new ConsumerRecord[String, String]("topic", 1, 0, Constants.END_OF_QUEUE_KEY, "")
       val mapEndRecord = new util.HashMap[TopicPartition, util.List[ConsumerRecord[String, String]]]()
       mapEndRecord.put(new TopicPartition("topic", 1), util.Arrays.asList(endRecord))
       val endRecords = new ConsumerRecords[String, String](mapEndRecord)

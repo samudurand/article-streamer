@@ -1,19 +1,15 @@
 {
-  "date": "1998-05-02 10:25:10",
-  "endOfQueue": false,
-  "article": {
-    "id": "00000000-0000-0000-0000-000000000002",
-    "originalId": "789070025044436320",
-    "publicationDate": "1998-05-02 10:25:10",
-    "links": [
-      "https://t.co/C5m0dEKan9"
-    ],
-    "content": "Let's go for Spark Summit ! #Spark https://t.co/CfrtgKan9",
-    "author": {
-      "id": 1234,
-      "displayName": "user1",
-      "followersCount": 0
-    },
-    "score": 0
-  }
+  "id": "00000000-0000-0000-0000-000000000002",
+  "originalId": "789070025044436320",
+  "publicationDate": "1998-05-02 10:25:10",
+  "links": [
+    "https://t.co/C5m0dEKan9"
+  ],
+  "content": "Let's go for Spark Summit ! #Spark https://t.co/CfrtgKan9",
+  "author": {
+    "id": 1234,
+    "displayName": "user1",
+    "followersCount": 0
+  },
+  "score": 0
 }

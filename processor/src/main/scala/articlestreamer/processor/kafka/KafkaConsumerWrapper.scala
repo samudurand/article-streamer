@@ -74,7 +74,7 @@ class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, S
     while (recordsIterator.hasNext) {
       val record = recordsIterator.next()
 
-      if (record.key() == Constants.END_OF_KEUE_KEY) {
+      if (record.key() == Constants.END_OF_QUEUE_KEY) {
         endFound = true
       } else {
 

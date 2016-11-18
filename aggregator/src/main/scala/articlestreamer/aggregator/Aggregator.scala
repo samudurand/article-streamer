@@ -60,11 +60,9 @@ class Aggregator(config: ConfigLoader,
   }
 
   private def endOfQueueRecord(): ProducerRecord[String, String] = {
-    val currenttime = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-    val currendDate = new Date(currenttime.getTime.getTime)
     new ProducerRecord[String, String](
       config.kafkaMainTopic,
-      Constants.END_OF_KEUE_KEY, "")
+      Constants.END_OF_QUEUE_KEY, "")
   }
 
   private def convertToArticle(status: Status): TwitterArticle = {

@@ -8,7 +8,7 @@ import articlestreamer.aggregator.twitter.{DefaultTwitterStreamerFactory, Twitte
 import articlestreamer.shared.BaseSpec
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.marshalling.CustomJsonFormats
-import articlestreamer.shared.model.kafka.KafkaRecord
+import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.scoring.TwitterScoreCalculator
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.json4s.jackson.Serialization.read
@@ -47,7 +47,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     verify(streamer, times(1)).startStreaming()
   }
 
-  "Tweet received" should "be converted to an article and send to kafka" in {
+  "Tweet received" should "be converted to an article and sent to kafka" in {
     when(scoreCalculator.calculateBaseScore(any())).thenReturn(10)
 
     val uRLEntity = mock(classOf[URLEntity])
@@ -69,15 +69,17 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
 
     tweetHandler(status)
 
-    val recordSent = read[KafkaRecord](captor.getValue.value())
-    recordSent.endOfQueue shouldBe false
-    recordSent.date shouldBe date
-
-    val articleSent = recordSent.article.get
+    val articleRecord = captor.getAllValues.get(0)
+    articleRecord.key() should startWith ("tweet")
+    val articleSent = read[TwitterArticle](articleRecord.value())
     articleSent.content shouldBe "some content"
     articleSent.originalId shouldBe "1000"
     articleSent.score shouldBe Some(10)
     articleSent.links shouldBe List("http://anyurl.com")
+
+    val endQueueRecord = captor.getAllValues.get(1)
+    endQueueRecord.key() shouldBe "endOfQueue"
+    endQueueRecord.value() shouldBe empty
   }
 
   "Any tweet not potentially an article " should "be ignored" in {

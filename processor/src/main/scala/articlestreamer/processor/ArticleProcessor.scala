@@ -41,11 +41,9 @@ class ArticleProcessor(config: ConfigLoader,
     val updatedArticles = articles
       .grouped(config.tweetsBatchSize)
       .flatMap { batch =>
-        val mappedBatch = batch.map( article => (article.originalId.toLong, article)).toMap
-
         try {
-          val updated = scoreCalculator.updateScores(mappedBatch)
-          updated
+          val mappedBatch = batch.map( article => (article.originalId.toLong, article)).toMap
+          scoreCalculator.updateScores(mappedBatch)
         } catch {
           case ex: Exception =>
             logger.error("Error while updating scores.", ex)
@@ -59,9 +57,7 @@ class ArticleProcessor(config: ConfigLoader,
   }
 
   private def getRecordsFromSource: List[TwitterArticle] = {
-    val recordsValues: List[TwitterArticle] = consumer.pullAll()
-    consumer.stopConsumer()
-    recordsValues
+    consumer.pullAll()
   }
 
 }
