@@ -1,7 +1,7 @@
 package articlestreamer.aggregator
 
 import java.sql.Date
-import java.util.{Calendar, TimeZone, UUID}
+import java.util.UUID
 
 import articlestreamer.aggregator.kafka.KafkaProducerWrapper
 import articlestreamer.aggregator.twitter.TwitterStreamerFactory
