@@ -33,3 +33,5 @@ Datasets and options :
         maybeArticle
       }
       .collect().toList
+
+TODO : contribute to json4s to detect abstract class Constructor use attempt https://github.com/json4s/json4s/pull/331/commits/627f5474fda8bbe34ee2aaa24e595ff28610a4f0

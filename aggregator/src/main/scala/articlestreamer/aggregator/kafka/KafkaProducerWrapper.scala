@@ -29,7 +29,7 @@ object KafkaProducerWrapper {
 
     val properties = new Properties()
     properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBrokers)
-    properties.put(ProducerConfig.ACKS_CONFIG, "all")
+    properties.put(ProducerConfig.ACKS_CONFIG, "1")
     properties.put(ProducerConfig.RETRIES_CONFIG, 0.asInstanceOf[AnyRef])
     properties.put(ProducerConfig.BATCH_SIZE_CONFIG, 16384.asInstanceOf[AnyRef])
     properties.put(ProducerConfig.LINGER_MS_CONFIG, 1.asInstanceOf[AnyRef])

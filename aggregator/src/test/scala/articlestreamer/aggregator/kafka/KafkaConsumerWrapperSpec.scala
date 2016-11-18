@@ -1,9 +1,11 @@
 package articlestreamer.aggregator.kafka
 
+import java.util
+
 import articlestreamer.shared.BaseSpec
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.kafka.KafkaFactory
-import org.apache.kafka.clients.consumer.{ConsumerRecords, KafkaConsumer}
+import org.apache.kafka.clients.consumer.{ConsumerRecord, ConsumerRecords, KafkaConsumer}
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
@@ -34,7 +36,12 @@ class KafkaConsumerWrapperSpec extends BaseSpec with BeforeAndAfter {
   }
 
   it should "poll 10 times" in {
+    val mockIter = mock(classOf[util.Iterator[ConsumerRecord[String, AnyRef]]])
+    when(mockIter.hasNext()).thenReturn(true).thenReturn(false)
+    when(mockIter.next()).thenReturn(new ConsumerRecord[String, AnyRef]("", 0, 0, "", ""))
+
     val records = mock(classOf[ConsumerRecords[String, AnyRef]])
+    when(records.iterator()).thenReturn(mockIter)
     when(consumer.poll(1000)).thenReturn(records)
 
     consumerWrapper.poll(1 second, 10)
@@ -45,6 +52,18 @@ class KafkaConsumerWrapperSpec extends BaseSpec with BeforeAndAfter {
   it should "close the Consumer" in {
     consumerWrapper.stopConsumer()
     verify(consumer, times(1)).close()
+  }
+
+  it should "print records" in {
+    val mockIter = mock(classOf[util.Iterator[ConsumerRecord[String, AnyRef]]])
+    when(mockIter.hasNext()).thenReturn(true).thenReturn(false)
+    when(mockIter.next()).thenReturn(new ConsumerRecord[String, AnyRef]("", 0, 0, "", "abc"))
+
+    val records = mock(classOf[ConsumerRecords[String, AnyRef]])
+    when(records.iterator()).thenReturn(mockIter)
+
+    val str = consumerWrapper.printRecords(records)
+    str shouldBe "abc"
   }
 
   "Config" should "be tested with SSL" in {

@@ -31,6 +31,13 @@ object Commons {
 
     addCompilerPlugin("com.github.ghik" %% "silencer-plugin" % "0.5"),
 
-    cleanKeepFiles ++= Seq("resolution-cache", "streams").map(target.value / _)
+    cleanKeepFiles ++= Seq("resolution-cache", "streams").map(target.value / _),
+
+    dependencyOverrides ++= Set(
+      "org.scala-lang.modules" %% "scala-xml" % "1.0.5",
+      "org.json4s" %% "json4s-jackson" % "3.4.1",
+      "commons-io" % "commons-io" % "2.4"
+    )
+
   )
 }

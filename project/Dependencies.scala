@@ -13,7 +13,7 @@ object Dependencies {
     "com.softwaremill.macwire" %% "macros" % "2.2.4" % "provided",
     "com.softwaremill.macwire" %% "util" % "2.2.4",
     "com.softwaremill.macwire" %% "proxy" % "2.2.4",
-    "ch.qos.logback" % "logback-classic" % "1.1.7",
+    "ch.qos.logback" % "logback-classic" % "1.1.7" exclude("org.slf4j","slf4j-api"),
     "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0",
     "com.github.ghik" %% "silencer-lib" % "0.5",
 
