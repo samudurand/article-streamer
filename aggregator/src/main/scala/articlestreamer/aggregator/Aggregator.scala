@@ -8,6 +8,7 @@ import articlestreamer.aggregator.twitter.TwitterStreamerFactory
 import articlestreamer.aggregator.twitter.utils.TwitterStatusMethods
 import articlestreamer.shared.Constants
 import articlestreamer.shared.configuration.ConfigLoader
+import articlestreamer.shared.kafka.{HalfDayTopicManager, DualTopicManager}
 import articlestreamer.shared.marshalling.CustomJsonFormats
 import articlestreamer.shared.model.{TweetAuthor, TwitterArticle}
 import articlestreamer.shared.scoring.TwitterScoreCalculator
@@ -20,6 +21,8 @@ class Aggregator(config: ConfigLoader,
                  producer: KafkaProducerWrapper,
                  scoreCalculator: TwitterScoreCalculator,
                  streamer: TwitterStreamerFactory) extends CustomJsonFormats with TwitterStatusMethods with LazyLogging {
+
+  val topicManager = new HalfDayTopicManager(config)
 
   def run() = {
 
@@ -46,7 +49,7 @@ class Aggregator(config: ConfigLoader,
         val article = convertToArticle(status)
 
         val record = new ProducerRecord[String, String](
-          config.kafkaMainTopic,
+          topicManager.getCurrentTopic(),
           s"tweet-${status.getId}",
           write(article))
 
@@ -61,7 +64,7 @@ class Aggregator(config: ConfigLoader,
 
   private def endOfQueueRecord(): ProducerRecord[String, String] = {
     new ProducerRecord[String, String](
-      config.kafkaMainTopic,
+      topicManager.getCurrentTopic(),
       Constants.END_OF_QUEUE_KEY, "")
   }
 

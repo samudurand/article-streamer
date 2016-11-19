@@ -7,6 +7,7 @@ import articlestreamer.aggregator.kafka.KafkaProducerWrapper
 import articlestreamer.aggregator.twitter.{DefaultTwitterStreamerFactory, TwitterStreamer}
 import articlestreamer.shared.BaseSpec
 import articlestreamer.shared.configuration.ConfigLoader
+import articlestreamer.shared.kafka.HalfDayTopicManager
 import articlestreamer.shared.marshalling.CustomJsonFormats
 import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.scoring.TwitterScoreCalculator
@@ -27,6 +28,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
 
   val config = new TestConfig()
 
+  val topicManager = new HalfDayTopicManager(config)
   var kafkaWrapper : KafkaProducerWrapper = _
   var scoreCalculator: TwitterScoreCalculator = _
   var streamer: TwitterStreamer = _
@@ -41,7 +43,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     val factory = mock(classOf[DefaultTwitterStreamerFactory])
     when(factory.getStreamer(any(), any(), any())).thenReturn(streamer)
 
-    val aggregator = new Aggregator(config, kafkaWrapper, scoreCalculator, factory)
+    val aggregator = new Aggregator(config, kafkaWrapper, scoreCalculator, factory, topicManager)
     aggregator.run()
 
     verify(streamer, times(1)).startStreaming()
@@ -132,7 +134,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     val factory = mock(classOf[DefaultTwitterStreamerFactory])
     when(factory.getStreamer(any(), captor.capture(), any())).thenReturn(streamer)
 
-    val aggregator = new Aggregator(config, kafkaWrapper, scoreCalculator, factory)
+    val aggregator = new Aggregator(config, kafkaWrapper, scoreCalculator, factory, topicManager)
     aggregator.run()
     captor.getValue()
   }

@@ -20,9 +20,8 @@ import scala.language.postfixOps
 /**
   * This class uses Java style loops to avoid using the JavaCollections methods provided by scala (using those would complicate the Unit tests)
   */
-class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, String]) extends LazyLogging with ArticleMarshaller {
+class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, String], topic: String) extends LazyLogging with ArticleMarshaller {
 
-  val topic = config.kafkaMainTopic
   val pollingTimeout = 1 seconds
 
   private val consumer = factory.getConsumer(KafkaConsumerWrapper.getProperties(config))

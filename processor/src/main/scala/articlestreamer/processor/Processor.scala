@@ -3,14 +3,24 @@ package articlestreamer.processor
 import articlestreamer.processor.kafka.KafkaConsumerWrapper
 import articlestreamer.processor.spark.SparkSessionProvider
 import articlestreamer.shared.configuration.ConfigLoader
+import articlestreamer.shared.kafka.{DualTopicManager, KafkaFactory}
 import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.scoring.TwitterScoreCalculator
 import com.typesafe.scalalogging.LazyLogging
 
-class ArticleProcessor(config: ConfigLoader,
-                       consumer: KafkaConsumerWrapper,
-                       scoreCalculator: TwitterScoreCalculator,
-                       sparkSessionProvider: SparkSessionProvider) extends LazyLogging {
+class Processor(config: ConfigLoader,
+                consumerFactory: KafkaFactory[String, String],
+                scoreCalculator: TwitterScoreCalculator,
+                sparkSessionProvider: SparkSessionProvider,
+                topicManager: DualTopicManager) extends LazyLogging {
+
+  val consumer1 = new KafkaConsumerWrapper(config, consumerFactory, topicManager.getFirstTopic())
+  val consumer2 = new KafkaConsumerWrapper(config, consumerFactory, topicManager.getSecondTopic())
+
+  sys.addShutdownHook {
+    consumer1.stopConsumer()
+    consumer2.stopConsumer()
+  }
 
   def run(): List[TwitterArticle] = {
 
@@ -57,7 +67,11 @@ class ArticleProcessor(config: ConfigLoader,
   }
 
   private def getRecordsFromSource: List[TwitterArticle] = {
-    consumer.pullAll()
+    if (topicManager.getCurrentTopic() == topicManager.getFirstTopic()) {
+      consumer1.pullAll()
+    } else {
+      consumer2.pullAll()
+    }
   }
 
 }

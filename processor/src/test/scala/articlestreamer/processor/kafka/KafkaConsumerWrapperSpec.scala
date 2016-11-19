@@ -2,10 +2,11 @@ package articlestreamer.processor.kafka
 
 import java.util
 
-import articlestreamer.shared.{BaseSpec, Constants}
+import articlestreamer.processor.kafka.KafkaConsumerWrapperSpec.prepareRecords
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.kafka.KafkaFactory
 import articlestreamer.shared.marshalling.CustomJsonFormats
+import articlestreamer.shared.{BaseSpec, Constants}
 import org.apache.kafka.clients.consumer.{ConsumerRecord, ConsumerRecords, KafkaConsumer}
 import org.apache.kafka.common.TopicPartition
 import org.mockito.ArgumentMatchers._
@@ -28,7 +29,7 @@ class KafkaConsumerWrapperSpec extends BaseSpec with BeforeAndAfter with CustomJ
     consumer = mock(classOf[KafkaConsumer[String, String]])
     when(factory.getConsumer(any())).thenReturn(consumer)
 
-    consumerWrapper = new KafkaConsumerWrapper(new TestConfig, factory)
+    consumerWrapper = new KafkaConsumerWrapper(new TestConfig, factory, "")
   }
 
   "Wrapper" should "pull all messages then stop on end of queue message" in {
@@ -37,7 +38,7 @@ class KafkaConsumerWrapperSpec extends BaseSpec with BeforeAndAfter with CustomJ
 
     val r1 = new ConsumerRecord[String, String]("topic", 1, 0, "key", tweet1)
     val r2 = new ConsumerRecord[String, String]("topic", 1, 0, "key2", tweet2)
-    prepareRecords(util.Arrays.asList(r1, r2), includeEndOfQueue = true)
+    prepareRecords(consumer, util.Arrays.asList(r1, r2), includeEndOfQueue = true)
 
     val values = consumerWrapper.pullAll()
 
@@ -53,7 +54,7 @@ class KafkaConsumerWrapperSpec extends BaseSpec with BeforeAndAfter with CustomJ
 
     val r1 = new ConsumerRecord[String, String]("topic", 1, 0, "key", tweet1)
     val r2 = new ConsumerRecord[String, String]("topic", 1, 0, "key2", tweet2)
-    prepareRecords(util.Arrays.asList(r1, r2), includeEndOfQueue = false)
+    prepareRecords(consumer, util.Arrays.asList(r1, r2), includeEndOfQueue = false)
 
     val values = consumerWrapper.pullAll()
 
@@ -69,7 +70,7 @@ class KafkaConsumerWrapperSpec extends BaseSpec with BeforeAndAfter with CustomJ
 
     val r0 = new ConsumerRecord[String, String]("topic", 1, 0, "key2", badlyFormatted)
     val r1 = new ConsumerRecord[String, String]("topic", 1, 0, "key", tweet1)
-    prepareRecords(util.Arrays.asList(r0, r1), includeEndOfQueue = true)
+    prepareRecords(consumer, util.Arrays.asList(r0, r1), includeEndOfQueue = true)
 
     val values = consumerWrapper.pullAll()
 
@@ -83,17 +84,37 @@ class KafkaConsumerWrapperSpec extends BaseSpec with BeforeAndAfter with CustomJ
     verify(consumer, times(1)).close()
   }
 
-  private def prepareRecords(records: util.List[ConsumerRecord[String, String]], includeEndOfQueue: Boolean): Unit = {
+  "Config" should "be tested with SSL" in {
+    class Test2Config extends ConfigLoader {
+      override val kafkaSSLMode: Boolean = true
+    }
+
+    consumerWrapper = new KafkaConsumerWrapper(new Test2Config, factory, "")
+  }
+
+  "Config" should "be tested without SSL" in {
+    class Test2Config extends ConfigLoader {
+      override val kafkaSSLMode: Boolean = false
+    }
+
+    consumerWrapper = new KafkaConsumerWrapper(new Test2Config, factory, "")
+  }
+
+}
+
+object KafkaConsumerWrapperSpec {
+
+  def prepareRecords(consumer: KafkaConsumer[String, String], records: util.List[ConsumerRecord[String, String]], includeEndOfQueue: Boolean): Unit = {
     val mapRecords = new util.HashMap[TopicPartition, util.List[ConsumerRecord[String, String]]]()
     mapRecords.put(new TopicPartition("topic", 1), records)
     val consRecords = new ConsumerRecords[String, String](mapRecords)
     val noRecords = new ConsumerRecords[String, String](new util.HashMap())
 
-    when(consumer.poll(anyLong()))
-      .thenReturn(consRecords)
-      .thenReturn(noRecords)
-
-    if (includeEndOfQueue) {
+    if (!includeEndOfQueue) {
+      when(consumer.poll(anyLong()))
+        .thenReturn(consRecords)
+        .thenReturn(noRecords)
+    } else {
       val endRecord = new ConsumerRecord[String, String]("topic", 1, 0, Constants.END_OF_QUEUE_KEY, "")
       val mapEndRecord = new util.HashMap[TopicPartition, util.List[ConsumerRecord[String, String]]]()
       mapEndRecord.put(new TopicPartition("topic", 1), util.Arrays.asList(endRecord))
@@ -103,22 +124,6 @@ class KafkaConsumerWrapperSpec extends BaseSpec with BeforeAndAfter with CustomJ
         .thenReturn(consRecords)
         .thenReturn(endRecords)
     }
-  }
-
-  "Config" should "be tested with SSL" in {
-    class Test2Config extends ConfigLoader {
-      override val kafkaSSLMode: Boolean = true
-    }
-
-    consumerWrapper = new KafkaConsumerWrapper(new Test2Config, factory)
-  }
-
-  "Config" should "be tested without SSL" in {
-    class Test2Config extends ConfigLoader {
-      override val kafkaSSLMode: Boolean = false
-    }
-
-    consumerWrapper = new KafkaConsumerWrapper(new Test2Config, factory)
   }
 
 }

@@ -44,16 +44,17 @@ trait ConfigLoader extends LazyLogging {
     */
   val tweetsBatchSize = appConfig.getInt("twitter.tweetsBatchSize")
 
-  val kafkaBrokers = appConfig.getString("kafka.brokers")
-  val kafkaMainTopic = appConfig.getString("kafka.topic")
+  val kafkaMainTopic = appConfig.getString("kafka.topic-default")
+  val kafkaFirstTopic = appConfig.getString("kafka.topic1")
+  val kafkaSecondTopic = appConfig.getString("kafka.topic2")
 
+  val kafkaBrokers = appConfig.getString("kafka.brokers")
   /**
     * Maximum polling attempts before stopping
     */
   val kafkaMaxAttempts = appConfig.getInt("kafka.maxAttempts")
 
   val kafkaSSLMode = appConfig.getBoolean("kafka.sslProtocol")
-
   var kafkaTrustStore = ""
 
   protected def setupTrustStore(kafkaTrustStore: String) = {
