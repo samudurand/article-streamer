@@ -1,7 +1,7 @@
 package articlestreamer.shared.kafka
 
 import articlestreamer.shared.configuration.ConfigLoader
-import org.joda.time.LocalTime
+import org.joda.time.{DateTimeZone, LocalTime}
 
 /**
   * Handle the choice of topic. At the moment it simply choose based on the hour of the day (00 to 12 and 12 to 24)
@@ -12,8 +12,8 @@ class HalfDayTopicManager(config: ConfigLoader) extends DualTopicManager {
   val NOON = new LocalTime(12, 0, 0)
 
   def getCurrentTopic(): String = {
-    val now = new LocalTime()
-    if (now.isAfter(MIDNIGHT) && now.isBefore(NOON)) {
+    val now = new LocalTime(DateTimeZone.UTC)
+    if ((now.isEqual(MIDNIGHT) || now.isAfter(MIDNIGHT)) && now.isBefore(NOON)) {
       getFirstTopic()
     } else {
       getSecondTopic()
