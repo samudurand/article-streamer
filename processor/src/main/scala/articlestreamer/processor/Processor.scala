@@ -62,7 +62,7 @@ class Processor(config: ConfigLoader,
       }.toList
 
     val ds = sparkSession.createDataset(updatedArticles)
-    ds.sort($"score")
+    ds.sort($"score".desc)
       .collect().toList
   }
 
