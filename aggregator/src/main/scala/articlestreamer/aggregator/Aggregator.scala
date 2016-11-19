@@ -8,7 +8,7 @@ import articlestreamer.aggregator.twitter.TwitterStreamerFactory
 import articlestreamer.aggregator.twitter.utils.TwitterStatusMethods
 import articlestreamer.shared.Constants
 import articlestreamer.shared.configuration.ConfigLoader
-import articlestreamer.shared.kafka.{HalfDayTopicManager, DualTopicManager}
+import articlestreamer.shared.kafka.HalfDayTopicManager
 import articlestreamer.shared.marshalling.CustomJsonFormats
 import articlestreamer.shared.model.{TweetAuthor, TwitterArticle}
 import articlestreamer.shared.scoring.TwitterScoreCalculator

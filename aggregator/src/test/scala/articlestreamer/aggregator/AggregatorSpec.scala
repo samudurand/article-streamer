@@ -43,7 +43,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     val factory = mock(classOf[DefaultTwitterStreamerFactory])
     when(factory.getStreamer(any(), any(), any())).thenReturn(streamer)
 
-    val aggregator = new Aggregator(config, kafkaWrapper, scoreCalculator, factory, topicManager)
+    val aggregator = new Aggregator(config, kafkaWrapper, scoreCalculator, factory)
     aggregator.run()
 
     verify(streamer, times(1)).startStreaming()
@@ -134,7 +134,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     val factory = mock(classOf[DefaultTwitterStreamerFactory])
     when(factory.getStreamer(any(), captor.capture(), any())).thenReturn(streamer)
 
-    val aggregator = new Aggregator(config, kafkaWrapper, scoreCalculator, factory, topicManager)
+    val aggregator = new Aggregator(config, kafkaWrapper, scoreCalculator, factory)
     aggregator.run()
     captor.getValue()
   }
