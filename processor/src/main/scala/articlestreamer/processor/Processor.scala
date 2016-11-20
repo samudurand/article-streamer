@@ -67,7 +67,7 @@ class Processor(config: ConfigLoader,
   }
 
   private def getRecordsFromSource: List[TwitterArticle] = {
-    if (topicManager.getCurrentTopic() == topicManager.getFirstTopic()) {
+    if (topicManager.getCurrentTopic() == topicManager.getSecondTopic()) {
       consumer1.pullAll()
     } else {
       consumer2.pullAll()
