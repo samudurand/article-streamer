@@ -17,19 +17,31 @@ class HalfDayTopicManagerSpec extends BaseSpec {
   val config = new TestConfig
   val topicManager = new HalfDayTopicManager(config)
 
-  "HalfDayTopicManager" should "return first topic during morning" in {
+  "HalfDayTopicManager" should "give first topic as current topic during morning" in {
     DateTimeUtils.setCurrentMillisFixed(1182128400000l)
     topicManager.getCurrentTopic() shouldBe "topic1"
     DateTimeUtils.setCurrentMillisSystem()
   }
 
-  it should "return second topic during afternoon" in {
+  it should "give second topic as current topic during afternoon" in {
     DateTimeUtils.setCurrentMillisFixed(1182171600000l)
     topicManager.getCurrentTopic() shouldBe "topic2"
     DateTimeUtils.setCurrentMillisSystem()
   }
 
-  it should "return first topic at midnight" in {
+  it should "give second topic as not current topic during morning" in {
+    DateTimeUtils.setCurrentMillisFixed(1182128400000l)
+    topicManager.getNotCurrentTopic() shouldBe "topic2"
+    DateTimeUtils.setCurrentMillisSystem()
+  }
+
+  it should "give first topic as not current topic during afternoon" in {
+    DateTimeUtils.setCurrentMillisFixed(1182171600000l)
+    topicManager.getNotCurrentTopic() shouldBe "topic1"
+    DateTimeUtils.setCurrentMillisSystem()
+  }
+
+  it should "give first topic as current topic at midnight" in {
     DateTimeUtils.setCurrentMillisFixed(1182124800000l)
     topicManager.getCurrentTopic() shouldBe "topic1"
     DateTimeUtils.setCurrentMillisSystem()

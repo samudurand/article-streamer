@@ -10,6 +10,8 @@ trait DualTopicManager {
 
   def getCurrentTopic(): String
 
+  def getNotCurrentTopic(): String
+
   def getFirstTopic(): String
 
   def getSecondTopic(): String

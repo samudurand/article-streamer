@@ -1,12 +1,12 @@
 package articlestreamer.aggregator
 
 import java.sql.Date
-import java.util.UUID
+import java.util.{TimeZone, UUID}
 
 import articlestreamer.aggregator.kafka.KafkaProducerWrapper
+import articlestreamer.aggregator.kafka.scheduled.EndQueueJob
 import articlestreamer.aggregator.twitter.TwitterStreamerFactory
 import articlestreamer.aggregator.twitter.utils.TwitterStatusMethods
-import articlestreamer.shared.Constants
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.kafka.HalfDayTopicManager
 import articlestreamer.shared.marshalling.CustomJsonFormats
@@ -15,6 +15,11 @@ import articlestreamer.shared.scoring.TwitterScoreCalculator
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.kafka.clients.producer._
 import org.json4s.jackson.Serialization.write
+import org.quartz.CronScheduleBuilder._
+import org.quartz.JobBuilder.newJob
+import org.quartz.JobDataMap
+import org.quartz.TriggerBuilder._
+import org.quartz.impl.StdSchedulerFactory
 import twitter4j.Status
 
 class Aggregator(config: ConfigLoader,
@@ -25,6 +30,8 @@ class Aggregator(config: ConfigLoader,
   val topicManager = new HalfDayTopicManager(config)
 
   def run() = {
+
+    scheduleEndOfQueue()
 
     val twitterStreamer = streamer.getStreamer(config, tweetHandler(producer), stopHandler(producer))
 
@@ -54,18 +61,11 @@ class Aggregator(config: ConfigLoader,
           write(article))
 
         producer.send(record)
-        producer.send(endOfQueueRecord())
 
       } else {
         logger.warn(s"Tweet ${status.getId} ignored : '${status.getText.mkString}'")
       }
     }
-  }
-
-  private def endOfQueueRecord(): ProducerRecord[String, String] = {
-    new ProducerRecord[String, String](
-      topicManager.getCurrentTopic(),
-      Constants.END_OF_QUEUE_KEY, "")
   }
 
   private def convertToArticle(status: Status): TwitterArticle = {
@@ -88,6 +88,38 @@ class Aggregator(config: ConfigLoader,
     val baseScore = scoreCalculator.calculateBaseScore(article)
     article.copy(score = Some(baseScore))
 
+  }
+
+  private def scheduleEndOfQueue() = {
+    val scheduler = StdSchedulerFactory.getDefaultScheduler
+
+    val paramsMorning = new JobDataMap()
+    paramsMorning.put("producer", producer)
+    paramsMorning.put("topic", topicManager.getSecondTopic())
+    val jobMorning = newJob(classOf[EndQueueJob]).withIdentity("terminateAfternoonQueue")
+      .setJobData(new JobDataMap())
+      .build()
+    val morningTrigger = newTrigger()
+      .withIdentity("triggerTerminateAfternoonQueue")
+      .withSchedule(dailyAtHourAndMinute(0, 1).inTimeZone(TimeZone.getTimeZone("UTC")))
+      .forJob("terminateAfternoonQueue")
+      .build()
+    scheduler.scheduleJob(jobMorning, morningTrigger)
+
+    val paramsAfternoon = new JobDataMap()
+    paramsAfternoon.put("producer", producer)
+    paramsAfternoon.put("topic", topicManager.getFirstTopic())
+    val jobAfternoon = newJob(classOf[EndQueueJob]).withIdentity("terminateMorningQueue")
+      .setJobData(new JobDataMap())
+      .build()
+    val afternoonTrigger = newTrigger()
+      .withIdentity("triggerTerminateMorningQueue")
+      .withSchedule(dailyAtHourAndMinute(12, 1).inTimeZone(TimeZone.getTimeZone("UTC")))
+      .forJob("terminateMorningQueue")
+      .build()
+    scheduler.scheduleJob(jobAfternoon, afternoonTrigger)
+
+    scheduler.start()
   }
 
   private def stopHandler(producer: KafkaProducerWrapper): () => Unit = {

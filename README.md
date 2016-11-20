@@ -6,6 +6,8 @@ The idea of this project is to provide a tool that will aggregate articles about
 from various sources (Twitter, Linkedin, Blogs... ). 
 For each a score will be calculated. That score will represent the potential interest or value based on their popularity and other factors (to be determined).
 
+Every 12 hours the kafka topic changes so that if you trigger the articles processing only the articles having been recovered some time ago will be processed. 
+
 ## Configuration
 
 There is two possible way of configuration :

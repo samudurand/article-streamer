@@ -42,7 +42,7 @@ class Processor(config: ConfigLoader,
     }
   }
 
-  def processArticles(articles: List[TwitterArticle]): List[TwitterArticle] = {
+  private def processArticles(articles: List[TwitterArticle]): List[TwitterArticle] = {
     val sparkSession = sparkSessionProvider.getSparkSession()
 
     import sparkSession.implicits._

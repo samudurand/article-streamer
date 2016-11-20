@@ -20,6 +20,15 @@ class HalfDayTopicManager(config: ConfigLoader) extends DualTopicManager {
     }
   }
 
+  def getNotCurrentTopic(): String = {
+    val currentTopic = getCurrentTopic()
+    if (currentTopic == getFirstTopic()) {
+      getSecondTopic()
+    } else {
+      getFirstTopic()
+    }
+  }
+
   override def getTopicList(): Array[String] = Array(config.kafkaFirstTopic, config.kafkaSecondTopic)
 
   override def getFirstTopic(): String = config.kafkaFirstTopic
