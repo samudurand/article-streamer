@@ -44,6 +44,8 @@ class ProcessorSpec extends BaseSpec with SharedSparkContext with DataFrameSuite
     override def getFirstTopic(): String = "topic1"
 
     override def getSecondTopic(): String = "topic2"
+
+    override def getNotCurrentTopic(): String = ???
   }
 
   val config = new TestConfig

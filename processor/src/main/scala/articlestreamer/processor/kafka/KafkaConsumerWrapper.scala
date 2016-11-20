@@ -35,7 +35,7 @@ class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, S
     */
   def pullAll(): List[TwitterArticle] = {
 
-    logger.info("Polling started.")
+    logger.info(s"Polling started. Reading from topic $topic")
 
     val millis = pollingTimeout.toMillis
 

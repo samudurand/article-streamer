@@ -6,13 +6,19 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.quartz.{Job, JobExecutionContext}
 
 
-class EndQueueJob(producer: KafkaProducerWrapper, topic: String) extends Job {
+class EndQueueJob extends Job {
+
+  val TOPIC_PARAM = "topic"
+  val PRODUCER_PARAM = "producer"
 
   override def execute(context: JobExecutionContext) = {
-    producer.send(endOfQueueRecord())
+    val params = context.getJobDetail.getJobDataMap
+    val topic = params.getString(TOPIC_PARAM)
+    val producer = (params.get(PRODUCER_PARAM)).asInstanceOf[KafkaProducerWrapper]
+    producer.send(endOfQueueRecord(topic))
   }
 
-  private def endOfQueueRecord(): ProducerRecord[String, String] = {
+  private def endOfQueueRecord(topic: String): ProducerRecord[String, String] = {
     new ProducerRecord[String, String](topic, Constants.END_OF_QUEUE_KEY, "")
   }
 }
