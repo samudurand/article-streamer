@@ -77,9 +77,9 @@ class ProcessorSpec extends BaseSpec with SharedSparkContext with DataFrameSuite
     prepareConsumersToPullTwoRecords(consumer1)
 
     val article = TwitterArticle("00000000-0000-0000-0000-000000000001", "789070025009336320", new Date(123456789l),
-      mutable.WrappedArray.empty, "", TweetAuthor(1234, "user1", 0), Some(20))
+      mutable.WrappedArray.empty, "", TweetAuthor(1234, "user1", 0), Some(10))
     val article2 = TwitterArticle("00000000-0000-0000-0000-000000000002", "789070025044436320", new Date(123456789l),
-      mutable.WrappedArray.empty, "", TweetAuthor(5678, "user2", 0), Some(10))
+      mutable.WrappedArray.empty, "", TweetAuthor(5678, "user2", 0), Some(20))
 
     val mapCaptor: ArgumentCaptor[Map[Long, TwitterArticle]] = ArgumentCaptor.forClass(classOf[Map[Long, TwitterArticle]])
     when(scoreCalculator.updateScores(mapCaptor.capture()))

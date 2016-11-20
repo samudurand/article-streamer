@@ -17,13 +17,13 @@ import org.apache.kafka.clients.producer._
 import org.json4s.jackson.Serialization.write
 import org.quartz.CronScheduleBuilder._
 import org.quartz.JobBuilder.newJob
-import org.quartz.JobDataMap
 import org.quartz.TriggerBuilder._
-import org.quartz.impl.StdSchedulerFactory
+import org.quartz.{JobDataMap, Scheduler}
 import twitter4j.Status
 
 class Aggregator(config: ConfigLoader,
                  producer: KafkaProducerWrapper,
+                 scheduler: Scheduler,
                  scoreCalculator: TwitterScoreCalculator,
                  streamer: TwitterStreamerFactory) extends CustomJsonFormats with TwitterStatusMethods with LazyLogging {
 
@@ -44,6 +44,8 @@ class Aggregator(config: ConfigLoader,
       logger.info("Streaming stopped")
 
       producer.stopProducer()
+
+      scheduler.shutdown()
     })
   }
 
@@ -91,7 +93,6 @@ class Aggregator(config: ConfigLoader,
   }
 
   private def scheduleEndOfQueue() = {
-    val scheduler = StdSchedulerFactory.getDefaultScheduler
 
     val paramsMorning = new JobDataMap()
     paramsMorning.put("producer", producer)

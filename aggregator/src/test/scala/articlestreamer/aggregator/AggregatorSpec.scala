@@ -16,6 +16,8 @@ import org.json4s.jackson.Serialization.read
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
+import org.quartz.Scheduler
+import org.quartz.impl.StdSchedulerFactory
 import org.scalatest.BeforeAndAfter
 import twitter4j.{Status, URLEntity, User}
 
@@ -32,18 +34,24 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
   var kafkaWrapper : KafkaProducerWrapper = _
   var scoreCalculator: TwitterScoreCalculator = _
   var streamer: TwitterStreamer = _
+  var scheduler: Scheduler = _
 
   before {
     kafkaWrapper = mock(classOf[KafkaProducerWrapper])
     scoreCalculator = mock(classOf[TwitterScoreCalculator])
     streamer = mock(classOf[TwitterStreamer])
+    scheduler = StdSchedulerFactory.getDefaultScheduler
+  }
+
+  after {
+    scheduler.shutdown()
   }
 
   "Aggregator when started" should "begin streaming" in {
     val factory = mock(classOf[DefaultTwitterStreamerFactory])
     when(factory.getStreamer(any(), any(), any())).thenReturn(streamer)
 
-    val aggregator = new Aggregator(config, kafkaWrapper, scoreCalculator, factory)
+    val aggregator = new Aggregator(config, kafkaWrapper, scheduler, scoreCalculator, factory)
     aggregator.run()
 
     verify(streamer, times(1)).startStreaming()
@@ -71,17 +79,13 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
 
     tweetHandler(status)
 
-    val articleRecord = captor.getAllValues.get(0)
+    val articleRecord = captor.getValue
     articleRecord.key() should startWith ("tweet")
     val articleSent = read[TwitterArticle](articleRecord.value())
     articleSent.content shouldBe "some content"
     articleSent.originalId shouldBe "1000"
     articleSent.score shouldBe Some(10)
     articleSent.links shouldBe List("http://anyurl.com")
-
-    val endQueueRecord = captor.getAllValues.get(1)
-    endQueueRecord.key() shouldBe "endOfQueue"
-    endQueueRecord.value() shouldBe empty
   }
 
   "Any tweet not potentially an article " should "be ignored" in {
@@ -134,7 +138,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     val factory = mock(classOf[DefaultTwitterStreamerFactory])
     when(factory.getStreamer(any(), captor.capture(), any())).thenReturn(streamer)
 
-    val aggregator = new Aggregator(config, kafkaWrapper, scoreCalculator, factory)
+    val aggregator = new Aggregator(config, kafkaWrapper, scheduler, scoreCalculator, factory)
     aggregator.run()
     captor.getValue()
   }
