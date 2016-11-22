@@ -2,7 +2,7 @@ import com.heroku.sbt.HerokuPlugin.autoImport._
 import sbt.Keys._
 import scoverage.ScoverageKeys._
 
-javaOptions ++= Seq("-Xms512M", "-Xmx2048M", "-XX:MaxPermSize=2048M", "-XX:+CMSClassUnloadingEnabled")
+javaOptions ++= Seq("-Xms1024M", "-Xmx2048M", "-XX:MaxPermSize=2048M", "-XX:+CMSClassUnloadingEnabled")
 
 // Necessary for using
 parallelExecution in Test := false
@@ -74,6 +74,7 @@ lazy val processor = (project in file("processor")).
     libraryDependencies += "org.apache.spark" %% "spark-hive"       % "2.0.0" % "test",
     //libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka-0-10" % "2.0.0",
     //libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka-0-8" % "2.0.0",
+    libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.40",
 
     libraryDependencies += "org.scalaj"       %% "scalaj-http"      % "2.3.0",
     libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion,

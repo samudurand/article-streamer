@@ -1,18 +1,24 @@
 package articlestreamer.processor
 
+import java.util
+
 import articlestreamer.processor.kafka.KafkaConsumerWrapper
 import articlestreamer.processor.spark.SparkSessionProvider
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.kafka.{DualTopicManager, KafkaFactory}
 import articlestreamer.shared.model.TwitterArticle
+import articlestreamer.shared.model.db.TwitterArticleRow
 import articlestreamer.shared.scoring.TwitterScoreCalculator
 import com.typesafe.scalalogging.LazyLogging
+import org.apache.spark.sql.{Dataset, SaveMode}
 
 class Processor(config: ConfigLoader,
                 consumerFactory: KafkaFactory[String, String],
                 scoreCalculator: TwitterScoreCalculator,
                 sparkSessionProvider: SparkSessionProvider,
                 topicManager: DualTopicManager) extends LazyLogging {
+
+  val ARTICLE_TABLE = "article_pending"
 
   val consumer1 = new KafkaConsumerWrapper(config, consumerFactory, topicManager.getFirstTopic())
   val consumer2 = new KafkaConsumerWrapper(config, consumerFactory, topicManager.getSecondTopic())
@@ -35,6 +41,7 @@ class Processor(config: ConfigLoader,
         s"Score : ${a.score} \n" +
         s"Date : ${a.publicationDate} \n" +
         s"Content : ${a.content} \n"))
+
       sortedArticles
     } else {
       logger.info("No article recovered, terminating program")
@@ -61,9 +68,26 @@ class Processor(config: ConfigLoader,
         }
       }.toList
 
-    val ds = sparkSession.createDataset(updatedArticles)
-    ds.sort($"score".desc)
-      .collect().toList
+    val sortedDs = sparkSession
+      .createDataset(updatedArticles)
+      .sort($"score".desc)
+
+    sortedDs.cache()
+
+    saveToDB(sortedDs)
+    sortedDs.collect().toList
+  }
+
+  private def saveToDB(sortedDs: Dataset[TwitterArticle]): Unit = {
+    val connectionProp = new util.Properties()
+    connectionProp.put("user", config.mysqlConfig.user)
+    connectionProp.put("password", config.mysqlConfig.password)
+
+    sortedDs
+      .map(article => new TwitterArticleRow(article))
+      .write
+      .mode(SaveMode.Append)
+      .jdbc(config.mysqlConfig.jdbcUrl, ARTICLE_TABLE, connectionProp)
   }
 
   private def getRecordsFromSource: List[TwitterArticle] = {

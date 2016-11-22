@@ -17,6 +17,8 @@ final case class TwitterSearchConfig(mainTag: String,
                                articleUnrelatedWords: List[String],
                                subjectUnrelatedWords: List[String])
 
+final case class MysqlConfig(jdbcUrl: String, user: String, password: String)
+
 trait ConfigLoader extends LazyLogging {
 
   val appConfig = ConfigFactory.load()
@@ -37,6 +39,12 @@ trait ConfigLoader extends LazyLogging {
     appConfig.getStringList(s"$twitterPath.subjectRelatedWords").toList,
     appConfig.getStringList(s"$twitterPath.articleUnrelatedWords").toList,
     appConfig.getStringList(s"$twitterPath.subjectUnrelatedWords").toList
+  )
+
+  val mysqlConfig = MysqlConfig(
+    appConfig.getString("mysql.jdbcUrl"),
+    appConfig.getString("mysql.user"),
+    appConfig.getString("mysql.password")
   )
 
   /**
