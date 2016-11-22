@@ -77,6 +77,7 @@ class Processor(config: ConfigLoader,
     val connectionProp = new util.Properties()
     connectionProp.put("user", config.mysqlConfig.user)
     connectionProp.put("password", config.mysqlConfig.password)
+    connectionProp.put("useSSL", "false")
 
     sortedDs
       .map(article => new TwitterArticleRow(article))
