@@ -10,7 +10,7 @@ import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.model.db.TwitterArticleRow
 import articlestreamer.shared.scoring.TwitterScoreCalculator
 import com.typesafe.scalalogging.LazyLogging
-import org.apache.spark.sql.{Dataset, SaveMode}
+import org.apache.spark.sql.SaveMode
 
 class Processor(config: ConfigLoader,
                 consumerFactory: KafkaFactory[String, String],
@@ -74,11 +74,6 @@ class Processor(config: ConfigLoader,
 
     sortedDs.cache()
 
-    saveToDB(sortedDs)
-    sortedDs.collect().toList
-  }
-
-  private def saveToDB(sortedDs: Dataset[TwitterArticle]): Unit = {
     val connectionProp = new util.Properties()
     connectionProp.put("user", config.mysqlConfig.user)
     connectionProp.put("password", config.mysqlConfig.password)
@@ -88,6 +83,8 @@ class Processor(config: ConfigLoader,
       .write
       .mode(SaveMode.Append)
       .jdbc(config.mysqlConfig.jdbcUrl, ARTICLE_TABLE, connectionProp)
+
+    sortedDs.collect().toList
   }
 
   private def getRecordsFromSource: List[TwitterArticle] = {

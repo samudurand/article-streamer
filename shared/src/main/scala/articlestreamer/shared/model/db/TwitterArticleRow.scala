@@ -14,7 +14,6 @@ case class TwitterArticleRow(id: String,
                              author: Long,
                              score: Int) {
 
-
   def this(article: TwitterArticle) = {
     this(article.id,
       article.originalId,
