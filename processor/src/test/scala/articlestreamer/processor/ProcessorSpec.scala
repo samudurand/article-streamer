@@ -1,5 +1,6 @@
 package articlestreamer.processor
 
+import java.io.File
 import java.sql.Date
 import java.util
 import java.util.Arrays.asList
@@ -7,7 +8,7 @@ import java.util.Arrays.asList
 import articlestreamer.processor.kafka.KafkaConsumerWrapperSpec.prepareRecords
 import articlestreamer.processor.spark.SparkSessionProvider
 import articlestreamer.shared.BaseSpec
-import articlestreamer.shared.configuration.ConfigLoader
+import articlestreamer.shared.configuration.{ConfigLoader, MysqlConfig}
 import articlestreamer.shared.kafka.{DualTopicManager, KafkaFactory}
 import articlestreamer.shared.marshalling.CustomJsonFormats
 import articlestreamer.shared.model.{TweetAuthor, TwitterArticle}
@@ -29,14 +30,18 @@ import scala.io.Source
   */
 class ProcessorSpec extends BaseSpec with SharedSparkContext with DataFrameSuiteBase with BeforeAndAfter with CustomJsonFormats {
 
+  // TODO Ideally I would not use a fake DB in unit tests but SPart-Test-Base does not mock JDBC access yet
+  private val jdbcUrl = buildTempDerbyUrl()
+
   class TestConfig extends ConfigLoader {
     override val tweetsBatchSize: Int = 1
     override val kafkaMaxAttempts: Int = 2
+    override val mysqlConfig: MysqlConfig = MysqlConfig(jdbcUrl, "", "")
   }
 
   class TestTopicManager extends DualTopicManager {
 
-    var currentTopic = getSecondTopic()
+    var currentTopic: String = getSecondTopic()
 
     override def getTopicList(): Array[String] = ???
 
@@ -161,4 +166,11 @@ class ProcessorSpec extends BaseSpec with SharedSparkContext with DataFrameSuite
     val m = captor.getValue
     m.values
   }
+
+  private def buildTempDerbyUrl(): String = {
+    val tempDir = com.holdenkarau.spark.testing.Utils.createTempDir("./")
+    val filePath = new File(tempDir, "metastore").getCanonicalPath
+    s"jdbc:derby:;databaseName=$filePath;create=true"
+  }
+
 }

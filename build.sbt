@@ -6,9 +6,10 @@ javaOptions ++= Seq("-Xms1024M", "-Xmx2048M", "-XX:MaxPermSize=2048M", "-XX:+CMS
 
 // Necessary for using
 parallelExecution in Test := false
+libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.40"
 
 // Prevent reloading dependencies after each `clean`
-cleanKeepFiles ++= Seq("resolution-cache", "streams").map(target.value / _)
+//cleanKeepFiles ++= Seq("resolution-cache", "streams").map(target.value / _)
 
 // Test with coverage
 addCommandAlias("test-agg", ";project aggregator;clean;coverage;test;coverageReport")
@@ -71,14 +72,14 @@ lazy val processor = (project in file("processor")).
     libraryDependencies += "org.apache.spark" %% "spark-core"       % "2.0.0" exclude("org.slf4j","slf4j-log4j12"),
     libraryDependencies += "org.apache.spark" %% "spark-sql"        % "2.0.0",
     libraryDependencies += "org.apache.spark" %% "spark-streaming"  % "2.0.0",
-    libraryDependencies += "org.apache.spark" %% "spark-hive"       % "2.0.0" % "test",
+    libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.40",
+    libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion,
     //libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka-0-10" % "2.0.0",
     //libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka-0-8" % "2.0.0",
-    libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.40",
+    //libraryDependencies += "org.scalaj"       %% "scalaj-http"      % "2.3.0",
 
-    libraryDependencies += "org.scalaj"       %% "scalaj-http"      % "2.3.0",
-    libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion,
     libraryDependencies += "com.holdenkarau" %% "spark-testing-base" % "2.0.0_0.4.7" % "test",
+    libraryDependencies += "org.apache.spark" %% "spark-hive"       % "2.0.0" % "test",
 
     coverageExcludedPackages := ".*OnDemandSparkSessionProvider;.*MainApp"
 
