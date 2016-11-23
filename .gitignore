@@ -1,6 +1,7 @@
 /env
 /.idea
 main.iml
+
 ### Scala template
 *.class
 development.conf
@@ -23,3 +24,4 @@ project/plugins/project/
 
 /logs/
 /derby.log
+/webapp/webapp.iml
