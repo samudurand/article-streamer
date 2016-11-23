@@ -69,4 +69,14 @@ $ sbt test-shared
 $ sbt test-all
 
 ```
-  
+
+# Viewer 
+ 
+ To visualise the articles waiting to be evaluated manually you need to start the viewer.
+ 
+ You will need Sails installed to start the application
+ 
+ ```
+ $ npm -g install sails
+ $ sails lift
+ ```

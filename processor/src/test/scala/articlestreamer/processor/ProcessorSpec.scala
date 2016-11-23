@@ -30,7 +30,7 @@ import scala.io.Source
   */
 class ProcessorSpec extends BaseSpec with SharedSparkContext with DataFrameSuiteBase with BeforeAndAfter with CustomJsonFormats {
 
-  // TODO Ideally I would not use a fake DB in unit tests but SPart-Test-Base does not mock JDBC access yet
+  // TODO Ideally I would not use a fake DB in unit tests but Spark-Test-Base does not mock JDBC access yet
   private val jdbcUrl = buildTempDerbyUrl()
 
   class TestConfig extends ConfigLoader {
