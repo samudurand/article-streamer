@@ -1,0 +1,8 @@
+{
+  "name": "viewer",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "sails": "^0.12.10"
+  }
+}
