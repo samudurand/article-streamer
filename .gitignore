@@ -25,3 +25,4 @@ project/plugins/project/
 /logs/
 /derby.log
 /webapp/webapp.iml
+/webapp/node_modules/
