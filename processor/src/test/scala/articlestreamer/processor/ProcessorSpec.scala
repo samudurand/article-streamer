@@ -31,11 +31,12 @@ class ProcessorSpec extends BaseSpec with SharedSparkContext with DataFrameSuite
 
   class TestConfig extends ConfigLoader {
     override val tweetsBatchSize: Int = 1
+    override val kafkaMaxAttempts: Int = 2
   }
 
   class TestTopicManager extends DualTopicManager {
 
-    var currentTopic = getFirstTopic()
+    var currentTopic = getSecondTopic()
 
     override def getTopicList(): Array[String] = ???
 
@@ -86,7 +87,7 @@ class ProcessorSpec extends BaseSpec with SharedSparkContext with DataFrameSuite
       .thenReturn(List(article, article2), List())
 
     val processor = new Processor(config, consumerFactory, scoreCalculator, ssProvider, new TestTopicManager)
-    val articles = processor.run()
+    val articles = processor()
 
     articles should have length 2
     articles(0).id shouldBe article2.id
@@ -121,7 +122,7 @@ class ProcessorSpec extends BaseSpec with SharedSparkContext with DataFrameSuite
       .thenThrow(new RuntimeException())
 
     val processor = new Processor(config, consumerFactory, scoreCalculator, ssProvider, new TestTopicManager)
-    val articles = processor.run()
+    val articles = processor()
 
     articles should have size 1
     articles.head.id shouldBe article.id
@@ -131,29 +132,29 @@ class ProcessorSpec extends BaseSpec with SharedSparkContext with DataFrameSuite
     when(consumer1.poll(any())).thenReturn(new ConsumerRecords[String, String](new util.HashMap()))
 
     val processor = new Processor(config, consumerFactory, scoreCalculator, ssProvider, new TestTopicManager)
-    val articles = processor.run()
+    val articles = processor()
 
     articles shouldBe empty
     verify(scoreCalculator, never()).updateScores(any())
-    verify(consumer1, times(10)).poll(any())
+    verify(consumer1, times(2)).poll(any())
   }
 
   it should "poll from the right topic" in {
     val topicManager = new TestTopicManager
-    topicManager.currentTopic = topicManager.getFirstTopic()
+    topicManager.currentTopic = topicManager.getSecondTopic()
 
     when(consumer1.poll(any())).thenReturn(new ConsumerRecords[String, String](new util.HashMap()))
     when(consumer2.poll(any())).thenReturn(new ConsumerRecords[String, String](new util.HashMap()))
 
     val processor = new Processor(config, consumerFactory, scoreCalculator, ssProvider, topicManager)
-    processor.run()
+    processor()
 
-    verify(consumer1, times(10)).poll(any())
+    verify(consumer1, times(2)).poll(any())
 
-    topicManager.currentTopic = topicManager.getSecondTopic()
-    processor.run()
+    topicManager.currentTopic = topicManager.getFirstTopic()
+    processor()
 
-    verify(consumer2, times(10)).poll(any())
+    verify(consumer2, times(2)).poll(any())
   }
 
   def extractArticles[T](captor: ArgumentCaptor[Map[Long, T]]): Iterable[T] = {

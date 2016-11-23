@@ -19,3 +19,4 @@ trait ArticleMarshaller extends Serializable with CustomJsonFormats with LazyLog
   }
 
 }
+

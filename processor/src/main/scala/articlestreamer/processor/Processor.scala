@@ -28,7 +28,7 @@ class Processor(config: ConfigLoader,
     consumer2.stopConsumer()
   }
 
-  def run(): List[TwitterArticle] = {
+  def apply(): List[TwitterArticle] = {
 
     val records = getRecordsFromSource
 

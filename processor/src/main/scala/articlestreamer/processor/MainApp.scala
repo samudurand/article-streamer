@@ -20,6 +20,6 @@ object MainApp extends App {
   lazy val topicManager = wire[HalfDayTopicManager]
 
   val processor = wire[Processor]
-  processor.run()
+  processor()
 
 }
