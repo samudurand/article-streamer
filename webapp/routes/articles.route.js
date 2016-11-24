@@ -1,3 +1,5 @@
+const Status = {};
+
 module.exports = [
   {
     method: 'GET',

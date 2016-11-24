@@ -74,9 +74,8 @@ $ sbt test-all
  
  To visualise the articles waiting to be evaluated manually you need to start the viewer.
  
- You will need Sails installed to start the application
- 
+ You can run the app with ```npm start``` or using nodemon for live reload while coding.
  ```
- $ npm -g install sails
- $ sails lift
+ $ npm install -g nodemon
+ $ nodemon server.js
  ```
