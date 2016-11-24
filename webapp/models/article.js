@@ -26,6 +26,10 @@ module.exports = function(sequelize, DataTypes) {
     score: {
       type: DataTypes.INTEGER(11),
       allowNull: false
+    },
+    status: {
+      type: DataTypes.INTEGER(11),
+      allowNull: false
     }
   }, {
     tableName: 'article'

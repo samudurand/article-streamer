@@ -1,4 +1,8 @@
-const Status = {};
+const Status = {
+  PENDING: 0,
+  ACCEPTED: 1,
+  REJECTED: -1
+};
 
 module.exports = [
   {
@@ -6,7 +10,7 @@ module.exports = [
     path: '/article/pending',
     handler: function (request, reply) {
       const Article = request.getDb().getModel('article');
-      return Article.findAll().then(function (articles) {
+      return Article.findAll({ where: { status: Status.PENDING } }).then(function (articles) {
         return reply(articles);
       });
     }
