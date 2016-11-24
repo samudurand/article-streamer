@@ -27,3 +27,4 @@ project/plugins/project/
 /webapp/webapp.iml
 /webapp/node_modules/
 /webapp/config/local.json
+/webapp/npm-debug.log

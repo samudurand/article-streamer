@@ -3,20 +3,21 @@
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('article', {
     id: {
-      type: DataTypes.TEXT,
-      allowNull: true
+      type: DataTypes.STRING,
+      allowNull: false,
+      primaryKey: true
     },
     originalId: {
       type: DataTypes.TEXT,
-      allowNull: true
+      allowNull: false
     },
     publicationDate: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: false
     },
     content: {
       type: DataTypes.TEXT,
-      allowNull: true
+      allowNull: false
     },
     author: {
       type: DataTypes.BIGINT,
@@ -24,7 +25,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     score: {
       type: DataTypes.INTEGER(11),
-      allowNull: true
+      allowNull: false
     }
   }, {
     tableName: 'article'
