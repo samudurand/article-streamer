@@ -18,13 +18,13 @@ USE `article_streaming`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `article_pending`
+-- Table structure for table `article`
 --
 
-DROP TABLE IF EXISTS `article_pending`;
+DROP TABLE IF EXISTS `article`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `article_pending` (
+CREATE TABLE `article` (
   `id` text,
   `originalId` text,
   `publicationDate` date DEFAULT NULL,

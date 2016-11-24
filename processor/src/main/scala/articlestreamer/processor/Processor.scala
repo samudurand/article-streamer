@@ -18,7 +18,7 @@ class Processor(config: ConfigLoader,
                 sparkSessionProvider: SparkSessionProvider,
                 topicManager: DualTopicManager) extends LazyLogging {
 
-  val ARTICLE_TABLE = "article_pending"
+  val ARTICLE_TABLE = "article"
 
   val consumer1 = new KafkaConsumerWrapper(config, consumerFactory, topicManager.getFirstTopic())
   val consumer2 = new KafkaConsumerWrapper(config, consumerFactory, topicManager.getSecondTopic())
