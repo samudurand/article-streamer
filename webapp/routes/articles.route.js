@@ -8,9 +8,15 @@ const Status = {
 
 function getByStatus(request, reply, status) {
   const Article = request.getDb().getModel(ARTICLE_MODEL);
-  return Article.findAll({where: {status: status}}).then(function (articles) {
-    return reply(articles).code(200);
-  });
+  return Article.findAll({where: {status: status}})
+    .then(
+      (articles) => {
+        return reply(articles).code(200);
+      },
+      (err) => {
+        console.error('Cannot retrieve articles.', err);
+        return reply().code(500);
+      });
 }
 
 module.exports = [
@@ -48,7 +54,7 @@ module.exports = [
           (count) => {
             if (count == 1) {
               return reply().code(202);
-            } else if (count <= 1) {
+            } else {
               console.error('Failed to update status of article' + id);
               return reply({error: 'no records affected'}).code(500);
             }
