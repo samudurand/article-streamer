@@ -45,15 +45,20 @@ server.register([
       routes: 'routes/**/*.route.js' // uses glob to include files
     }
   }
-], {}, () => {
+], {}, (err) => {
 
-  // Start the server
-  server.start((err) => {
+  if (err) {
+    console.error("Server failed to start", err);
+  } else {
 
-    if (err) {
-      throw err;
-    }
-    console.log('Server running at:', server.info.uri);
-  });
+    // Start the server
+    server.start((err) => {
+
+      if (err) {
+        throw err;
+      }
+      console.log('Server running at:', server.info.uri);
+    });
+  }
 
 });

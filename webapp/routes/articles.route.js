@@ -9,7 +9,7 @@ const Status = {
 function getByStatus(request, reply, status) {
   const Article = request.getDb().getModel(ARTICLE_MODEL);
   return Article.findAll({where: {status: status}}).then(function (articles) {
-    return reply(articles);
+    return reply(articles).code(200);
   });
 }
 
@@ -40,24 +40,24 @@ module.exports = [
     path: '/article/{id}/status/{status}',
     handler: function (request, reply) {
       const Article = request.getDb().getModel(ARTICLE_MODEL);
-      Article.update(
-        { status: request.params.status },
-        { where: {id: request.params.id }}
-      ).then(
-        (count) => {return reply('success');},
-        (err) => {return ('error');}
-      );
+      const status = request.params.status;
+      const id = request.params.id;
 
-      // return Article.find({ where: { title: 'aProject' } })
-      //   .on('success', function (project) {
-      //     // Check if record exists in db
-      //     if (project) {
-      //       project.updateAttributes({
-      //         title: 'a very different title now'
-      //       })
-      //         .success(function () {})
-      //     }
-      //   });
+      Article.update({status: status}, {where: {id: id}})
+        .then(
+          (count) => {
+            if (count == 1) {
+              return reply().code(202);
+            } else if (count <= 1) {
+              console.error('Failed to update status of article' + id);
+              return reply({error: 'no records affected'}).code(500);
+            }
+          },
+          (err) => {
+            console.error('Failed to update status of article', err);
+            return reply().code(500);
+          }
+        );
 
     },
     config: {
