@@ -48,7 +48,7 @@ server.register([
 ], {}, (err) => {
 
   if (err) {
-    console.error("Server failed to start", err);
+    console.error('Server failed to start', err);
   } else {
 
     // Start the server

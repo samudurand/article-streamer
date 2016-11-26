@@ -18,6 +18,7 @@
   },
   "scripts": {
     "lint": "eslint .",
+    "start": "nodemon server.js",
     "prestart": "npm run lint",
     "pretest": "npm run lint"
   },

@@ -8,7 +8,7 @@ const Status = {
 
 function getByStatus(request, reply, status) {
   const Article = request.getDb().getModel(ARTICLE_MODEL);
-  return Article.findAll({where: {status: status}})
+  return Article.findAll({ where: { status: status }})
     .then(
       (articles) => {
         return reply(articles).code(200);
