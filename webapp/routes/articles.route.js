@@ -1,3 +1,4 @@
+var logger = require('winston');
 const Joi = require('joi');
 const ARTICLE_MODEL = 'article';
 const Status = {
@@ -14,7 +15,7 @@ function getByStatus(request, reply, status) {
         return reply(articles).code(200);
       },
       (err) => {
-        console.error('Cannot retrieve articles.', err);
+        logger.error('Cannot retrieve articles.', err);
         return reply().code(500);
       });
 }
@@ -55,12 +56,12 @@ module.exports = [
             if (count == 1) {
               return reply().code(202);
             } else {
-              console.error('Failed to update status of article' + id);
+              logger.error('Failed to update status of article' + id);
               return reply({error: 'no records affected'}).code(500);
             }
           },
           (err) => {
-            console.error('Failed to update status of article', err);
+            logger.error('Failed to update status of article', err);
             return reply().code(500);
           }
         );

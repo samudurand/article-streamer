@@ -1,5 +1,6 @@
 'use strict';
 
+const logger = require('winston');
 const Hapi = require('hapi');
 const Config = require('config');
 const Sequelize = require('sequelize');
@@ -48,7 +49,7 @@ server.register([
 ], {}, (err) => {
 
   if (err) {
-    console.error('Server failed to start', err);
+    logger.error('Server failed to start', err);
   } else {
 
     // Start the server
@@ -57,7 +58,7 @@ server.register([
       if (err) {
         throw err;
       }
-      console.log('Server running at:', server.info.uri);
+      logger.log('Server running at:', server.info.uri);
     });
   }
 
