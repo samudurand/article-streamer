@@ -74,8 +74,4 @@ $ sbt test-all
  
  To visualise the articles waiting to be evaluated manually you need to start the viewer.
  
- You can run the app with ```npm start``` or using nodemon for live reload while coding.
- ```
- $ npm install -g nodemon
- $ nodemon server.js
- ```
+ ```npm install -g vue-cli```
