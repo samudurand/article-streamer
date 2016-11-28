@@ -1,6 +1,6 @@
 # webapp-frontend
 
-> front end part of article viewer
+> frontend for article viewer
 
 ## Build Setup
 
