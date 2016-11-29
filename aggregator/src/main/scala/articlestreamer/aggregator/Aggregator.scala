@@ -1,6 +1,6 @@
 package articlestreamer.aggregator
 
-import java.sql.Date
+import java.sql.Timestamp
 import java.util.{TimeZone, UUID}
 
 import articlestreamer.aggregator.kafka.KafkaProducerWrapper
@@ -81,7 +81,7 @@ class Aggregator(config: ConfigLoader,
     val article = TwitterArticle(
       UUID.randomUUID().toString,
       String.valueOf(status.getId),
-      new Date(status.getCreatedAt.getTime),
+      new Timestamp(status.getCreatedAt.getTime),
       urls,
       status.getText,
       TweetAuthor(author.getId, author.getScreenName, author.getFollowersCount),
