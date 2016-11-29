@@ -47,14 +47,9 @@
 </script>
 
 <style scoped>
-  .mdl-data-table {
-    /*table-layout:fixed;*/
-    /*width:100%;*/
-  }
 
   .tab-logo {
-    min-width: 72px;
-    max-width: 100px;
+    width: 72px;
   }
 
   .tab-logo img {
