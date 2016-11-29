@@ -66,7 +66,7 @@
         );
       },
       reject: function (id) {
-        ArticleService.setState(context, id, -1);
+        ArticleService.setState(this, id, -1);
       }
     }
   };
