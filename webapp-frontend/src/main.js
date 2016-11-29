@@ -3,6 +3,7 @@ import Pending from './components/Pending.vue'
 import Accepted from './components/Accepted.vue'
 import Rejected from './components/Rejected.vue'
 import dateFns from 'date-fns'
+import store from './store'
 
 import VueRouter from 'vue-router'
 import VueResource from 'vue-resource'
@@ -26,6 +27,15 @@ const router = new VueRouter({
   routes
 });
 
+router.beforeEach((to, from, next) => {
+  store.commit('pageChange', to.path);
+  next();
+});
+
 const app = new Vue({
-  router
+  router,
+  store,
+  data: {
+    store: store
+  }
 }).$mount('#app');

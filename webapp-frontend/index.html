@@ -14,17 +14,17 @@
     <header class="mdl-layout__header">
       <div class="mdl-layout__header-row">
         <!-- Title -->
-        <span class="mdl-layout-title">Title</span>
+        <span class="mdl-layout-title">Articles</span>
       </div>
       <!-- Tabs -->
       <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
-        <router-link href="#scroll-tab-1" to="pending" class="mdl-layout__tab is-active">Pending</router-link>
-        <router-link href="#scroll-tab-2" to="accepted" class="mdl-layout__tab">Accepted</router-link>
-        <router-link href="#scroll-tab-3" to="rejected" class="mdl-layout__tab">Rejected</router-link>
+        <router-link href="#scroll-tab-1" to="pending" v-once v-bind:class="{ 'is-active': (store.state.navState != null && (store.state.navState === '/pending' || store.state.navState === '/')) }" class="mdl-layout__tab">Pending</router-link>
+        <router-link href="#scroll-tab-2" to="accepted" v-once v-bind:class="{ 'is-active': (store.state.navState != null && store.state.navState === '/accepted') }" class="mdl-layout__tab">Accepted</router-link>
+        <router-link href="#scroll-tab-3" to="rejected" v-once v-bind:class="{ 'is-active': (store.state.navState != null && store.state.navState === '/rejected') }" class="mdl-layout__tab">Rejected</router-link>
       </div>
     </header>
     <div class="mdl-layout__drawer">
-      <span class="mdl-layout-title">Title</span>
+      <span class="mdl-layout-title">Articles</span>
     </div>
     <main class="mdl-layout__content">
 
