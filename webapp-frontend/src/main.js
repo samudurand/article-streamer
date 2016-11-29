@@ -12,7 +12,7 @@ Vue.use(VueRouter);
 
 Vue.filter('parseDate', function (value) {
   const date = dateFns.parse(value);
-  return dateFns.format(date, 'MM/DD/YYYY');
+  return dateFns.format(date, 'HH:MM - DD MMM');
 });
 
 const routes = [
