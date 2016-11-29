@@ -33,5 +33,5 @@ class HalfDayTopicManager(config: ConfigLoader) extends DualTopicManager {
 
   override def getFirstTopic(): String = config.kafkaFirstTopic
 
-  override def getSecondTopic(): String = config.kafkaSecondTopic
+  override def getSecondTopic(): String = config.kafkaFirstTopic
 }
