@@ -1,11 +1,12 @@
 import Vue from 'vue';
+import VueResource from 'vue-resource'
 import dateFns from 'date-fns'
 import store from './store'
 import router from './routing'
-
-import VueResource from 'vue-resource'
+import AsyncComputed from 'vue-async-computed'
 
 Vue.use(VueResource);
+Vue.use(AsyncComputed);
 Vue.http.options.root = '/root';
 
 Vue.filter('parseDate', function (value) {

@@ -12,7 +12,12 @@ function getByStatus(request, reply, status) {
   return Article.findAll({ where: { status: status }})
     .then(
       (articles) => {
-        return reply(articles).code(200);
+        return reply(articles)
+            .header('Access-Control-Allow-Origin', '*')
+            .header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
+            .header('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
+            .header('Access-Control-Allow-Credentials', true)
+            .code(200);
       },
       (err) => {
         logger.error('Cannot retrieve articles.', err);

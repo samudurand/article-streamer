@@ -36,32 +36,13 @@
 </template>
 
 <script>
+  import ArticleService from '../service/articles.service'
+
   export default {
     name: 'accepted',
-    data() {
-      return {
-          articles: [
-            {
-              "id": "b84802a4-ba1b-49eb-b995-bf8a7c318a10",
-              "originalId": "801568316779274240",
-              "publicationDate": "2016-11-23T10:10:00.000Z",
-              "content": "#spark teststest https://t.co/WLUWq7roAm",
-              "author": 1935423961,
-              "score": 0,
-              "status": 0
-            },
-            {
-              "id": "5c0a28cf-d154-43a5-8a9b-7acf5e840c9c",
-              "originalId": "801807662388219904",
-              "publicationDate": "2016-11-24T14:23:00.000Z",
-              "content": "#apache #Spark #MachineLearning Tutorial  #Analytics vía @BigDataReport_ https://t.co/G1YvU9dmq8 https://t.co/lj0PdRvA9B",
-              "author": 191537652,
-              "score": 100,
-              "status": 0
-            }
-          ]
-      };
-    },
+    asyncComputed: {
+      articles: (context) => ArticleService.get(context, 'accepted')
+    }
   };
 </script>
 

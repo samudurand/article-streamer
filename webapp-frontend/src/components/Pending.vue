@@ -36,16 +36,28 @@
 </template>
 
 <script>
+  import ArticleService from '../service/articles.service'
 
-export default {
-  name: 'pending',
-  data() {
-    return {
-      articles: []
-    };
-  }
-};
+  export default {
+    name: 'pending',
+    asyncComputed: {
+      articles: (context) => ArticleService.get(context, 'pending')
+    }
+  };
 </script>
 
 <style scoped>
+  .mdl-data-table {
+    /*table-layout:fixed;*/
+    /*width:100%;*/
+  }
+
+  .tab-logo {
+    min-width: 72px;
+    max-width: 100px;
+  }
+
+  .tab-logo img {
+    width: 100%;
+  }
 </style>
