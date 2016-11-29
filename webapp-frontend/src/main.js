@@ -2,12 +2,18 @@ import Vue from 'vue';
 import Pending from './components/Pending.vue'
 import Accepted from './components/Accepted.vue'
 import Rejected from './components/Rejected.vue'
+import dateFns from 'date-fns'
 
 import VueRouter from 'vue-router'
 import VueResource from 'vue-resource'
 
 Vue.use(VueResource);
 Vue.use(VueRouter);
+
+Vue.filter('parseDate', function (value) {
+  const date = dateFns.parse(value);
+  return dateFns.format(date, 'MM/DD/YYYY');
+});
 
 const routes = [
   { path: '/pending', component: Pending },

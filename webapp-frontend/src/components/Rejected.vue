@@ -6,7 +6,7 @@
 
 <script>
 export default {
-  name: 'pending',
+  name: 'rejected',
   data() {
     return {
     };

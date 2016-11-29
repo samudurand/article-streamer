@@ -16,7 +16,7 @@
         </thead>
         <tbody>
           <tr v-for="article in articles">
-            <td class="mdl-data-table__cell--non-numeric">{{article.publicationDate}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{article.publicationDate | parseDate }}</td>
             <td class="mdl-data-table__cell--non-numeric">
               <div style="word-break: break-all; white-space: normal;">{{article.content}}</div></td>
             <td>{{article.score}}</td>
@@ -37,7 +37,7 @@
 
 <script>
   export default {
-    name: 'pending',
+    name: 'accepted',
     data() {
       return {
           articles: [
