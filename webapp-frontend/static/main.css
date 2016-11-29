@@ -5,3 +5,15 @@
 .material-icons.red {
   color: 	red;
 }
+
+td.nopadding {
+  padding: 1px;
+}
+
+.tab-logo {
+  width: 72px;
+}
+
+.tab-logo img {
+  width: 100%;
+}

@@ -21,7 +21,12 @@ function getByStatus(request, reply, status) {
       },
       (err) => {
         logger.error('Cannot retrieve articles.', err);
-        return reply().code(500);
+        return reply()
+            .header('Access-Control-Allow-Origin', '*')
+            .header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
+            .header('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
+            .header('Access-Control-Allow-Credentials', true)
+            .code(500);
       });
 }
 
@@ -59,15 +64,30 @@ module.exports = [
         .then(
           (count) => {
             if (count == 1) {
-              return reply().code(202);
+              return reply()
+                  .header('Access-Control-Allow-Origin', '*')
+                  .header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
+                  .header('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
+                  .header('Access-Control-Allow-Credentials', true)
+                  .code(202);
             } else {
               logger.error('Failed to update status of article' + id);
-              return reply({error: 'no records affected'}).code(500);
+              return reply({error: 'no records affected'})
+                  .header('Access-Control-Allow-Origin', '*')
+                  .header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
+                  .header('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
+                  .header('Access-Control-Allow-Credentials', true)
+                  .code(500);
             }
           },
           (err) => {
             logger.error('Failed to update status of article', err);
-            return reply().code(500);
+            return reply()
+                .header('Access-Control-Allow-Origin', '*')
+                .header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
+                .header('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
+                .header('Access-Control-Allow-Credentials', true)
+                .code(500);
           }
         );
 

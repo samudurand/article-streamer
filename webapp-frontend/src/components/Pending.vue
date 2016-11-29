@@ -1,4 +1,4 @@
-<template xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<template xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
 
   <div class="mdl-grid">
 
@@ -23,17 +23,17 @@
               <div style="word-break: break-all; white-space: normal;">{{article.content}}</div></td>
             <!--<td>{{article.score}}</td>-->
             <td class="nopadding">
-              <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" v-bind:click="accept(article.originalId)">
+              <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" v-on:click="accept(article.id)">
                 <i class="material-icons green">add</i>
               </button>
             </td>
             <td class="nopadding">
-              <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" v-bind:click="reject(article.originalId)">
+              <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" v-on:click="reject(article.id)">
                 <i class="material-icons red">remove</i>
               </button>
             </td>
             <td class="tab-logo">
-              <a v-bind:href="'https://twitter.com/any/status/' + article.originalId" target="_blank"><img src="../assets/twitter.png"></a>
+              <a v-bind:href="'https://twitter.com/any/status/' + article.id" target="_blank"><img src="../assets/twitter.png"></a>
             </td>
           </tr>
         </tbody>
@@ -56,27 +56,21 @@
       articles: (context) => ArticleService.get(context, 'pending')
     },
     methods: {
-      accept: function () {
-
+      accept: function (id) {
+        ArticleService.setState(this, id, 'accepted').then(
+          (res) => {
+            console.log(res);
+            this.$asyncComputed.articles(this);
+          },
+          (err) => console.log(err)
+        );
       },
-      reject: function () {
-
+      reject: function (context, id) {
+        ArticleService.setState(context, id, 'rejected');
       }
     }
   };
 </script>
 
 <style scoped>
-
-  td.nopadding {
-    padding: 1px;
-  }
-
-  .tab-logo {
-    width: 72px;
-  }
-
-  .tab-logo img {
-    width: 100%;
-  }
 </style>

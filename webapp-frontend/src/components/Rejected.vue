@@ -10,7 +10,9 @@
           <tr>
             <th class="mdl-data-table__cell--non-numeric">Date</th>
             <th class="mdl-data-table__cell--non-numeric">Content</th>
-            <th>Score</th>
+            <!--<th>Score</th>-->
+            <th></th>
+            <th></th>
             <th></th>
           </tr>
         </thead>
@@ -19,9 +21,19 @@
             <td class="mdl-data-table__cell--non-numeric">{{article.publicationDate | parseDate }}</td>
             <td class="mdl-data-table__cell--non-numeric">
               <div style="word-break: break-all; white-space: normal;">{{article.content}}</div></td>
-            <td>{{article.score}}</td>
+            <!--<td>{{article.score}}</td>-->
+            <td class="nopadding">
+              <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" v-bind:click="accept(article.originalId)">
+                <i class="material-icons green">add</i>
+              </button>
+            </td>
+            <td class="nopadding">
+              <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" v-bind:click="reject(article.originalId)">
+                <i class="material-icons red">remove</i>
+              </button>
+            </td>
             <td class="tab-logo">
-              <a v-bind:href="'https://twitter.com/any/status/' + article.originalId" target="_blank"><img src="../assets/twitter.png"></a>
+              <a v-bind:href="'https://twitter.com/any/status/' + article.id" target="_blank"><img src="../assets/twitter.png"></a>
             </td>
           </tr>
         </tbody>
@@ -47,12 +59,4 @@
 </script>
 
 <style scoped>
-
-  .tab-logo {
-    width: 72px;
-  }
-
-  .tab-logo img {
-    width: 100%;
-  }
 </style>
