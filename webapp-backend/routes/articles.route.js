@@ -32,6 +32,18 @@ function getByStatus(request, reply, status) {
 
 module.exports = [
   {
+    method: 'OPTIONS',
+    path: '/{path*}',
+    handler: function (request, reply) {
+        return reply()
+            .header('Access-Control-Allow-Origin', '*')
+            .header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
+            .header('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
+            .header('Access-Control-Allow-Credentials', true)
+            .code(200);
+    }
+  },
+  {
     method: 'GET',
     path: '/article/pending',
     handler: function (request, reply) {
@@ -64,7 +76,7 @@ module.exports = [
         .then(
           (count) => {
             if (count == 1) {
-              return reply()
+              return reply({})
                   .header('Access-Control-Allow-Origin', '*')
                   .header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
                   .header('Access-Control-Allow-Headers', 'X-Requested-With,content-type')

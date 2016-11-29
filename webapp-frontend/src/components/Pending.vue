@@ -57,16 +57,16 @@
     },
     methods: {
       accept: function (id) {
-        ArticleService.setState(this, id, 'accepted').then(
+        ArticleService.setState(this, id, 1).then(
           (res) => {
             console.log(res);
-            this.$asyncComputed.articles(this);
+            //Need to refresh the list
           },
           (err) => console.log(err)
         );
       },
       reject: function (context, id) {
-        ArticleService.setState(context, id, 'rejected');
+        ArticleService.setState(context, id, -1);
       }
     }
   };

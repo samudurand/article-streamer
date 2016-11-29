@@ -21,17 +21,7 @@
             <td class="mdl-data-table__cell--non-numeric">{{article.publicationDate | parseDate }}</td>
             <td class="mdl-data-table__cell--non-numeric">
               <div style="word-break: break-all; white-space: normal;">{{article.content}}</div></td>
-            <!--<td>{{article.score}}</td>-->
-            <td class="nopadding">
-              <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" v-bind:click="accept(article.originalId)">
-                <i class="material-icons green">add</i>
-              </button>
-            </td>
-            <td class="nopadding">
-              <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" v-bind:click="reject(article.originalId)">
-                <i class="material-icons red">remove</i>
-              </button>
-            </td>
+            <td>{{article.score}}</td>
             <td class="tab-logo">
               <a v-bind:href="'https://twitter.com/any/status/' + article.id" target="_blank"><img src="../assets/twitter.png"></a>
             </td>
