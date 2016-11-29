@@ -20,7 +20,7 @@
           <tr v-for="article in articles">
             <td class="mdl-data-table__cell--non-numeric">{{article.publicationDate | parseDate }}</td>
             <td class="mdl-data-table__cell--non-numeric">
-              <div style="word-break: break-all; white-space: normal;">{{article.content}}</div></td>
+              <div style="word-break: break-all; white-space: normal;" v-html="formatContent(article.content)"></div></td>
             <!--<td>{{article.score}}</td>-->
             <td class="nopadding">
               <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" v-on:click="accept(article.id)">
@@ -49,6 +49,7 @@
 
 <script>
   import ArticleService from '../service/articles.service'
+  import linkifyHtml from 'linkifyjs/html';
 
   export default {
     name: 'pending',
@@ -75,6 +76,9 @@
             console.log(err)
           }
         );
+      },
+      formatContent: function (content) {
+          return linkifyHtml(content);
       }
     }
   };
