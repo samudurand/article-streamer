@@ -65,7 +65,7 @@
           (err) => console.log(err)
         );
       },
-      reject: function (context, id) {
+      reject: function (id) {
         ArticleService.setState(context, id, -1);
       }
     }
