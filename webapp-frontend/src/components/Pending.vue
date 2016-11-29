@@ -58,15 +58,23 @@
     methods: {
       accept: function (id) {
         ArticleService.setState(this, id, 1).then(
-          (res) => {
-            console.log(res);
-            //Need to refresh the list
+          function () {
+            this.$data.articles.shift();
           },
-          (err) => console.log(err)
+          function (err) {
+            console.log(err)
+          }
         );
       },
       reject: function (id) {
-        ArticleService.setState(this, id, -1);
+        ArticleService.setState(this, id, -1).then(
+          function () {
+            this.$data.articles.shift();
+          },
+          function (err) {
+            console.log(err)
+          }
+        );
       }
     }
   };
