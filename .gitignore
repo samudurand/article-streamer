@@ -24,7 +24,3 @@ project/plugins/project/
 
 /logs/
 /derby.log
-/webapp/webapp.iml
-/webapp/node_modules/
-/webapp/config/local.json
-/webapp/npm-debug.log
