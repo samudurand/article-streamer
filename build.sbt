@@ -50,6 +50,8 @@ lazy val aggregator = (project in file("aggregator")).
     mainClass in (Compile, packageBin) := Commons.producerMainClass,
     mainClass in assembly := Commons.producerMainClass,
 
+    assemblyOutputPath in assembly := file(s"./aggregator/docker/aggregator-assembly-${version.value}.jar"),
+
     libraryDependencies ++= Dependencies.commonDependencies,
     libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
     libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion,
