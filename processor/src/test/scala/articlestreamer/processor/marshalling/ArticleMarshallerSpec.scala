@@ -22,12 +22,12 @@ class ArticleMarshallerSpec extends BaseSpec with ArticleMarshaller {
     articleTweet.get should have(
       'id ("00000000-0000-0000-0000-000000000001"),
       'originalId ("789070025009336320"),
-      'publicationDate (df.parse("2016-10-20 11:45:28.000")),
       'links (List("https://t.co/C5m0dEKan9")),
       'content ("Well done! Tough challenge to master #Spark https://t.co/C5m0dEKan9"),
       'author (TweetAuthor(1234, "user1", 0)),
       'score (Some(0))
     )
+    articleTweet.get.publicationDate.getTime() shouldBe 1476960328000l
   }
 
   it should "unmarshall a tweet without score" in {

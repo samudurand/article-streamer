@@ -1,6 +1,7 @@
 /env
 /.idea
 main.iml
+
 ### Scala template
 *.class
 development.conf
@@ -22,3 +23,4 @@ project/plugins/project/
 .worksheet
 
 /logs/
+/derby.log

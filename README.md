@@ -69,4 +69,9 @@ $ sbt test-shared
 $ sbt test-all
 
 ```
-  
+
+# Viewer 
+ 
+ To visualise the articles waiting to be evaluated manually you need to start the viewer.
+ 
+ ```npm install -g vue-cli```

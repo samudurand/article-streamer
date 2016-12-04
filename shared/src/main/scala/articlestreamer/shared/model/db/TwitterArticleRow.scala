@@ -1,6 +1,6 @@
 package articlestreamer.shared.model.db
 
-import java.sql.Date
+import java.sql.Timestamp
 
 import articlestreamer.shared.model.TwitterArticle
 
@@ -9,7 +9,7 @@ import articlestreamer.shared.model.TwitterArticle
   */
 case class TwitterArticleRow(id: String,
                              originalId: String,
-                             publicationDate: Date,
+                             publicationDate: Timestamp,
                              content: String,
                              author: Long,
                              score: Int) {
