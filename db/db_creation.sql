@@ -1,5 +1,3 @@
-CREATE DATABASE  IF NOT EXISTS `article_streaming` /*!40100 DEFAULT CHARACTER SET latin1 */;
-USE `article_streaming`;
 -- MySQL dump 10.13  Distrib 5.7.12, for osx10.9 (x86_64)
 --
 -- Host: 178.62.95.107    Database: article_streaming
@@ -25,12 +23,14 @@ DROP TABLE IF EXISTS `article`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `article` (
-  `id` text,
-  `originalId` text,
-  `publicationDate` date DEFAULT NULL,
-  `content` text,
+  `id` varchar(36) NOT NULL,
+  `originalId` text NOT NULL,
+  `publicationDate` datetime(6) NOT NULL,
+  `content` text NOT NULL,
   `author` bigint(20) DEFAULT NULL,
-  `score` int(11) DEFAULT NULL
+  `score` int(11) NOT NULL,
+  `status` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -43,4 +43,4 @@ CREATE TABLE `article` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-11-22 16:41:34
+-- Dump completed on 2016-12-04 17:16:00
