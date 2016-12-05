@@ -1,0 +1,13 @@
+# Twitter config
+TW_CONS_KEY=
+TW_CONS_SEC=
+TW_ACC_TOKEN=
+TW_ACC_SEC=
+
+# Kafka config
+KAFKA_BROKERS=
+
+# Mysql config
+MYSQL_JDBC_URL=
+MYSQL_USER=
+MYSQL_PSWD=

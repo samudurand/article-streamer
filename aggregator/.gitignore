@@ -21,3 +21,4 @@ project/plugins/project/
 .worksheet
 
 docker/aggregator-assembly-*.jar
+/docker-env.list
