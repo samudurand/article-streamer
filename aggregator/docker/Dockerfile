@@ -15,8 +15,6 @@ ENV AGG_VERSION 1.0.0
 ENV SCALA_VERSION 2.11.8
 ENV SBT_VERSION 0.13.9
 
-COPY aggregator-assembly-${AGG_VERSION}.jar /
-
 #EXPOSE 8080
 
 # Install Scala
@@ -33,5 +31,7 @@ RUN \
   apt-get update && \
   apt-get install sbt && \
   sbt sbtVersion
+
+COPY aggregator-assembly-${AGG_VERSION}.jar /
 
 ENTRYPOINT java -jar aggregator-assembly-${AGG_VERSION}.jar
