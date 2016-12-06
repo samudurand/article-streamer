@@ -53,6 +53,18 @@ Stop the Aggregator
 
 ## Docker
 
+One of the options to run this system is Via Docker containers. Here are a couple of directions to help you install it by that mean.
+
+### Kakfa
+
+This project is design to work with Kafka 10 (v0.10.1.0). 
+You can either use your own installation or docker images such as [jplock/zookeeper](https://hub.docker.com/r/jplock/zookeeper/) 
+for Zookeeper and [ches/kafka](https://hub.docker.com/r/ches/kafka/)
+```
+$ docker run -d -p 2181:2181 --name zookeeper jplock/zookeeper:3.4.6
+$ docker run -d -p 9092:9092 --name kafka --link zookeeper:zookeeper ches/kafka:0.10.1.0
+```
+
 ### Aggregator
 
 To build the docker image you first need to fill the environment variable file **docker-env.list**, 
