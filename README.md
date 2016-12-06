@@ -51,6 +51,19 @@ Stop the Aggregator
 
 ```$ heroku ps:scale worker=0``` 
 
+## Docker
+
+### Aggregator
+
+To build the docker image you first need to fill the environment variable file **docker-env.list**, 
+then run the following commands from the root
+```
+// Build a Fatjar in ./docker
+$ sbt "project aggregator" coverageOff assembly
+// Build the image
+$ docker build -t [dockerhub-username]/[project] ./aggregator/docker/.
+```
+
 # Testing
 
 To run the tests and generate the coverage reports
