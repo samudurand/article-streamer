@@ -51,6 +51,12 @@ lazy val aggregator = (project in file("aggregator")).
     mainClass in assembly := Commons.producerMainClass,
 
     assemblyOutputPath in assembly := file(s"./aggregator/docker/aggregator-assembly-${version.value}.jar"),
+    assemblyMergeStrategy in assembly := {
+        case PathList("development.conf") => MergeStrategy.discard
+        case x =>
+            val oldStrategy = (assemblyMergeStrategy in assembly).value
+            oldStrategy(x)
+    },
 
     libraryDependencies ++= Dependencies.commonDependencies,
     libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
