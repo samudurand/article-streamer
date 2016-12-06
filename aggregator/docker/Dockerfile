@@ -11,7 +11,7 @@ LABEL description="The aggregator for the Article Streamer project" \
       git.repo="https://github.com/firens/article-streamer" \
 	  project.name="article-streamer"
 
-ENV AGG_VERSION 1.0.0
+ENV AGG_VERSION 0.0.1
 ENV SCALA_VERSION 2.11.8
 ENV SBT_VERSION 0.13.9
 

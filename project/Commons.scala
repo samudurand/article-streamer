@@ -3,7 +3,7 @@ import sbt._
 import scoverage.ScoverageKeys._
 
 object Commons {
-  val appVersion = "1.0.0"
+  val appVersion = "0.0.1"
   val scalaV = "2.11.8"
 
   // Used as main class for the whole project

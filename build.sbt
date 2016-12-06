@@ -37,7 +37,7 @@ lazy val root = (project in file(".")).
     herokuAppName in Compile := "article-streamer-aggregator",
     herokuFatJar in Compile := Some((assemblyOutputPath in assembly).value),
     herokuProcessTypes in Compile := Map(
-      "worker" -> "java -jar target/scala-2.11/article-streamer-assembly-1.0.0.jar")
+      "worker" -> "java -jar target/scala-2.11/article-streamer-assembly-0.0.1.jar")
 
   ) dependsOn (aggregator % "test->test;compile->compile") aggregate(aggregator)
 
