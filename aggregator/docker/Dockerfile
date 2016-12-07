@@ -34,4 +34,4 @@ RUN \
 
 COPY aggregator-assembly-${AGG_VERSION}.jar /
 
-ENTRYPOINT java -jar aggregator-assembly-${AGG_VERSION}.jar
+ENTRYPOINT exec java -jar aggregator-assembly-${AGG_VERSION}.jar

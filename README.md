@@ -55,6 +55,21 @@ Stop the Aggregator
 
 One of the options to run this system is Via Docker containers. Here are a couple of directions to help you install it by that mean.
 
+### Docker Compose
+
+The provided ___docker-compose.yml___ file will start the aggregator, kafka and zookeeper all at once in separate containers.
+```
+$ docker-compose up -d
+```
+To see the logs
+```
+$ docker-compose logs -f
+```
+Stop all at once
+```
+$ docker-compose stop -t 60
+```
+
 ### Kakfa
 
 This project is design to work with Kafka 10 (v0.10.1.0). 
