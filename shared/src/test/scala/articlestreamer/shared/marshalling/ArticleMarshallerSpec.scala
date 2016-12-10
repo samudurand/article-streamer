@@ -1,4 +1,4 @@
-package articlestreamer.processor.marshalling
+package articlestreamer.shared.marshalling
 
 import java.text.SimpleDateFormat
 import java.util.TimeZone
@@ -8,7 +8,7 @@ import articlestreamer.shared.model.TweetAuthor
 
 import scala.io.Source
 
-class ArticleMarshallerSpec extends BaseSpec with ArticleMarshaller {
+class ArticleMarshallerSpec extends BaseSpec with TwitterArticleMarshaller {
 
   val df: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
   df.setTimeZone(TimeZone.getTimeZone("GMT"))
