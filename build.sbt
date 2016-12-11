@@ -76,14 +76,11 @@ lazy val processor = (project in file("processor")).
     parallelExecution in Test := false,
 
     libraryDependencies ++= Dependencies.commonDependencies,
-    libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
     libraryDependencies += "org.apache.spark" %% "spark-core"       % "2.0.0" exclude("org.slf4j","slf4j-log4j12"),
     libraryDependencies += "org.apache.spark" %% "spark-sql"        % "2.0.0",
     libraryDependencies += "org.apache.spark" %% "spark-streaming"  % "2.0.0",
     libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.40",
-    libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion,
-    //libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka-0-10" % "2.0.0",
-    //libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka-0-8" % "2.0.0",
+    libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka-0-10" % "2.0.0",
 
     libraryDependencies += "com.holdenkarau" %% "spark-testing-base" % "2.0.0_0.4.7" % "test",
     libraryDependencies += "org.apache.spark" %% "spark-hive"       % "2.0.0" % "test",
@@ -96,9 +93,6 @@ lazy val twitterScoreUpdater = (project in file("twitter-score-updater")).
   settings(Commons.settings: _*).
   settings(
     name := "twitterScoreUpdater",
-
-    // Necessary for using
-    parallelExecution in Test := false,
 
     libraryDependencies ++= Dependencies.commonDependencies,
     libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
@@ -113,7 +107,7 @@ lazy val shared = (project in file("shared")).
   settings(
     name := "shared",
 
-    // Necessary for using
+    // Necessary for using spark testing base
     parallelExecution in Test := false,
 
     libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
