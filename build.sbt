@@ -84,7 +84,6 @@ lazy val processor = (project in file("processor")).
     libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion,
     //libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka-0-10" % "2.0.0",
     //libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka-0-8" % "2.0.0",
-    //libraryDependencies += "org.scalaj"       %% "scalaj-http"      % "2.3.0",
 
     libraryDependencies += "com.holdenkarau" %% "spark-testing-base" % "2.0.0_0.4.7" % "test",
     libraryDependencies += "org.apache.spark" %% "spark-hive"       % "2.0.0" % "test",

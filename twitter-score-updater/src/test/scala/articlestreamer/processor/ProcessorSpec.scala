@@ -1,21 +1,18 @@
 package articlestreamer.processor
 
-import java.io.File
 import java.sql.Timestamp
 import java.util
 import java.util.Arrays.asList
 
 import articlestreamer.processor.kafka.KafkaConsumerWrapperSpec.prepareRecords
-import articlestreamer.processor.spark.SparkSessionProvider
 import articlestreamer.shared.BaseSpec
-import articlestreamer.shared.configuration.{ConfigLoader, MysqlConfig}
+import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.kafka.{DualTopicManager, KafkaFactory}
 import articlestreamer.shared.marshalling.CustomJsonFormats
 import articlestreamer.shared.model.{TweetAuthor, TwitterArticle}
 import articlestreamer.shared.scoring.{NaiveTwitterScoreCalculator, TwitterScoreCalculator}
-import com.holdenkarau.spark.testing.{DataFrameSuiteBase, SharedSparkContext}
+import articlestreamer.twitterupdater.ScoreUpdater
 import org.apache.kafka.clients.consumer.{ConsumerRecord, ConsumerRecords, KafkaConsumer}
-import org.hamcrest.Matchers.{any => _}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
@@ -28,15 +25,11 @@ import scala.io.Source
 /**
   * Created by sam on 16/10/2016.
   */
-class ProcessorSpec extends BaseSpec with SharedSparkContext with DataFrameSuiteBase with BeforeAndAfter with CustomJsonFormats {
-
-  // TODO Ideally I would not use a fake DB in unit tests but Spark-Test-Base does not mock JDBC access yet
-  private val jdbcUrl = buildTempDerbyUrl()
+class ProcessorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats {
 
   class TestConfig extends ConfigLoader {
     override val tweetsBatchSize: Int = 1
     override val kafkaMaxAttempts: Int = 2
-    override val mysqlConfig: MysqlConfig = MysqlConfig(jdbcUrl, "", "")
   }
 
   class TestTopicManager extends DualTopicManager {
@@ -57,7 +50,6 @@ class ProcessorSpec extends BaseSpec with SharedSparkContext with DataFrameSuite
   val config = new TestConfig
 
   var factory: TwitterFactory = _
-  var ssProvider: SparkSessionProvider = _
   var consumerFactory: KafkaFactory[String, String] = _
   var consumer1: KafkaConsumer[String, String] = _
   var consumer2: KafkaConsumer[String, String] = _
@@ -66,9 +58,6 @@ class ProcessorSpec extends BaseSpec with SharedSparkContext with DataFrameSuite
   before {
     factory = mock(classOf[TwitterFactory])
     when(factory.getInstance).thenReturn(mock(classOf[Twitter]))
-
-    ssProvider = mock(classOf[SparkSessionProvider])
-    when(ssProvider.getSparkSession()).thenReturn(spark)
 
     scoreCalculator = mock(classOf[NaiveTwitterScoreCalculator])
 
@@ -91,7 +80,7 @@ class ProcessorSpec extends BaseSpec with SharedSparkContext with DataFrameSuite
     when(scoreCalculator.updateScores(mapCaptor.capture()))
       .thenReturn(List(article, article2), List())
 
-    val processor = new Processor(config, consumerFactory, scoreCalculator, ssProvider, new TestTopicManager)
+    val processor = new ScoreUpdater(config, consumerFactory, scoreCalculator, new TestTopicManager)
     val articles = processor()
 
     articles should have length 2
@@ -126,7 +115,7 @@ class ProcessorSpec extends BaseSpec with SharedSparkContext with DataFrameSuite
       .thenReturn(List(article))
       .thenThrow(new RuntimeException())
 
-    val processor = new Processor(config, consumerFactory, scoreCalculator, ssProvider, new TestTopicManager)
+    val processor = new ScoreUpdater(config, consumerFactory, scoreCalculator, new TestTopicManager)
     val articles = processor()
 
     articles should have size 1
@@ -136,7 +125,7 @@ class ProcessorSpec extends BaseSpec with SharedSparkContext with DataFrameSuite
   it should "process an empty queue" in {
     when(consumer1.poll(any())).thenReturn(new ConsumerRecords[String, String](new util.HashMap()))
 
-    val processor = new Processor(config, consumerFactory, scoreCalculator, ssProvider, new TestTopicManager)
+    val processor = new ScoreUpdater(config, consumerFactory, scoreCalculator, new TestTopicManager)
     val articles = processor()
 
     articles shouldBe empty
@@ -151,7 +140,7 @@ class ProcessorSpec extends BaseSpec with SharedSparkContext with DataFrameSuite
     when(consumer1.poll(any())).thenReturn(new ConsumerRecords[String, String](new util.HashMap()))
     when(consumer2.poll(any())).thenReturn(new ConsumerRecords[String, String](new util.HashMap()))
 
-    val processor = new Processor(config, consumerFactory, scoreCalculator, ssProvider, topicManager)
+    val processor = new ScoreUpdater(config, consumerFactory, scoreCalculator, topicManager)
     processor()
 
     verify(consumer1, times(2)).poll(any())
@@ -165,12 +154,6 @@ class ProcessorSpec extends BaseSpec with SharedSparkContext with DataFrameSuite
   def extractArticles[T](captor: ArgumentCaptor[Map[Long, T]]): Iterable[T] = {
     val m = captor.getValue
     m.values
-  }
-
-  private def buildTempDerbyUrl(): String = {
-    val tempDir = com.holdenkarau.spark.testing.Utils.createTempDir("./")
-    val filePath = new File(tempDir, "metastore").getCanonicalPath
-    s"jdbc:derby:;databaseName=$filePath;create=true"
   }
 
 }

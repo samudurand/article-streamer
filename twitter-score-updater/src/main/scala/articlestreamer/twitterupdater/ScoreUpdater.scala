@@ -1,25 +1,31 @@
 package articlestreamer.twitterupdater
 
 import articlestreamer.shared.configuration.ConfigLoader
-import articlestreamer.shared.kafka.{DualTopicManager, KafkaFactory}
+import articlestreamer.shared.kafka.{DualTopicManager, KafkaFactory, KafkaProducerWrapper}
+import articlestreamer.shared.marshalling.CustomJsonFormats
 import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.scoring.TwitterScoreCalculator
 import articlestreamer.twitterupdater.kafka.KafkaConsumerWrapper
 import com.typesafe.scalalogging.LazyLogging
+import org.apache.kafka.clients.producer.ProducerRecord
+import org.json4s.jackson.Serialization.write
 
 class ScoreUpdater(config: ConfigLoader,
-                   consumerFactory: KafkaFactory[String, String],
+                   factory: KafkaFactory[String, String],
                    scoreCalculator: TwitterScoreCalculator,
-                   topicManager: DualTopicManager) extends LazyLogging {
+                   topicManager: DualTopicManager) extends CustomJsonFormats with LazyLogging {
 
   val ARTICLE_TABLE = "article"
 
-  val consumer1 = new KafkaConsumerWrapper(config, consumerFactory, topicManager.getFirstTopic())
-  val consumer2 = new KafkaConsumerWrapper(config, consumerFactory, topicManager.getSecondTopic())
+  val consumer1 = new KafkaConsumerWrapper(config, factory, topicManager.getFirstTopic())
+  val consumer2 = new KafkaConsumerWrapper(config, factory, topicManager.getSecondTopic())
+  val producer = new KafkaProducerWrapper(config, factory)
 
   sys.addShutdownHook {
+    logger.info("Stopping consumers and producer.")
     consumer1.stopConsumer()
     consumer2.stopConsumer()
+    producer.stopProducer()
   }
 
   def apply(): List[TwitterArticle] = {
@@ -51,9 +57,12 @@ class ScoreUpdater(config: ConfigLoader,
       .flatMap { batch =>
         try {
           val mappedBatch = batch.map( article => (article.originalId.toLong, article)).toMap
-          scoreCalculator.updateScores(mappedBatch)
+          val updatedArticles = scoreCalculator.updateScores(mappedBatch)
 
-          //TODO send to new kafka topic
+          // Store updated messages
+          updatedArticles.foreach(sendToKafka)
+
+          updatedArticles
         } catch {
           case ex: Exception =>
             logger.error("Error while updating scores.", ex)
@@ -61,6 +70,15 @@ class ScoreUpdater(config: ConfigLoader,
         }
       }.toList
 
+  }
+
+  private def sendToKafka(article: TwitterArticle) = {
+    val record = new ProducerRecord[String, String](
+      config.kafkaArticlesTopic,
+      s"tweet-${article.id}",
+      write(article))
+
+    producer.send(record)
   }
 
   private def getRecordsFromSource: List[TwitterArticle] = {

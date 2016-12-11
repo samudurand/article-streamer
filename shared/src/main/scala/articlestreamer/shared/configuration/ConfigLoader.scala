@@ -55,6 +55,7 @@ trait ConfigLoader extends LazyLogging {
   val kafkaMainTopic = appConfig.getString("kafka.topic-default")
   val kafkaFirstTopic = appConfig.getString("kafka.topic1")
   val kafkaSecondTopic = appConfig.getString("kafka.topic2")
+  val kafkaArticlesTopic = appConfig.getString("kafka.topic-articles")
 
   val kafkaBrokers = appConfig.getString("kafka.brokers")
   /**

@@ -106,7 +106,7 @@ object KafkaConsumerWrapper {
 
     val properties = new Properties()
     properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBrokers)
-    properties.put(ConsumerConfig.GROUP_ID_CONFIG, "test-" + UUID.randomUUID().toString)
+    properties.put(ConsumerConfig.GROUP_ID_CONFIG, "kafka-tweet-consumers")
     properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true")
     properties.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "1000")
     properties.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "30000")

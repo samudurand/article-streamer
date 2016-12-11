@@ -2,13 +2,13 @@ package articlestreamer.processor
 
 import java.util
 
-import articlestreamer.processor.kafka.KafkaConsumerWrapper
 import articlestreamer.processor.spark.SparkSessionProvider
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.kafka.{DualTopicManager, KafkaFactory}
 import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.model.db.TwitterArticleRow
 import articlestreamer.shared.scoring.TwitterScoreCalculator
+import articlestreamer.twitterupdater.kafka.KafkaConsumerWrapper
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.spark.sql.SaveMode
 
