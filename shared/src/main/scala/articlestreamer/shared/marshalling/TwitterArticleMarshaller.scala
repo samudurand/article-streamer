@@ -4,7 +4,7 @@ import articlestreamer.shared.model.TwitterArticle
 import com.typesafe.scalalogging.LazyLogging
 import org.json4s.jackson.Serialization._
 
-object TwitterArticleMarshaller extends Serializable with CustomJsonFormats with LazyLogging {
+trait TwitterArticleMarshaller extends Serializable with CustomJsonFormats with LazyLogging {
 
   def unmarshallArticle(article: String): Option[TwitterArticle] = {
 
@@ -18,4 +18,6 @@ object TwitterArticleMarshaller extends Serializable with CustomJsonFormats with
   }
 
 }
+
+object TwitterArticleMarshaller extends TwitterArticleMarshaller
 

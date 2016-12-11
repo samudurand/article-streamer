@@ -1,6 +1,7 @@
 package articlestreamer.processor
 
 import java.sql.DriverManager
+import java.util.UUID
 
 import articlestreamer.processor.spark.SparkProvider
 import articlestreamer.shared.configuration.ConfigLoader
@@ -34,7 +35,7 @@ class Processor(config: ConfigLoader,
       ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG -> config.kafkaBrokers,
       ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG -> classOf[StringDeserializer],
       ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG -> classOf[StringDeserializer],
-      ConsumerConfig.GROUP_ID_CONFIG -> "article-processor",
+      ConsumerConfig.GROUP_ID_CONFIG -> s"article-processor-${UUID.randomUUID().toString}",
       ConsumerConfig.AUTO_OFFSET_RESET_CONFIG -> "earliest",
       ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG -> (false: java.lang.Boolean)
     )
@@ -79,10 +80,16 @@ class Processor(config: ConfigLoader,
         val conn = DriverManager.getConnection(conf.mysqlConfig.jdbcUrl, dbConfig)
 
         val del = conn.prepareStatement("" +
-          s"INSERT INTO article " +
+          s"INSERT INTO article" +
           s"(id, originalId, publicationDate, content, author, score) " +
-          s"VALUES (${article.id},${article.originalId},${article.publicationDate}," +
-          s"${article.content},${article.author},${article.score})")
+          s"VALUES (?,?,?,?,?,?)")
+
+        del.setString(1, article.id)
+        del.setString(2, article.originalId)
+        del.setTimestamp(3, article.publicationDate)
+        del.setString(4, article.content)
+        del.setLong(5, article.author)
+        del.setInt(6, article.score)
 
         del.executeUpdate
 
