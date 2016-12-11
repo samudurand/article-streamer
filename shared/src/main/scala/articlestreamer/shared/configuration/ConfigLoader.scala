@@ -19,7 +19,7 @@ final case class TwitterSearchConfig(mainTag: String,
 
 final case class MysqlConfig(jdbcUrl: String, user: String, password: String)
 
-trait ConfigLoader extends LazyLogging {
+trait ConfigLoader extends LazyLogging with Serializable {
 
   val appConfig = ConfigFactory.load()
 

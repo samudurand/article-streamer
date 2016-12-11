@@ -1,6 +1,6 @@
 package articlestreamer.processor
 
-import articlestreamer.processor.spark.OnDemandSparkSessionProvider
+import articlestreamer.processor.spark.OnDemandSparkProvider
 import articlestreamer.shared.configuration.DefaultConfigLoader
 import articlestreamer.shared.kafka.{HalfDayTopicManager, KafkaFactory}
 import articlestreamer.shared.scoring.NaiveTwitterScoreCalculator
@@ -15,7 +15,7 @@ object MainApp extends App {
   lazy val twitterFactory = wire[TwitterFactory]
   lazy val twitterService = wire[TwitterService]
   lazy val consumerFactory = wire[KafkaFactory[String, String]]
-  lazy val sparkProvider = wire[OnDemandSparkSessionProvider]
+  lazy val sparkProvider = wire[OnDemandSparkProvider]
   lazy val twitterScoreCalculator = wire[NaiveTwitterScoreCalculator]
   lazy val topicManager = wire[HalfDayTopicManager]
 

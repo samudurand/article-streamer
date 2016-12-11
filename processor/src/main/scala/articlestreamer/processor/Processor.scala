@@ -1,99 +1,108 @@
 package articlestreamer.processor
 
-import java.util
+import java.sql.DriverManager
 
-import articlestreamer.processor.spark.SparkSessionProvider
+import articlestreamer.processor.spark.SparkProvider
 import articlestreamer.shared.configuration.ConfigLoader
-import articlestreamer.shared.kafka.{DualTopicManager, KafkaFactory}
+import articlestreamer.shared.kafka.DualTopicManager
+import articlestreamer.shared.marshalling.TwitterArticleMarshaller
 import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.model.db.TwitterArticleRow
-import articlestreamer.shared.scoring.TwitterScoreCalculator
-import articlestreamer.twitterupdater.kafka.KafkaConsumerWrapper
-import com.typesafe.scalalogging.LazyLogging
-import org.apache.spark.sql.SaveMode
+import com.typesafe.scalalogging.{LazyLogging, Logger}
+import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.common.serialization.StringDeserializer
+import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
+import org.apache.spark.streaming.kafka010.KafkaUtils
+import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 
 class Processor(config: ConfigLoader,
-                consumerFactory: KafkaFactory[String, String],
-                scoreCalculator: TwitterScoreCalculator,
-                sparkSessionProvider: SparkSessionProvider,
-                topicManager: DualTopicManager) extends LazyLogging {
-
-  val ARTICLE_TABLE = "article"
-
-  val consumer1 = new KafkaConsumerWrapper(config, consumerFactory, topicManager.getFirstTopic())
-  val consumer2 = new KafkaConsumerWrapper(config, consumerFactory, topicManager.getSecondTopic())
+                sparkSessionProvider: SparkProvider,
+                topicManager: DualTopicManager) {
 
   sys.addShutdownHook {
-    consumer1.stopConsumer()
-    consumer2.stopConsumer()
   }
 
-  def apply(): List[TwitterArticle] = {
+  def apply(): Unit = {
 
-    val records = getRecordsFromSource
+    val logger = Logger(classOf[Processor])
 
-    if (records.nonEmpty) {
+    import org.apache.spark.streaming._
 
-      logger.info(s"Processing ${records.length} articles")
+    val ssc = new StreamingContext(sparkSessionProvider.getSparkConf(), Seconds(10))
 
-      val sortedArticles = processArticles(records)
-      sortedArticles.foreach(a => logger.info(s"Article ${a.originalId} \n" +
-        s"Score : ${a.score} \n" +
-        s"Date : ${a.publicationDate} \n" +
-        s"Content : ${a.content} \n"))
+    val kafkaParams = Map[String, Object](
+      ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG -> config.kafkaBrokers,
+      ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG -> classOf[StringDeserializer],
+      ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG -> classOf[StringDeserializer],
+      ConsumerConfig.GROUP_ID_CONFIG -> "article-processor",
+      ConsumerConfig.AUTO_OFFSET_RESET_CONFIG -> "earliest",
+      ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG -> (false: java.lang.Boolean)
+    )
 
-      sortedArticles
-    } else {
-      logger.info("No article recovered, terminating program")
-      List()
-    }
-  }
+    val stream = KafkaUtils.createDirectStream[String, String](
+      ssc,
+      PreferConsistent,
+      Subscribe[String, String](Array(config.kafkaArticlesTopic), kafkaParams)
+    )
 
-  private def processArticles(articles: List[TwitterArticle]): List[TwitterArticle] = {
-    val sparkSession = sparkSessionProvider.getSparkSession()
-
-    import sparkSession.implicits._
-
-    // Grouped to fit twitter limitations
-    val updatedArticles = articles
-      .grouped(config.tweetsBatchSize)
-      .flatMap { batch =>
-        try {
-          val mappedBatch = batch.map( article => (article.originalId.toLong, article)).toMap
-          scoreCalculator.updateScores(mappedBatch)
-        } catch {
-          case ex: Exception =>
-            logger.error("Error while updating scores.", ex)
-            List()
-        }
-      }.toList
-
-    val sortedDs = sparkSession
-      .createDataset(updatedArticles)
-      .sort($"score".desc)
-
-    sortedDs.cache()
-
-    val connectionProp = new util.Properties()
-    connectionProp.put("user", config.mysqlConfig.user)
-    connectionProp.put("password", config.mysqlConfig.password)
-    connectionProp.put("useSSL", "false")
-
-    sortedDs
+    val articles = stream
+      .map(record => (record.key, record.value))
+      .flatMap {
+        case (_, value) =>
+          TwitterArticleMarshaller.unmarshallArticle(value) match {
+            case Some(article) => Some(article)
+            case None =>
+              logger.error(s"Couldn't parse to an article : $value")
+              Option.empty[TwitterArticle]
+          }
+      }
       .map(article => new TwitterArticleRow(article))
-      .write
-      .mode(SaveMode.Append)
-      .jdbc(config.mysqlConfig.jdbcUrl, ARTICLE_TABLE, connectionProp)
 
-    sortedDs.collect().toList
-  }
+    articles.cache()
 
-  private def getRecordsFromSource: List[TwitterArticle] = {
-    if (topicManager.getCurrentTopic() == topicManager.getSecondTopic()) {
-      consumer1.pullAll()
-    } else {
-      consumer2.pullAll()
+    articles.foreachRDD { rdd =>
+
+      //Class.forName("com.mysql.jdbc.Driver")
+
+      val conf = config
+
+      rdd.foreach { article =>
+
+        val internLogger = Logger(classOf[Processor])
+
+        val dbConfig = new java.util.Properties()
+        dbConfig.put("user", conf.mysqlConfig.user)
+        dbConfig.put("password", conf.mysqlConfig.password)
+        dbConfig.put("useSSL", "false")
+        dbConfig.put("driver", "com.mysql.jdbc.Driver")
+
+        val conn = DriverManager.getConnection(conf.mysqlConfig.jdbcUrl, dbConfig)
+
+        val del = conn.prepareStatement("" +
+          s"INSERT INTO article " +
+          s"(id, originalId, publicationDate, content, author, score) " +
+          s"VALUES (${article.id},${article.originalId},${article.publicationDate}," +
+          s"${article.content},${article.author},${article.score})")
+
+        del.executeUpdate
+
+        conn.close()
+
+        internLogger.info(s"Article ${article.originalId} \n" +
+          s"Score : ${article.score} \n" +
+          s"Date : ${article.publicationDate} \n" +
+          s"Content : ${article.content} \n")
+      }
+
     }
+
+    ssc.start()
+    ssc.awaitTermination()
+
+    sys.addShutdownHook {
+      ssc.stop(stopSparkContext = true, stopGracefully = true)
+    }
+
   }
 
 }
