@@ -13,7 +13,7 @@
 //import articlestreamer.shared.marshalling.CustomJsonFormats
 //import articlestreamer.shared.model.{TweetAuthor, TwitterArticle}
 //import articlestreamer.shared.scoring.{NaiveTwitterScoreCalculator, TwitterScoreCalculator}
-//import com.holdenkarau.spark.testing.{DataFrameSuiteBase, SharedSparkContext}
+//import com.holdenkarau.spark.testing.{DataFrameSuiteBase, SharedSparkContext, StreamingSuiteBase}
 //import org.apache.kafka.clients.consumer.{ConsumerRecord, ConsumerRecords, KafkaConsumer}
 //import org.hamcrest.Matchers.{any => _}
 //import org.mockito.ArgumentCaptor
@@ -28,7 +28,7 @@
 ///**
 //  * Created by sam on 16/10/2016.
 //  */
-//class ProcessorSpec extends BaseSpec with SharedSparkContext with DataFrameSuiteBase with BeforeAndAfter with CustomJsonFormats {
+//class ProcessorSpec extends BaseSpec with StreamingSuiteBase with BeforeAndAfter with CustomJsonFormats {
 //
 //  // TODO Ideally I would not use a fake DB in unit tests but Spark-Test-Base does not mock JDBC access yet
 //  private val jdbcUrl = buildTempDerbyUrl()

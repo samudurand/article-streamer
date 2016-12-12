@@ -1,27 +1,22 @@
 package articlestreamer.processor
 
-import java.sql.DriverManager
+import java.sql.{DriverManager, SQLException}
 import java.util.UUID
 
 import articlestreamer.processor.spark.SparkProvider
 import articlestreamer.shared.configuration.ConfigLoader
-import articlestreamer.shared.kafka.DualTopicManager
 import articlestreamer.shared.marshalling.TwitterArticleMarshaller
-import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.model.db.TwitterArticleRow
 import com.typesafe.scalalogging.Logger
-import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecord}
 import org.apache.kafka.common.serialization.StringDeserializer
+import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
 import org.apache.spark.streaming.kafka010.KafkaUtils
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 
 class Processor(config: ConfigLoader,
-                sparkSessionProvider: SparkProvider,
-                topicManager: DualTopicManager) {
-
-  sys.addShutdownHook {
-  }
+                sparkSessionProvider: SparkProvider) {
 
   def apply(): Unit = {
 
@@ -37,31 +32,30 @@ class Processor(config: ConfigLoader,
       ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG -> classOf[StringDeserializer],
       ConsumerConfig.GROUP_ID_CONFIG -> s"article-processor-${UUID.randomUUID().toString}",
       ConsumerConfig.AUTO_OFFSET_RESET_CONFIG -> "earliest",
-      ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG -> (false: java.lang.Boolean)
-    )
+      ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG -> (false: java.lang.Boolean))
 
     val stream = KafkaUtils.createDirectStream[String, String](
       ssc,
       PreferConsistent,
-      Subscribe[String, String](Array(config.kafkaArticlesTopic), kafkaParams)
-    )
+      Subscribe[String, String](Array(config.kafkaArticlesTopic), kafkaParams))
 
-    val articles = stream
-      .map(record => (record.key, record.value))
-      .flatMap {
-        case (_, value) =>
-          TwitterArticleMarshaller.unmarshallArticle(value) match {
-            case Some(article) => Some(article)
-            case None =>
-              logger.error(s"Couldn't parse to an article : $value")
-              Option.empty[TwitterArticle]
-          }
-      }
-      .map(article => new TwitterArticleRow(article))
+    stream
+      .map(recordToTuple)
+      .flatMap(parseRecordsToArticles)
+      .foreachRDD (saveToDB)
 
-    articles.cache()
+    ssc.start()
+    ssc.awaitTermination()
 
-    articles.foreachRDD { rdd =>
+    sys.addShutdownHook {
+      logger.info("Stopping article streaming")
+      ssc.stop(stopSparkContext = true, stopGracefully = true)
+    }
+
+  }
+
+  protected val saveToDB: (RDD[TwitterArticleRow]) => Unit = {
+    rdd => {
 
       val conf = config
 
@@ -78,9 +72,9 @@ class Processor(config: ConfigLoader,
         val conn = DriverManager.getConnection(conf.mysqlConfig.jdbcUrl, dbConfig)
 
         val del = conn.prepareStatement("" +
-          s"INSERT INTO article" +
-          s"(id, originalId, publicationDate, content, author, score) " +
-          s"VALUES (?,?,?,?,?,?)")
+          "INSERT INTO article" +
+          "(id, originalId, publicationDate, content, author, score) " +
+          "VALUES (?,?,?,?,?,?)")
 
         del.setString(1, article.id)
         del.setString(2, article.originalId)
@@ -89,7 +83,12 @@ class Processor(config: ConfigLoader,
         del.setLong(5, article.author)
         del.setInt(6, article.score)
 
-        del.executeUpdate
+        try {
+          del.executeUpdate
+        } catch {
+          case ex: SQLException =>
+            internLogger.error(s"Failed to save article to DB. Article : $article", ex)
+        }
 
         conn.close()
 
@@ -98,19 +97,23 @@ class Processor(config: ConfigLoader,
           s"Date : ${article.publicationDate} \n" +
           s"Content : ${article.content} \n")
       }
-
     }
-
-    ssc.start()
-    ssc.awaitTermination()
-
-    sys.addShutdownHook {
-      logger.info("Stopping article streaming")
-      ssc.stop(stopSparkContext = true, stopGracefully = true)
-    }
-
   }
 
+  protected val parseRecordsToArticles: ((String, String)) => Iterable[TwitterArticleRow] = {
+    case (_, value) => {
+      TwitterArticleMarshaller.unmarshallArticle(value) match {
+        case Some(article) => Some(new TwitterArticleRow(article))
+        case None =>
+          Logger(classOf[Processor]).error(s"Couldn't parse to an article : $value")
+          Option.empty[TwitterArticleRow]
+      }
+    }
+  }
+
+  protected val recordToTuple: (ConsumerRecord[String, String]) => (String, String) = {
+    record => (record.key, record.value)
+  }
 }
 
 

@@ -88,27 +88,3 @@ class ScoreUpdater(config: ConfigLoader,
   }
 
 }
-
-
-/*
-
-#Datasets
-
-  https://databricks.com/blog/2016/01/04/introducing-apache-spark-datasets.html
-
-#Rdd dataframe dataset
-
-  https://databricks.com/blog/2016/07/14/a-tale-of-three-apache-spark-apis-rdds-dataframes-and-datasets.html
-
-#Convert list/rdd to dataset
-
-  http://stackoverflow.com/a/37513784/1660475
-
-#Various
-
-  https://jaceklaskowski.gitbooks.io/mastering-apache-spark/content/spark-logging.html
-  https://metabroadcast.com/blog/resetting-kafka-offsets
-  http://www.cakesolutions.net/teamblogs/spark-streaming-tricky-parts
-  http://why-not-learn-something.blogspot.co.uk/2016/05/apache-spark-streaming-how-to-do.html
-
-*/
