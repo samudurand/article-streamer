@@ -7,7 +7,7 @@ import articlestreamer.shared.twitter.service.TwitterService
 import com.softwaremill.macwire._
 import twitter4j.TwitterFactory
 
-object MainApp extends App {
+object App extends App {
 
   lazy val configLoader = wire[DefaultConfigLoader]
 
