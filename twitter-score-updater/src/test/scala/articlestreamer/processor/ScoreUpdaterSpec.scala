@@ -3,6 +3,7 @@ package articlestreamer.processor
 import java.sql.Timestamp
 import java.util
 import java.util.Arrays.asList
+import java.util.concurrent
 
 import articlestreamer.processor.kafka.KafkaConsumerWrapperSpec.prepareRecords
 import articlestreamer.shared.BaseSpec
@@ -13,6 +14,7 @@ import articlestreamer.shared.model.{TweetAuthor, TwitterArticle}
 import articlestreamer.shared.scoring.{NaiveTwitterScoreCalculator, TwitterScoreCalculator}
 import articlestreamer.twitterupdater.ScoreUpdater
 import org.apache.kafka.clients.consumer.{ConsumerRecord, ConsumerRecords, KafkaConsumer}
+import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord, RecordMetadata}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
@@ -25,7 +27,7 @@ import scala.io.Source
 /**
   * Created by sam on 16/10/2016.
   */
-class ProcessorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats {
+class ScoreUpdaterSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats {
 
   class TestConfig extends ConfigLoader {
     override val tweetsBatchSize: Int = 1
@@ -53,6 +55,7 @@ class ProcessorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats 
   var consumerFactory: KafkaFactory[String, String] = _
   var consumer1: KafkaConsumer[String, String] = _
   var consumer2: KafkaConsumer[String, String] = _
+  var producer: KafkaProducer[String, String] = _
   var scoreCalculator: TwitterScoreCalculator = _
 
   before {
@@ -63,11 +66,13 @@ class ProcessorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats 
 
     consumer1 = mock(classOf[KafkaConsumer[String, String]])
     consumer2 = mock(classOf[KafkaConsumer[String, String]])
+    producer = mock(classOf[KafkaProducer[String, String]])
     consumerFactory = mock(classOf[KafkaFactory[String, String]])
     when(consumerFactory.getConsumer(any())).thenReturn(consumer1, consumer2)
+    when(consumerFactory.getProducer(any())).thenReturn(producer)
   }
 
-  it should "retrieve articles and update scores, then return in proper order" in {
+  it should "retrieve articles and update scores" in {
 
     prepareConsumersToPullTwoRecords(consumer1)
 
@@ -78,20 +83,27 @@ class ProcessorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats 
 
     val mapCaptor: ArgumentCaptor[Map[Long, TwitterArticle]] = ArgumentCaptor.forClass(classOf[Map[Long, TwitterArticle]])
     when(scoreCalculator.updateScores(mapCaptor.capture()))
-      .thenReturn(List(article, article2), List())
+      .thenReturn(List(article), List(article2))
 
-    val processor = new ScoreUpdater(config, consumerFactory, scoreCalculator, new TestTopicManager)
-    val articles = processor()
+    val recordsCaptor: ArgumentCaptor[ProducerRecord[String, String]] = ArgumentCaptor.forClass(classOf[ProducerRecord[String, String]])
+    when(producer.send(recordsCaptor.capture(), any())).thenReturn(mock(classOf[concurrent.Future[RecordMetadata]]))
+
+    val scoreUpdater = new ScoreUpdater(config, consumerFactory, scoreCalculator, new TestTopicManager)
+    val articles = scoreUpdater()
 
     articles should have length 2
-    articles(0).id shouldBe article2.id
-    articles(1).id shouldBe article.id
+    articles(0).id shouldBe article.id
+    articles(1).id shouldBe article2.id
 
     val processedArticles = mapCaptor.getAllValues
     processedArticles.get(0) should have size 1
     processedArticles.get(0)(789070025009336320l).id shouldBe article.id
     processedArticles.get(1) should have size 1
     processedArticles.get(1)(789070025044436320l).id shouldBe article2.id
+
+    val sentRecords = recordsCaptor.getAllValues
+    sentRecords.get(0).key() shouldBe s"tweet-${article.id}"
+    sentRecords.get(1).key() shouldBe s"tweet-${article2.id}"
   }
 
   def prepareConsumersToPullTwoRecords(consumer: KafkaConsumer[String, String]) = {

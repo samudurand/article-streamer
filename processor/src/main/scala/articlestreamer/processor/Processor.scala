@@ -9,7 +9,7 @@ import articlestreamer.shared.kafka.DualTopicManager
 import articlestreamer.shared.marshalling.TwitterArticleMarshaller
 import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.model.db.TwitterArticleRow
-import com.typesafe.scalalogging.{LazyLogging, Logger}
+import com.typesafe.scalalogging.Logger
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
@@ -63,8 +63,6 @@ class Processor(config: ConfigLoader,
 
     articles.foreachRDD { rdd =>
 
-      //Class.forName("com.mysql.jdbc.Driver")
-
       val conf = config
 
       rdd.foreach { article =>
@@ -107,6 +105,7 @@ class Processor(config: ConfigLoader,
     ssc.awaitTermination()
 
     sys.addShutdownHook {
+      logger.info("Stopping article streaming")
       ssc.stop(stopSparkContext = true, stopGracefully = true)
     }
 

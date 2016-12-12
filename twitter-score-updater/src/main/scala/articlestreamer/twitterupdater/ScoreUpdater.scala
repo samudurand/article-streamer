@@ -15,8 +15,6 @@ class ScoreUpdater(config: ConfigLoader,
                    scoreCalculator: TwitterScoreCalculator,
                    topicManager: DualTopicManager) extends CustomJsonFormats with LazyLogging {
 
-  val ARTICLE_TABLE = "article"
-
   val consumer1 = new KafkaConsumerWrapper(config, factory, topicManager.getFirstTopic())
   val consumer2 = new KafkaConsumerWrapper(config, factory, topicManager.getSecondTopic())
   val producer = new KafkaProducerWrapper(config, factory)
@@ -65,6 +63,7 @@ class ScoreUpdater(config: ConfigLoader,
           updatedArticles
         } catch {
           case ex: Exception =>
+            val ex1 = ex
             logger.error("Error while updating scores.", ex)
             List()
         }
