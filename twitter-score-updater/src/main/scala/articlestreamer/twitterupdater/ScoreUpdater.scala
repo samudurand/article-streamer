@@ -63,7 +63,6 @@ class ScoreUpdater(config: ConfigLoader,
           updatedArticles
         } catch {
           case ex: Exception =>
-            val ex1 = ex
             logger.error("Error while updating scores.", ex)
             List()
         }

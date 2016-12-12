@@ -77,7 +77,7 @@ class KafkaConsumerWrapperSpec extends BaseSpec with BeforeAndAfter with CustomJ
 
     verify(consumer, times(2)).poll(anyLong())
     values should have length 1
-    values(0).id shouldBe "00000000-0000-0000-0000-000000000001"
+    values.head.id shouldBe "00000000-0000-0000-0000-000000000001"
   }
 
   it should "stop consumer" in {

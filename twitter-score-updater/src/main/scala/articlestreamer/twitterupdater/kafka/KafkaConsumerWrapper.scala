@@ -1,7 +1,7 @@
 package articlestreamer.twitterupdater.kafka
 
 import java.util
-import java.util.{Properties, UUID}
+import java.util.Properties
 
 import articlestreamer.shared.Constants
 import articlestreamer.shared.configuration.ConfigLoader

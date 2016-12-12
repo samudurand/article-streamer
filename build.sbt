@@ -13,9 +13,10 @@ libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.40"
 
 // Test with coverage
 addCommandAlias("test-agg", ";project aggregator;clean;coverage;test;coverageReport")
+addCommandAlias("test-score", ";project twitterScoreUpdater;clean;coverage;test;coverageReport")
 addCommandAlias("test-proc", ";project processor;clean;coverage;test;coverageReport")
 addCommandAlias("test-shared", ";project shared;clean;coverage;test;coverageReport")
-addCommandAlias("test-all", ";test-agg;test-proc;test-shared")
+addCommandAlias("test-all", ";test-agg;test-score;test-proc;test-shared")
 
 //noinspection ScalaUnnecessaryParentheses
 lazy val root = (project in file(".")).
