@@ -86,7 +86,7 @@ lazy val processor = (project in file("processor")).
     libraryDependencies += "com.holdenkarau" %% "spark-testing-base" % "2.0.0_0.4.7" % "test",
     libraryDependencies += "org.apache.spark" %% "spark-hive"       % "2.0.0" % "test",
 
-    coverageExcludedPackages := ".*OnDemandSparkSessionProvider;.*MainApp"
+    coverageExcludedPackages := ".*OnDemandSparkSessionProvider;.*.App"
 
 ) dependsOn (shared % "test->test;compile->compile")
 
@@ -99,7 +99,7 @@ lazy val twitterScoreUpdater = (project in file("twitter-score-updater")).
     libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
     libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion,
 
-    coverageExcludedPackages := ".*OnDemandSparkSessionProvider;.*MainApp"
+    coverageExcludedPackages := ".*OnDemandSparkSessionProvider;.*.App"
 
 ) dependsOn (shared % "test->test;compile->compile")
 

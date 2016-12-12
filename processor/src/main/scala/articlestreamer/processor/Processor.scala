@@ -1,8 +1,9 @@
 package articlestreamer.processor
 
-import java.sql.{DriverManager, SQLException}
+import java.sql.SQLException
 import java.util.UUID
 
+import articlestreamer.processor.jdbc.ConnectionProvider
 import articlestreamer.processor.spark.SparkProvider
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.marshalling.TwitterArticleMarshaller
@@ -16,7 +17,8 @@ import org.apache.spark.streaming.kafka010.KafkaUtils
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 
 class Processor(config: ConfigLoader,
-                sparkSessionProvider: SparkProvider) {
+                sparkSessionProvider: SparkProvider,
+                connectionProvider: ConnectionProvider) {
 
   def apply(): Unit = {
 
@@ -42,22 +44,26 @@ class Processor(config: ConfigLoader,
     stream
       .map(recordToTuple)
       .flatMap(parseRecordsToArticles)
-      .foreachRDD (saveToDB)
+      .foreachRDD(saveToDB)
 
     ssc.start()
     ssc.awaitTermination()
 
     sys.addShutdownHook {
       logger.info("Stopping article streaming")
-      ssc.stop(stopSparkContext = true, stopGracefully = true)
+      try {
+        ssc.stop(stopSparkContext = true, stopGracefully = true)
+      } catch {case _: Throwable => }
     }
 
   }
 
-  protected val saveToDB: (RDD[TwitterArticleRow]) => Unit = {
+  private[processor] val saveToDB: (RDD[TwitterArticleRow]) => Unit = {
+
     rdd => {
 
       val conf = config
+      val connProvider = connectionProvider
 
       rdd.foreach { article =>
 
@@ -69,7 +75,7 @@ class Processor(config: ConfigLoader,
         dbConfig.put("useSSL", "false")
         dbConfig.put("driver", "com.mysql.jdbc.Driver")
 
-        val conn = DriverManager.getConnection(conf.mysqlConfig.jdbcUrl, dbConfig)
+        val conn = connProvider.getConnection(conf.mysqlConfig.jdbcUrl, dbConfig)
 
         val del = conn.prepareStatement("" +
           "INSERT INTO article" +
@@ -100,7 +106,7 @@ class Processor(config: ConfigLoader,
     }
   }
 
-  protected val parseRecordsToArticles: ((String, String)) => Iterable[TwitterArticleRow] = {
+  private[processor] val parseRecordsToArticles: ((String, String)) => Iterable[TwitterArticleRow] = {
     case (_, value) => {
       TwitterArticleMarshaller.unmarshallArticle(value) match {
         case Some(article) => Some(new TwitterArticleRow(article))
@@ -111,7 +117,7 @@ class Processor(config: ConfigLoader,
     }
   }
 
-  protected val recordToTuple: (ConsumerRecord[String, String]) => (String, String) = {
+  private[processor] val recordToTuple: (ConsumerRecord[String, String]) => (String, String) = {
     record => (record.key, record.value)
   }
 }
