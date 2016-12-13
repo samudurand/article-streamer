@@ -1,3 +1,4 @@
+SHELL=/bin/bash
 MAILTO=root
 
-45 16 * * * root java -jar /score-updater-assembly-0.0.1.jar >> /var/log/updater.log 2>&1
+0 11,23 * * * root . /root/project_env.sh; java -jar /score-updater-assembly-0.0.1.jar >> /var/log/updater.log 2>&1

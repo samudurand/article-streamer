@@ -13,12 +13,11 @@ ENV APP_VERSION 0.0.1
 COPY score-updater-assembly-${APP_VERSION}.jar /
 COPY crontab /etc/cron.d/pull-tweets
 
-# Give execution rights on the cron job
 RUN chmod 0644 /etc/cron.d/pull-tweets && \
     touch /var/log/cron.log && \
     touch /var/log/updater.log
 
 VOLUME /var/log/
 
-# Run the command on container startup
-CMD cron && tail -f /var/log/updater.log
+CMD printenv | sed 's/^\(.*\)$/export \1/g' > /root/project_env.sh && \
+    cron && tail -f /var/log/updater.log

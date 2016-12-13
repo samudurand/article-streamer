@@ -31,3 +31,4 @@ project/plugins/project/
 **/resources/development.conf
 /src/test/test.iml
 /docker/score-updater-assembly-*.jar
+/docker-env.list
