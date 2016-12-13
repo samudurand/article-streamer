@@ -73,7 +73,10 @@ lazy val processor = (project in file("processor")).
   settings(
     name := "processor",
 
-    // Necessary for using
+    // Check that one regularly, at the moment very low to avoid unit testing the main stream
+    coverageMinimum := 55,
+
+      // Necessary for using
     parallelExecution in Test := false,
 
     libraryDependencies ++= Dependencies.commonDependencies,
@@ -86,7 +89,7 @@ lazy val processor = (project in file("processor")).
     libraryDependencies += "com.holdenkarau" %% "spark-testing-base" % "2.0.0_0.4.7" % "test",
     libraryDependencies += "org.apache.spark" %% "spark-hive"       % "2.0.0" % "test",
 
-    coverageExcludedPackages := ".*OnDemandSparkSessionProvider;.*.App"
+    coverageExcludedPackages := ".*OnDemandSparkProvider;.*.App"
 
 ) dependsOn (shared % "test->test;compile->compile")
 
