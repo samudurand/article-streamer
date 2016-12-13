@@ -1,9 +1,8 @@
 package articlestreamer.processor
 
-import java.sql.SQLException
+import java.sql.{DriverManager, SQLException}
 import java.util.UUID
 
-import articlestreamer.processor.jdbc.ConnectionProvider
 import articlestreamer.processor.spark.SparkProvider
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.marshalling.TwitterArticleMarshaller
@@ -17,8 +16,7 @@ import org.apache.spark.streaming.kafka010.KafkaUtils
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 
 class Processor(config: ConfigLoader,
-                sparkSessionProvider: SparkProvider,
-                connectionProvider: ConnectionProvider) {
+                sparkSessionProvider: SparkProvider) {
 
   def apply(): Unit = {
 
@@ -63,7 +61,6 @@ class Processor(config: ConfigLoader,
     rdd => {
 
       val conf = config
-      val connProvider = connectionProvider
 
       rdd.foreach { article =>
 
@@ -73,24 +70,25 @@ class Processor(config: ConfigLoader,
         dbConfig.put("user", conf.mysqlConfig.user)
         dbConfig.put("password", conf.mysqlConfig.password)
         dbConfig.put("useSSL", "false")
-        dbConfig.put("driver", "com.mysql.jdbc.Driver")
+        dbConfig.put("driver", conf.mysqlConfig.driver)
 
-        val conn = connProvider.getConnection(conf.mysqlConfig.jdbcUrl, dbConfig)
+        val conn = DriverManager.getConnection(conf.mysqlConfig.jdbcUrl, dbConfig)
 
-        val del = conn.prepareStatement("" +
+        val query = conn.prepareStatement("" +
           "INSERT INTO article" +
           "(id, originalId, publicationDate, content, author, score) " +
           "VALUES (?,?,?,?,?,?)")
 
-        del.setString(1, article.id)
-        del.setString(2, article.originalId)
-        del.setTimestamp(3, article.publicationDate)
-        del.setString(4, article.content)
-        del.setLong(5, article.author)
-        del.setInt(6, article.score)
+        query.setString(1, article.id)
+        query.setString(2, article.originalId)
+        query.setTimestamp(3, article.publicationDate)
+        query.setString(4, article.content)
+        query.setLong(5, article.author)
+        query.setInt(6, article.score)
 
         try {
-          del.executeUpdate
+          query.executeUpdate
+          query.close()
         } catch {
           case ex: SQLException =>
             internLogger.error(s"Failed to save article to DB. Article : $article", ex)
