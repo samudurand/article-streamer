@@ -1,12 +1,24 @@
 That project is a **Work In Progress**
 
+# Current State
+
+At the moment only Twitter is supported.
+
+### Score updating
+
+Every 12 hours the kafka topic used as a sink for the tweets changes to let the ones already retrieved pending until their score is updated. 
+
+The score of each tweet is updated after 11 hours to let the time to people to retweet/favorite it. 
+
 # Article Streamer
 
 The idea of this project is to provide a tool that will aggregate articles about one or several provided subjects (Scala, Spark...) 
 from various sources (Twitter, Linkedin, Blogs... ). 
 For each a score will be calculated. That score will represent the potential interest or value based on their popularity and other factors (to be determined).
 
-Every 12 hours the kafka topic changes so that if you trigger the articles processing only the articles having been recovered some time ago will be processed. 
+## Architecture
+
+Soon coming
 
 ## Configuration
 
@@ -18,11 +30,13 @@ There is two possible way of configuration :
   - TW_ACC_TOKEN : twitter access token
   - TW_ACC_SEC   : twitter access token secret
   - KAFKA_BROKERS, KAFKA_CA, KAFKA_CERT, KAFKA_PRIVATE_KEY for kafka and SSL config
+  - ...
  
 2. The configuration file _application.conf_ contains all other and default configurations
   - Twitter authentication
   - Kakfa (including SSL certificates)
   - Spark
+  - Mysql
     
 ### Tweaking the config
     
@@ -57,7 +71,7 @@ One of the options to run this system is Via Docker containers. Here are a coupl
 
 ### Docker Compose
 
-The provided ___docker-compose.yml___ file will start the aggregator, kafka and zookeeper all at once in separate containers.
+The provided _docker-compose.yml_ file will start the aggregator, kafka and zookeeper all at once in separate containers.
 ```
 $ docker-compose up -d
 ```
@@ -93,21 +107,32 @@ $ docker build -t [dockerhub-username]/[project] ./aggregator/docker/.
 
 # Testing
 
-To run the tests and generate the coverage reports
+To run the tests and generate the coverage reports (./[PROJECT]/target/scala-2.11/scoverage-report/index.html)
 
+
+Aggregator
 ```
-// Aggregator
 $ sbt test-agg
+```
 
-// Processor
+Twitter score updater
+```
+$ sbt test-score
+```
+
+Processor
+```
 $ sbt test-proc
+```
 
-// Shared entities
+Shared entities
+```
 $ sbt test-shared
+```
 
-// All at once
+All at once
+```
 $ sbt test-all
-
 ```
 
 # Viewer 
