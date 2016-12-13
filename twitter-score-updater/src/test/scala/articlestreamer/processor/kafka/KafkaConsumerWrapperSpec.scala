@@ -7,6 +7,7 @@ import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.kafka.KafkaFactory
 import articlestreamer.shared.marshalling.CustomJsonFormats
 import articlestreamer.shared.{BaseSpec, Constants}
+import articlestreamer.twitterupdater.kafka.KafkaConsumerWrapper
 import org.apache.kafka.clients.consumer.{ConsumerRecord, ConsumerRecords, KafkaConsumer}
 import org.apache.kafka.common.TopicPartition
 import org.mockito.ArgumentMatchers._
@@ -76,7 +77,7 @@ class KafkaConsumerWrapperSpec extends BaseSpec with BeforeAndAfter with CustomJ
 
     verify(consumer, times(2)).poll(anyLong())
     values should have length 1
-    values(0).id shouldBe "00000000-0000-0000-0000-000000000001"
+    values.head.id shouldBe "00000000-0000-0000-0000-000000000001"
   }
 
   it should "stop consumer" in {

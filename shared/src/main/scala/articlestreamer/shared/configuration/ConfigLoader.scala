@@ -17,9 +17,9 @@ final case class TwitterSearchConfig(mainTag: String,
                                articleUnrelatedWords: List[String],
                                subjectUnrelatedWords: List[String])
 
-final case class MysqlConfig(jdbcUrl: String, user: String, password: String)
+final case class MysqlConfig(jdbcUrl: String, user: String, password: String, driver: String)
 
-trait ConfigLoader extends LazyLogging {
+trait ConfigLoader extends LazyLogging with Serializable {
 
   val appConfig = ConfigFactory.load()
 
@@ -44,7 +44,8 @@ trait ConfigLoader extends LazyLogging {
   val mysqlConfig = MysqlConfig(
     appConfig.getString("mysql.jdbcUrl"),
     appConfig.getString("mysql.user"),
-    appConfig.getString("mysql.password")
+    appConfig.getString("mysql.password"),
+    appConfig.getString("mysql.driver")
   )
 
   /**
@@ -55,6 +56,7 @@ trait ConfigLoader extends LazyLogging {
   val kafkaMainTopic = appConfig.getString("kafka.topic-default")
   val kafkaFirstTopic = appConfig.getString("kafka.topic1")
   val kafkaSecondTopic = appConfig.getString("kafka.topic2")
+  val kafkaArticlesTopic = appConfig.getString("kafka.topic-articles")
 
   val kafkaBrokers = appConfig.getString("kafka.brokers")
   /**

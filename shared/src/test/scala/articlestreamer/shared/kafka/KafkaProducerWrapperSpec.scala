@@ -1,8 +1,7 @@
-package articlestreamer.aggregator.kafka
+package articlestreamer.shared.kafka
 
 import articlestreamer.shared.BaseSpec
 import articlestreamer.shared.configuration.ConfigLoader
-import articlestreamer.shared.kafka.KafkaFactory
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers._

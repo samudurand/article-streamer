@@ -1,4 +1,4 @@
-package articlestreamer.processor.marshalling
+package articlestreamer.shared.marshalling
 
 import java.text.SimpleDateFormat
 import java.util.TimeZone
@@ -8,7 +8,7 @@ import articlestreamer.shared.model.TweetAuthor
 
 import scala.io.Source
 
-class ArticleMarshallerSpec extends BaseSpec with ArticleMarshaller {
+class TwitterArticleMarshallerSpec extends BaseSpec with TwitterArticleMarshaller {
 
   val df: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
   df.setTimeZone(TimeZone.getTimeZone("GMT"))
@@ -20,14 +20,14 @@ class ArticleMarshallerSpec extends BaseSpec with ArticleMarshaller {
 
     articleTweet.isDefined shouldBe true
     articleTweet.get should have(
-      'id ("00000000-0000-0000-0000-000000000001"),
-      'originalId ("789070025009336320"),
-      'links (List("https://t.co/C5m0dEKan9")),
-      'content ("Well done! Tough challenge to master #Spark https://t.co/C5m0dEKan9"),
-      'author (TweetAuthor(1234, "user1", 0)),
-      'score (Some(0))
+      'id ("d0fa3a2a-74a9-49d5-8fac-b12f810f29b8"),
+      'originalId ("808316754900484096"),
+      'links (List("https://twitter.com/")),
+      'content ("#spark test https://t.co/WLUWq7roAm"),
+      'author (TweetAuthor(1935423961, "Firenssam", 3)),
+      'score (Some(10))
     )
-    articleTweet.get.publicationDate.getTime() shouldBe 1476960328000l
+    articleTweet.get.publicationDate.getTime shouldBe 1481552706000l
   }
 
   it should "unmarshall a tweet without score" in {

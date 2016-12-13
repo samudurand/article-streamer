@@ -1,9 +1,8 @@
-package articlestreamer.aggregator.kafka
+package articlestreamer.shared.kafka
 
 import java.util.Properties
 
 import articlestreamer.shared.configuration.ConfigLoader
-import articlestreamer.shared.kafka.KafkaFactory
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.producer.{ProducerConfig, ProducerRecord}
 import org.apache.kafka.common.config.SslConfigs

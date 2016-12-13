@@ -13,9 +13,10 @@ libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.40"
 
 // Test with coverage
 addCommandAlias("test-agg", ";project aggregator;clean;coverage;test;coverageReport")
+addCommandAlias("test-score", ";project twitterScoreUpdater;clean;coverage;test;coverageReport")
 addCommandAlias("test-proc", ";project processor;clean;coverage;test;coverageReport")
 addCommandAlias("test-shared", ";project shared;clean;coverage;test;coverageReport")
-addCommandAlias("test-all", ";test-agg;test-proc;test-shared")
+addCommandAlias("test-all", ";test-agg;test-score;test-proc;test-shared")
 
 //noinspection ScalaUnnecessaryParentheses
 lazy val root = (project in file(".")).
@@ -72,24 +73,36 @@ lazy val processor = (project in file("processor")).
   settings(
     name := "processor",
 
-    // Necessary for using
+    // Check that one regularly, at the moment very low to avoid unit testing the main stream
+    coverageMinimum := 55,
+
+      // Necessary for using
     parallelExecution in Test := false,
 
     libraryDependencies ++= Dependencies.commonDependencies,
-    libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
     libraryDependencies += "org.apache.spark" %% "spark-core"       % "2.0.0" exclude("org.slf4j","slf4j-log4j12"),
     libraryDependencies += "org.apache.spark" %% "spark-sql"        % "2.0.0",
     libraryDependencies += "org.apache.spark" %% "spark-streaming"  % "2.0.0",
     libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.40",
-    libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion,
-    //libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka-0-10" % "2.0.0",
-    //libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka-0-8" % "2.0.0",
-    //libraryDependencies += "org.scalaj"       %% "scalaj-http"      % "2.3.0",
+    libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka-0-10" % "2.0.0",
 
     libraryDependencies += "com.holdenkarau" %% "spark-testing-base" % "2.0.0_0.4.7" % "test",
     libraryDependencies += "org.apache.spark" %% "spark-hive"       % "2.0.0" % "test",
 
-    coverageExcludedPackages := ".*OnDemandSparkSessionProvider;.*MainApp"
+    coverageExcludedPackages := ".*OnDemandSparkProvider;.*.App"
+
+) dependsOn (shared % "test->test;compile->compile")
+
+lazy val twitterScoreUpdater = (project in file("twitter-score-updater")).
+  settings(Commons.settings: _*).
+  settings(
+    name := "twitterScoreUpdater",
+
+    libraryDependencies ++= Dependencies.commonDependencies,
+    libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
+    libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion,
+
+    coverageExcludedPackages := ".*OnDemandSparkSessionProvider;.*.App"
 
 ) dependsOn (shared % "test->test;compile->compile")
 
@@ -98,7 +111,7 @@ lazy val shared = (project in file("shared")).
   settings(
     name := "shared",
 
-    // Necessary for using
+    // Necessary for using spark testing base
     parallelExecution in Test := false,
 
     libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
