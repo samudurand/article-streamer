@@ -12,7 +12,7 @@ import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import twitter4j._
 
-class TwitterServiceSpec extends BaseSpec  with BeforeAndAfter{
+class TwitterServiceSpec extends BaseSpec  with BeforeAndAfter {
 
   class TestConfig extends ConfigLoader
   val config = new TestConfig

@@ -1,7 +1,7 @@
 package articlestreamer.aggregator.kafka.scheduled
 
-import articlestreamer.aggregator.kafka.KafkaProducerWrapper
 import articlestreamer.shared.Constants
+import articlestreamer.shared.kafka.KafkaProducerWrapper
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.quartz.{Job, JobExecutionContext}
 

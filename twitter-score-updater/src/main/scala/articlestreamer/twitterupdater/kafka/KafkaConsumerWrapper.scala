@@ -1,12 +1,12 @@
-package articlestreamer.processor.kafka
+package articlestreamer.twitterupdater.kafka
 
 import java.util
-import java.util.{Properties, UUID}
+import java.util.Properties
 
-import articlestreamer.processor.marshalling.ArticleMarshaller
 import articlestreamer.shared.Constants
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.kafka.KafkaFactory
+import articlestreamer.shared.marshalling.TwitterArticleMarshaller
 import articlestreamer.shared.model.TwitterArticle
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.kafka.clients.CommonClientConfigs
@@ -20,9 +20,10 @@ import scala.language.postfixOps
 /**
   * This class uses Java style loops to avoid using the JavaCollections methods provided by scala (using those would complicate the Unit tests)
   */
-class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, String], topic: String) extends LazyLogging with ArticleMarshaller {
+class KafkaConsumerWrapper(config: ConfigLoader, factory: KafkaFactory[String, String], topic: String)
+  extends LazyLogging with TwitterArticleMarshaller {
 
-  val pollingTimeout = 1 seconds
+  private val pollingTimeout = 1 seconds
 
   private val consumer = factory.getConsumer(KafkaConsumerWrapper.getProperties(config))
 
@@ -105,7 +106,7 @@ object KafkaConsumerWrapper {
 
     val properties = new Properties()
     properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBrokers)
-    properties.put(ConsumerConfig.GROUP_ID_CONFIG, "test-" + UUID.randomUUID().toString)
+    properties.put(ConsumerConfig.GROUP_ID_CONFIG, "kafka-tweet-consumers")
     properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true")
     properties.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "1000")
     properties.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "30000")

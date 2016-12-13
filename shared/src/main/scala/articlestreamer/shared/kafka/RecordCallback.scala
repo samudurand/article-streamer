@@ -1,4 +1,4 @@
-package articlestreamer.aggregator.kafka
+package articlestreamer.shared.kafka
 
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.kafka.clients.producer.{Callback, RecordMetadata}

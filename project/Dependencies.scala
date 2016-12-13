@@ -17,7 +17,7 @@ object Dependencies {
     "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0",
     "com.github.ghik" %% "silencer-lib" % "0.5",
 
-    "org.scalatest" % "scalatest_2.11" % "3.0.0" % "test",
+    "org.scalatest" % "scalatest_2.11" % "3.0.1" % "test",
     "org.mockito" % "mockito-core" % "2.2.1" % "test",
     "org.hamcrest" % "hamcrest-all" % "1.3" % "test"
   )

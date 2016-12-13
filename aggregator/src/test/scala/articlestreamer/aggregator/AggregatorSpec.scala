@@ -3,11 +3,10 @@ package articlestreamer.aggregator
 import java.text.SimpleDateFormat
 import java.util.TimeZone
 
-import articlestreamer.aggregator.kafka.KafkaProducerWrapper
 import articlestreamer.aggregator.twitter.{DefaultTwitterStreamerFactory, TwitterStreamer}
 import articlestreamer.shared.BaseSpec
 import articlestreamer.shared.configuration.ConfigLoader
-import articlestreamer.shared.kafka.HalfDayTopicManager
+import articlestreamer.shared.kafka.{HalfDayTopicManager, KafkaProducerWrapper}
 import articlestreamer.shared.marshalling.CustomJsonFormats
 import articlestreamer.shared.model.TwitterArticle
 import articlestreamer.shared.scoring.TwitterScoreCalculator

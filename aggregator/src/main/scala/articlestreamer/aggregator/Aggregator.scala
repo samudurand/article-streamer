@@ -3,12 +3,11 @@ package articlestreamer.aggregator
 import java.sql.Timestamp
 import java.util.{TimeZone, UUID}
 
-import articlestreamer.aggregator.kafka.KafkaProducerWrapper
 import articlestreamer.aggregator.kafka.scheduled.EndQueueJob
 import articlestreamer.aggregator.twitter.TwitterStreamerFactory
 import articlestreamer.aggregator.twitter.utils.TwitterStatusMethods
 import articlestreamer.shared.configuration.ConfigLoader
-import articlestreamer.shared.kafka.HalfDayTopicManager
+import articlestreamer.shared.kafka.{HalfDayTopicManager, KafkaProducerWrapper}
 import articlestreamer.shared.marshalling.CustomJsonFormats
 import articlestreamer.shared.model.{TweetAuthor, TwitterArticle}
 import articlestreamer.shared.scoring.TwitterScoreCalculator

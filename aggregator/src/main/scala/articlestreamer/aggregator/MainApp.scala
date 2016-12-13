@@ -1,9 +1,8 @@
 package articlestreamer.aggregator
 
-import articlestreamer.aggregator.kafka.KafkaProducerWrapper
 import articlestreamer.aggregator.twitter.DefaultTwitterStreamerFactory
 import articlestreamer.shared.configuration.DefaultConfigLoader
-import articlestreamer.shared.kafka.KafkaFactory
+import articlestreamer.shared.kafka.{KafkaFactory, KafkaProducerWrapper}
 import articlestreamer.shared.scoring.NaiveTwitterScoreCalculator
 import articlestreamer.shared.twitter.service.TwitterService
 import com.softwaremill.macwire._

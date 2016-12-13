@@ -1,7 +1,7 @@
 package articlestreamer.aggregator.kafka.scheduled
 
-import articlestreamer.aggregator.kafka.KafkaProducerWrapper
 import articlestreamer.shared.BaseSpec
+import articlestreamer.shared.kafka.KafkaProducerWrapper
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers._

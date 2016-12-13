@@ -1,6 +1,7 @@
 package articlestreamer.aggregator.kafka
 
 import articlestreamer.shared.BaseSpec
+import articlestreamer.shared.kafka.RecordCallback
 import com.github.ghik.silencer.silent
 import org.apache.kafka.clients.producer.RecordMetadata
 import org.apache.kafka.common.TopicPartition

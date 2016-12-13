@@ -9,7 +9,7 @@ import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 
 
-class NaiveTwitterScoreCalculatorSpec extends BaseSpec  with BeforeAndAfter{
+class NaiveTwitterScoreCalculatorSpec extends BaseSpec  with BeforeAndAfter {
 
   class TestConfigLoader extends ConfigLoader
 
