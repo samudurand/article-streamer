@@ -98,6 +98,14 @@ lazy val twitterScoreUpdater = (project in file("twitter-score-updater")).
   settings(
     name := "twitterScoreUpdater",
 
+    assemblyOutputPath in assembly := file(s"./twitter-score-updater/docker/score-updater-assembly-${version.value}.jar"),
+    assemblyMergeStrategy in assembly := {
+      case PathList("development.conf") => MergeStrategy.discard
+      case x =>
+        val oldStrategy = (assemblyMergeStrategy in assembly).value
+        oldStrategy(x)
+    },
+
     libraryDependencies ++= Dependencies.commonDependencies,
     libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
     libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion,

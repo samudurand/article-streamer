@@ -105,6 +105,15 @@ $ sbt "project aggregator" coverageOff assembly
 $ docker build -t [dockerhub-username]/[project] ./aggregator/docker/.
 ```
 
+### Twitter Score Updater
+
+```
+// Build a Fatjar in ./docker
+$ sbt "project twitterScoreUpdater" coverageOff assembly
+// Build the image
+$ docker build -t [dockerhub-username]/[project] ./twitter-score-updater/docker/.
+```
+
 # Testing
 
 To run the tests and generate the coverage reports (./[PROJECT]/target/scala-2.11/scoverage-report/index.html)
