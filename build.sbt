@@ -53,7 +53,7 @@ lazy val aggregator = (project in file("aggregator")).
 
     assemblyOutputPath in assembly := file(s"./aggregator/docker/aggregator-assembly-${version.value}.jar"),
     assemblyMergeStrategy in assembly := {
-        case PathList("development.conf") => MergeStrategy.discard
+        case PathList("development.conf", "docker-env.list") => MergeStrategy.discard
         case x =>
             val oldStrategy = (assemblyMergeStrategy in assembly).value
             oldStrategy(x)
@@ -73,18 +73,32 @@ lazy val processor = (project in file("processor")).
   settings(
     name := "processor",
 
-    // Check that one regularly, at the moment very low to avoid unit testing the main stream
+    // Check that one regularly, at the moment very low to avoid unit testing the main Stream
     coverageMinimum := 55,
 
-      // Necessary for using
+    // Necessary for using spark testing base
     parallelExecution in Test := false,
+
+    assemblyOutputPath in assembly := file(s"./processor/docker/processor-assembly-${version.value}.jar"),
+    assemblyMergeStrategy in assembly := {
+      case PathList("org","aopalliance", xs @ _*) => MergeStrategy.last
+      case PathList("javax", "inject", xs @ _*) => MergeStrategy.last
+      case PathList("javax", "servlet", xs @ _*) => MergeStrategy.last
+      case PathList("javax", "activation", xs @ _*) => MergeStrategy.last
+      case PathList("org", "apache", xs @ _*) => MergeStrategy.last
+      case "development.conf" => MergeStrategy.discard
+      case "docker-env.list" => MergeStrategy.discard
+      case x =>
+        val oldStrategy = (assemblyMergeStrategy in assembly).value
+        oldStrategy(x)
+    },
 
     libraryDependencies ++= Dependencies.commonDependencies,
     libraryDependencies += "org.apache.spark" %% "spark-core"       % "2.0.0" exclude("org.slf4j","slf4j-log4j12"),
     libraryDependencies += "org.apache.spark" %% "spark-sql"        % "2.0.0",
     libraryDependencies += "org.apache.spark" %% "spark-streaming"  % "2.0.0",
     libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.40",
-    libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka-0-10" % "2.0.0",
+    libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka-0-10" % "2.0.0" exclude("org.slf4j","slf4j-log4j12"),
 
     libraryDependencies += "com.holdenkarau" %% "spark-testing-base" % "2.0.0_0.4.7" % "test",
     libraryDependencies += "org.apache.spark" %% "spark-hive"       % "2.0.0" % "test",
@@ -100,7 +114,7 @@ lazy val twitterScoreUpdater = (project in file("twitter-score-updater")).
 
     assemblyOutputPath in assembly := file(s"./twitter-score-updater/docker/score-updater-assembly-${version.value}.jar"),
     assemblyMergeStrategy in assembly := {
-      case PathList("development.conf") => MergeStrategy.discard
+      case PathList("development.conf", "docker-env.list") => MergeStrategy.discard
       case x =>
         val oldStrategy = (assemblyMergeStrategy in assembly).value
         oldStrategy(x)
@@ -118,9 +132,6 @@ lazy val shared = (project in file("shared")).
   settings(Commons.settings: _*).
   settings(
     name := "shared",
-
-    // Necessary for using spark testing base
-    parallelExecution in Test := false,
 
     libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
     libraryDependencies ++= Dependencies.commonDependencies,

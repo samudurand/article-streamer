@@ -29,3 +29,4 @@ project/plugins/project/
 .worksheet
 
 **/resources/development.conf
+/docker/processor-assembly-*.jar
