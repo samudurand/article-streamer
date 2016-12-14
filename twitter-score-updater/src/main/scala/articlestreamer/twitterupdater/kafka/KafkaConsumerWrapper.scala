@@ -113,7 +113,7 @@ object KafkaConsumerWrapper {
     properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer")
     properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer")
     properties.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, "5000")
-    properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
+    properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
 
     if (kafkaSSLMode) {
       properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL")

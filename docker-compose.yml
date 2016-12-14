@@ -4,6 +4,7 @@ services:
     container_name: aggregator
     build:
       context: ./aggregator/docker/
+    image: firens/streamer-aggregator:0.0.1
     env_file: ./aggregator/docker-env.list
     environment:
       KAFKA_BROKERS: kafka:9092
@@ -14,6 +15,7 @@ services:
     container_name: score_updater
     build:
       context: ./twitter-score-updater/docker/
+    image: firens/streamer-score-updater:0.0.1
     env_file: ./twitter-score-updater/docker-env.list
     environment:
       KAFKA_BROKERS: kafka:9092
@@ -24,6 +26,7 @@ services:
     container_name: processor
     build:
       context: ./processor/docker/
+    image: firens/streamer-processor:0.0.1
     env_file: ./processor/docker-env.list
     environment:
       KAFKA_BROKERS: kafka:9092

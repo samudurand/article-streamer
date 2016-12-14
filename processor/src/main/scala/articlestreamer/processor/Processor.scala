@@ -30,7 +30,7 @@ class Processor(config: ConfigLoader,
       ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG -> config.kafkaBrokers,
       ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG -> classOf[StringDeserializer],
       ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG -> classOf[StringDeserializer],
-      ConsumerConfig.GROUP_ID_CONFIG -> s"article-processor-${UUID.randomUUID().toString}",
+      ConsumerConfig.GROUP_ID_CONFIG -> s"article-processor",
       ConsumerConfig.AUTO_OFFSET_RESET_CONFIG -> "earliest",
       ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG -> (false: java.lang.Boolean))
 
