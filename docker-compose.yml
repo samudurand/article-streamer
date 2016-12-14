@@ -20,6 +20,16 @@ services:
     depends_on:
       - kafka
 
+  processor:
+    container_name: processor
+    build:
+      context: ./processor/docker/
+    env_file: ./processor/docker-env.list
+    environment:
+      KAFKA_BROKERS: kafka:9092
+    depends_on:
+      - kafka
+
   kafka:
     container_name: kafka
     image: ches/kafka:0.10.1.0

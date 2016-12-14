@@ -20,4 +20,4 @@ RUN chmod 0644 /etc/cron.d/pull-tweets && \
 VOLUME /var/log/
 
 CMD printenv | sed 's/^\(.*\)$/export \1/g' > /root/project_env.sh && \
-    cron && tail -f /var/log/updater.log
+    cron && exec tail -f /var/log/updater.log
