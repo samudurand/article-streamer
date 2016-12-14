@@ -20,4 +20,8 @@ object App extends App {
   val scoreUpdater = wire[ScoreUpdater]
   scoreUpdater()
 
+  // TODO shouldn't be needed but KafkaConsumer 0.10.1.0 introduced a bug that prevent
+  // TODO the application from shutting down by itself. Might require investigation if not fix provided soon
+  System.exit(0)
+
 }

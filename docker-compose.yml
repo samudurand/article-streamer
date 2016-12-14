@@ -10,6 +10,16 @@ services:
     depends_on:
       - kafka
 
+  score_updater:
+    container_name: score_updater
+    build:
+      context: ./twitter-score-updater/docker/
+    env_file: ./twitter-score-updater/docker-env.list
+    environment:
+      KAFKA_BROKERS: kafka:9092
+    depends_on:
+      - kafka
+
   kafka:
     container_name: kafka
     image: ches/kafka:0.10.1.0
@@ -20,9 +30,14 @@ services:
       KAFKA_ADVERTISED_HOST_NAME: kafka
     depends_on:
       - zookeeper
+    volumes:
+      - kafka-data:/data
 
   zookeeper:
     container_name: zookeeper
     image: jplock/zookeeper:3.4.8
     ports:
      - "2181:2181"
+
+volumes:
+  kafka-data:
