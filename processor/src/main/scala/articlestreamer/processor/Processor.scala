@@ -31,7 +31,7 @@ class Processor(config: ConfigLoader,
       ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG -> classOf[StringDeserializer],
       ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG -> classOf[StringDeserializer],
       ConsumerConfig.GROUP_ID_CONFIG -> s"article-processor",
-      ConsumerConfig.AUTO_OFFSET_RESET_CONFIG -> "earliest",
+      ConsumerConfig.AUTO_OFFSET_RESET_CONFIG -> "latest",
       ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG -> (false: java.lang.Boolean))
 
     val stream = KafkaUtils.createDirectStream[String, String](

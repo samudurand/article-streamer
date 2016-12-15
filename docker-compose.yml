@@ -33,6 +33,15 @@ services:
     depends_on:
       - kafka
 
+  data_server:
+    container_name: data_server
+    build:
+      context: ./webapp-backend/
+    image: firens/streamer-data-server:0.0.1
+    ports:
+         - "8000:8000"
+    env_file: ./webapp-backend/docker-env.list
+
   kafka:
     container_name: kafka
     image: ches/kafka:0.10.1.0
