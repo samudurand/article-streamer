@@ -148,14 +148,14 @@ $ sbt test-all
  
  Allows to visualize the pending/accepted/rejected articles. The app is composed of the modules _webapp-backend_ and _webapp-frontend_ .
  
- ## Server
+## Server
  
  Uses Hapi and Sequelize
  
- ### Configuration
+### Configuration
  The configuration for the app host/port and database access is in _config/default.json_ , you can override it by adding a _local.json_ in the same directory 
  
- ### Install and run
+### Install and run
  ```
  $ cd webapp-backend
  $ npm install
@@ -168,7 +168,7 @@ $ sbt test-all
  ```
  Every change will hot reload all resources automatically
    
- ## Web UI
+## Web UI
  
  Based on Vuejs and Webpack
   
