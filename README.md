@@ -4,7 +4,7 @@ That project is a **Work In Progress**
 
 At the moment only Twitter is supported.
 
-![current architecture](./readme-assets/schema.svg)
+![current architecture](./readme-assets/schema.png)
 
 ### Score updating
 
