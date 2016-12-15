@@ -146,6 +146,29 @@ $ sbt test-all
 
 # Viewer 
  
- To visualise the articles waiting to be evaluated manually you need to start the viewer.
+ Allows to visualize the pending/accepted/rejected articles. The app is composed of the modules _webapp-backend_ and _webapp-frontend_ .
  
- ```npm install -g vue-cli```
+ ## Server
+ 
+ Uses Hapi and Sequelize
+ 
+ ```
+ $ cd webapp-backend
+ $ npm install
+ $ npm start
+ ```
+ 
+ If all goes well you should see this output, indicating that the server started and Sequelize managed to connect :
+ ```
+ Executing (default): SELECT 1+1 AS result
+ ```
+ 
+ ## Web UI
+ 
+ Based on Vuejs and Webpack
+  
+  ```
+  $ cd webapp-frontend
+  $ npm install
+  $ npm run dev
+  ```

@@ -9,7 +9,7 @@ const Status = {
 
 function getByStatus(request, reply, status) {
   const Article = request.getDb().getModel(ARTICLE_MODEL);
-  return Article.findAll({ where: { status: status }})
+  return Article.findAll({ where: { status: status }, order: 'publicationDate DESC'})
     .then(
       (articles) => {
         return reply(articles)

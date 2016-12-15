@@ -33,7 +33,7 @@
               </button>
             </td>
             <td class="tab-logo">
-              <a v-bind:href="'https://twitter.com/any/status/' + article.id" target="_blank"><img src="../assets/twitter.png"></a>
+              <a v-bind:href="'https://twitter.com/any/status/' + article.originalId" target="_blank"><img src="../assets/twitter.png"></a>
             </td>
           </tr>
         </tbody>
