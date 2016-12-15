@@ -152,6 +152,10 @@ $ sbt test-all
  
  Uses Hapi and Sequelize
  
+ ### Configuration
+ The configuration for the app host/port and database access is in _config/default.json_ , you can override it by adding a _local.json_ in the same directory 
+ 
+ ### Install and run
  ```
  $ cd webapp-backend
  $ npm install
@@ -162,7 +166,8 @@ $ sbt test-all
  ```
  Executing (default): SELECT 1+1 AS result
  ```
- 
+ Every change will hot reload all resources automatically
+   
  ## Web UI
  
  Based on Vuejs and Webpack
@@ -172,3 +177,8 @@ $ sbt test-all
   $ npm install
   $ npm run dev
   ```
+  You should see an output similar to :
+  ```
+  Listening at http://localhost:8080
+  ```
+  Every change will hot reload all resources automatically
