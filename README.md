@@ -160,6 +160,7 @@ $ sbt test-all
 ### Install and run
  ```
  $ cd webapp-backend
+ $ npm install -g nodemon
  $ npm install
  $ npm start
  ```

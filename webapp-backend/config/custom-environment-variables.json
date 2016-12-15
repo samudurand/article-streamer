@@ -1,0 +1,11 @@
+{
+  "app": {
+    "host": "localhost"
+  },
+
+  "mysql": {
+    "host": "MYSQL_HOST",
+    "username": "MYSQL_USER",
+    "password": "MYSQL_PSWD"
+  }
+}

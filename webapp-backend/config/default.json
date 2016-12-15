@@ -1,12 +1,12 @@
 {
   "app": {
-    "host": "localhost",
+    "host": "0.0.0.0",
     "port": 8000
   },
 
   "mysql": {
     "host": "",
-    "database": "",
+    "database": "article_streaming",
     "username": "",
     "password": ""
   }

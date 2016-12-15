@@ -2,3 +2,4 @@
 /node_modules/
 /webapp-backend.iml
 /config/local.json
+/docker-env.list
