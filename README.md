@@ -4,6 +4,8 @@ That project is a **Work In Progress**
 
 At the moment only Twitter is supported.
 
+![current architecture](./readme-assets/schema.svg)
+
 ### Score updating
 
 Every 12 hours the kafka topic used as a sink for the tweets changes to let the ones already retrieved pending until their score is updated. 
@@ -148,9 +150,9 @@ $ sbt test-all
  
  Allows to visualize the pending/accepted/rejected articles. The app is composed of the modules _webapp-backend_ and _webapp-frontend_ .
  
-## Server
+## Data Server
  
- Uses Hapi and Sequelize
+ Used as a data server to access the Database in a REST fashion. Uses Hapi and Sequelize
  
 ### Configuration
  The configuration for the app host/port and database access is in _config/default.json_ , you can override it by adding a _local.json_ in the same directory 
@@ -170,7 +172,8 @@ $ sbt test-all
    
 ## Web UI
  
- Based on Vuejs and Webpack
+ Simple single page app with a server delivering static content. 
+ It only contains the UI components, and relies on the Data Server for the content. Based on *Vuejs* and *Webpack*.
   
   ```
   $ cd webapp-frontend
