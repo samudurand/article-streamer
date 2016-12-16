@@ -1,7 +1,0 @@
-# Kafka config
-KAFKA_BROKERS=127.0.0.1:9092
-
-# Mysql config
-MYSQL_JDBC_URL=jdbc:mysql://178.62.95.107:3306/article_streaming
-MYSQL_USER=samr
-MYSQL_PSWD=0ert4ghty

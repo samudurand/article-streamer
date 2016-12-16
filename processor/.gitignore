@@ -30,3 +30,4 @@ project/plugins/project/
 
 **/resources/development.conf
 /docker/processor-assembly-*.jar
+docker-env.list
