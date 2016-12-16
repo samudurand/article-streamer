@@ -42,6 +42,14 @@ services:
          - "8000:8000"
     env_file: ./webapp-backend/docker-env.list
 
+  webapp:
+    container_name: webapp
+    build:
+      context: ./webapp-frontend/
+    image: firens/streamer-webapp:0.0.1
+    ports:
+         - "8080:8080"
+
   kafka:
     container_name: kafka
     image: ches/kafka:0.10.1.0
