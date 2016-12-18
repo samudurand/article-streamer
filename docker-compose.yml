@@ -51,7 +51,9 @@ services:
          - "8080:8080"
     env_file: ./webapp/docker-env.list
     environment:
-          DATA_SERVER_HOST: data_server:8000
+      DATA_SERVER_HOST: data_server:8000
+    depends_on:
+      - data_server
 
   kafka:
     container_name: kafka

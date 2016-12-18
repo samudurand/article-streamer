@@ -121,6 +121,8 @@ $ sbt test-all
  
  Allows to visualize the pending/accepted/rejected articles. The app is composed of the modules _data-server_ and _webapp_ .
  
+ Note : DATA_SERVER_HOST
+ 
 ## Data Server
  
  Used as a data server to access the Database in a REST fashion. Uses Hapi and Sequelize
