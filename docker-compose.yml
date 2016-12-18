@@ -36,11 +36,11 @@ services:
   data_server:
     container_name: data_server
     build:
-      context: ./webapp-backend/
+      context: ./data-server/
     image: firens/streamer-data-server:0.0.1
     ports:
          - "8000:8000"
-    env_file: ./webapp-backend/docker-env.list
+    env_file: ./data-server/docker-env.list
 
   webapp:
     container_name: webapp
