@@ -1,6 +1,10 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 var path = require('path')
 
+// Default data server URL to proxy '/api' calls
+var dataHostEnv = process.env.DATA_SERVER_HOST;
+var dataServerHost = dataHostEnv ? dataHostEnv : "127.0.0.1:8000";
+
 module.exports = {
   build: {
     env: require('./prod.env'),
@@ -23,7 +27,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/api': {
-        target: 'http://' + process.env.DATA_SERVER_HOST,
+        target: 'http://' + dataServerHost ,
         changeOrigin: true,
         pathRewrite: {
           '^/api': ''

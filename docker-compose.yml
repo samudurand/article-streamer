@@ -45,11 +45,11 @@ services:
   webapp:
     container_name: webapp
     build:
-      context: ./webapp-frontend/
+      context: ./webapp/
     image: firens/streamer-webapp:0.0.1
     ports:
          - "8080:8080"
-    env_file: ./webapp-frontend/docker-env.list
+    env_file: ./webapp/docker-env.list
     environment:
           DATA_SERVER_HOST: data_server:8000
 
