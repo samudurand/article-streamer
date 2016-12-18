@@ -6,48 +6,19 @@ At the moment only Twitter is supported.
 
 ![current architecture](./readme-assets/schema.png)
 
-### Score updating
+# Components
 
-Every 12 hours the kafka topic used as a sink for the tweets changes to let the ones already retrieved pending until their score is updated. 
+This system is composed of 6 elements
 
-The score of each tweet is updated after 11 hours to let the time to people to retweet/favorite it. 
+- An **aggregator** : aggregates tweets, posts and all other items streamed from the sources (Twitter, Instagram...). All tweets are put in a pending topic in Kafka for 12h.
+- A **score updater** (Twitter specific) : loads periodically (every 12h) all pending tweets and update their Score based on their current popularity, before sending them for analytics and persistence   
+- 
 
 # Article Streamer
 
 The idea of this project is to provide a tool that will aggregate articles about one or several provided subjects (Scala, Spark...) 
 from various sources (Twitter, Linkedin, Blogs... ). 
-For each a score will be calculated. That score will represent the potential interest or value based on their popularity and other factors (to be determined).
-
-## Architecture
-
-Soon coming
-
-## Configuration
-
-There is two possible way of configuration :
-
-1. Setting environment variables, which will override any other value (currently only the twitter authentication data and kafka can be configured by that mean)
-  - TW_CONS_KEY  : twitter consumer key
-  - TW_CONS_SEC  : twitter consumer secret
-  - TW_ACC_TOKEN : twitter access token
-  - TW_ACC_SEC   : twitter access token secret
-  - KAFKA_BROKERS, KAFKA_CA, KAFKA_CERT, KAFKA_PRIVATE_KEY for kafka and SSL config
-  - ...
- 
-2. The configuration file _application.conf_ contains all other and default configurations
-  - Twitter authentication
-  - Kakfa (including SSL certificates)
-  - Spark
-  - Mysql
-    
-### Tweaking the config
-    
-  If you need to modify the config beyond the environment variables provided, I highly recommend to avoid modifying _application.conf_, and instead to add a local file with your modifications and all the values you want to override ( typically _development.conf_ ).
-  
-  This file must be located in the same repository as _application.conf_ and must contain ```include application``` as first line. You also have to add ```-Dconfig.resource=/development.conf``` as an argument to SBT when running the app.
-  
-  For more information on how to override the configuration you can look at [Typesafe Config](https://github.com/typesafehub/config) which is used in this project. 
- 
+For each a score will be calculated. That score will represent the potential interest or value based on their popularity and other factors (to be determined)
 
 ## Deploy and run the Aggregator on Heroku
 

@@ -1,6 +1,6 @@
 
 function getArticles(context, state) {
-    return context.$http.get('http://localhost:8000/article/' + state).then(function (res) {
+    return context.$http.get('/api/article/' + state).then(function (res) {
         return res.body;
     }, function (err) {
         console.log('Could not load articles: ' + err);
@@ -9,7 +9,7 @@ function getArticles(context, state) {
 }
 
 function setState(context, id, state) {
-    return context.$http.put('http://localhost:8000/article/' + id + '/status/' + state).then(function (res) {
+    return context.$http.put('/api/article/' + id + '/status/' + state).then(function (res) {
         return res.body;
     }, function (err) {
         console.log('Could not load articles: ' + err);
