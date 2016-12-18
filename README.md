@@ -12,7 +12,7 @@ This system is composed of 6 elements
 
 - An **aggregator** : aggregates tweets, posts and all other items streamed from the sources (Twitter, Instagram...). All tweets are put in a pending topic in Kafka for 12h.
 - A **score updater** (Twitter specific) : loads periodically (every 12h) all pending tweets and update their Score based on their current popularity, before sending them for analytics and persistence   
-- 
+
 
 # Article Streamer
 
