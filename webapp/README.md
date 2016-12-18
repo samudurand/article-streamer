@@ -1,4 +1,4 @@
-# webapp-frontend
+# webapp
 
 > frontend for article viewer
 

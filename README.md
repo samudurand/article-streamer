@@ -119,7 +119,9 @@ $ sbt test-all
 
 # Viewer 
  
- Allows to visualize the pending/accepted/rejected articles. The app is composed of the modules _webapp-backend_ and _webapp-frontend_ .
+ Allows to visualize the pending/accepted/rejected articles. The app is composed of the modules _data-server_ and _webapp_ .
+ 
+ Note : DATA_SERVER_HOST
  
 ## Data Server
  
@@ -130,7 +132,7 @@ $ sbt test-all
  
 ### Install and run
  ```
- $ cd webapp-backend
+ $ cd data-server
  $ npm install -g nodemon
  $ npm install
  $ npm start
@@ -148,7 +150,7 @@ $ sbt test-all
  It only contains the UI components, and relies on the Data Server for the content. Based on *Vuejs* and *Webpack*.
   
   ```
-  $ cd webapp-frontend
+  $ cd webapp
   $ npm install
   $ npm run dev
   ```

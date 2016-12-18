@@ -36,22 +36,24 @@ services:
   data_server:
     container_name: data_server
     build:
-      context: ./webapp-backend/
+      context: ./data-server/
     image: firens/streamer-data-server:0.0.1
     ports:
          - "8000:8000"
-    env_file: ./webapp-backend/docker-env.list
+    env_file: ./data-server/docker-env.list
 
   webapp:
     container_name: webapp
     build:
-      context: ./webapp-frontend/
+      context: ./webapp/
     image: firens/streamer-webapp:0.0.1
     ports:
          - "8080:8080"
-    env_file: ./webapp-frontend/docker-env.list
+    env_file: ./webapp/docker-env.list
     environment:
-          DATA_SERVER_HOST: data_server:8000
+      DATA_SERVER_HOST: data_server:8000
+    depends_on:
+      - data_server
 
   kafka:
     container_name: kafka

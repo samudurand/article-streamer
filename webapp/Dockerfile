@@ -4,7 +4,7 @@ COPY package.json /webapp/package.json
 
 WORKDIR /webapp
 
-RUN npm install
+RUN npm install --production
 
 COPY . /webapp
 
