@@ -1,7 +1,6 @@
 package articlestreamer.processor
 
 import java.sql.{DriverManager, SQLException}
-import java.util.UUID
 
 import articlestreamer.processor.spark.SparkProvider
 import articlestreamer.shared.configuration.ConfigLoader

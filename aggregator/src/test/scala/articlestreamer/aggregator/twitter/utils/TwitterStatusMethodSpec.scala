@@ -6,6 +6,20 @@ import twitter4j.{Status, URLEntity}
 
 class TwitterStatusMethodSpec extends BaseSpec with TwitterStatusMethods {
 
+  "Status with English content" should "be accepted" in {
+    val status = mock(classOf[Status])
+    when(status.getLang).thenReturn("en")
+
+    status.containsEnglish shouldBe true
+  }
+
+  "Status with other language than English content" should "be rejected" in {
+    val status = mock(classOf[Status])
+    when(status.getLang).thenReturn("fr")
+
+    status.containsEnglish shouldBe false
+  }
+
   "Status with at least one page url" should "be identified as a potential article" in {
     val urlPage = buildEntity("http://thenextweb.com/e-dash-display")
     val urlImg = buildEntity("https://pbs.twimg.com/1234.jpeg")
