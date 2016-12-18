@@ -9,6 +9,10 @@ trait TwitterStatusMethods extends URLEntitiesMethods {
 
   implicit class StatusFilter(status: Status) {
 
+    def containsEnglish: Boolean = {
+      status.getLang == "en"
+    }
+
     def isPotentialArticle: Boolean = {
 
       val links = status.getURLEntities

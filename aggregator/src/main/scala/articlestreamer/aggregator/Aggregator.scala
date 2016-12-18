@@ -53,7 +53,13 @@ class Aggregator(config: ConfigLoader,
 
       logger.info(s"Status received: ${status.getCreatedAt}")
 
-      if (!status.isRetweet && status.isPotentialArticle) {
+      if (status.isRetweet) {
+        logger.warn(s"Tweet ${status.getId} ignored. Reason : 'Retweet' .")
+      } else if (!status.containsEnglish) {
+        logger.warn(s"Tweet ${status.getId} ignored. Reason : 'Not English' . Content : '${status.getText.mkString}'")
+      } else if (!status.isPotentialArticle) {
+        logger.warn(s"Tweet ${status.getId} ignored. Reason : 'Not Potential Article' . Content : '${status.getText.mkString}'")
+      } else {
         val article = convertToArticle(status)
 
         val record = new ProducerRecord[String, String](
@@ -62,9 +68,6 @@ class Aggregator(config: ConfigLoader,
           write(article))
 
         producer.send(record)
-
-      } else {
-        logger.warn(s"Tweet ${status.getId} ignored : '${status.getText.mkString}'")
       }
     }
   }
