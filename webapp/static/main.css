@@ -6,6 +6,14 @@
   color: 	red;
 }
 
+.material-icons.grey {
+  color: 	darkgrey;
+}
+
+.mdl-data-table tbody tr:hover {
+  background-color: inherit;
+}
+
 td.nopadding {
   padding: 1px;
 }

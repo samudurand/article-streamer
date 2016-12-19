@@ -17,19 +17,24 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="article in articles">
+          <tr v-for="(article, index) in articles">
             <td class="mdl-data-table__cell--non-numeric">{{article.publicationDate | parseDate }}</td>
             <td class="mdl-data-table__cell--non-numeric">
               <div style="word-break: break-all; white-space: normal;" v-html="formatContent(article.content)"></div></td>
             <!--<td>{{article.score}}</td>-->
             <td class="nopadding">
-              <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" v-on:click="accept(article.id)">
+              <button v-if="index === 0" class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" v-on:click="accept(article.id)">
                 <i class="material-icons green">add</i>
               </button>
             </td>
             <td class="nopadding">
-              <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" v-on:click="reject(article.id)">
+              <button v-if="index === 0" class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" v-on:click="reject(article.id)">
                 <i class="material-icons red">remove</i>
+              </button>
+            </td>
+            <td class="nopadding">
+              <button v-if="index === 0" class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" v-on:click="remove(article.id)">
+                <i class="material-icons grey">delete forever</i>
               </button>
             </td>
             <td class="tab-logo">
@@ -69,6 +74,16 @@
       },
       reject: function (id) {
         ArticleService.setState(this, id, -1).then(
+          function () {
+            this.$data.articles.shift();
+          },
+          function (err) {
+            console.log(err)
+          }
+        );
+      },
+      remove: function (id) {
+        ArticleService.delete(this, id).then(
           function () {
             this.$data.articles.shift();
           },

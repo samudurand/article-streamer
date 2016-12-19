@@ -21,7 +21,7 @@
             <td class="mdl-data-table__cell--non-numeric">{{article.publicationDate | parseDate }}</td>
             <td class="mdl-data-table__cell--non-numeric">
               <div style="word-break: break-all; white-space: normal;">{{article.content}}</div></td>
-            <td>{{article.score}}</td>
+            <!--<td>{{article.score}}</td>-->
             <td class="tab-logo">
               <a v-bind:href="'https://twitter.com/any/status/' + article.originalId" target="_blank"><img src="../assets/twitter.png"></a>
             </td>
