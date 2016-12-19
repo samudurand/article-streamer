@@ -11,7 +11,12 @@ libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.40"
 // Prevent reloading dependencies after each `clean`
 //cleanKeepFiles ++= Seq("resolution-cache", "streams").map(target.value / _)
 
-// Test with coverage
+// Build assemblies for docker deployment from root
+addCommandAlias("build-agg", ";project aggregator;coverageOff;assembly")
+addCommandAlias("build-proc", ";project processor;coverageOff;assembly")
+addCommandAlias("build-score", ";project twitterScoreUpdater;coverageOff;assembly")
+
+// Test with coverage from root
 addCommandAlias("test-agg", ";project aggregator;clean;coverage;test;coverageReport")
 addCommandAlias("test-score", ";project twitterScoreUpdater;clean;coverage;test;coverageReport")
 addCommandAlias("test-proc", ";project processor;clean;coverage;test;coverageReport")
