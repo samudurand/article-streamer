@@ -11,7 +11,7 @@ Vue.http.options.root = '/root';
 
 Vue.filter('parseDate', function (value) {
   const date = dateFns.parse(value);
-  return dateFns.format(date, 'HH:MM:ss - DD MMM');
+  return dateFns.format(date, 'HH:mm:ss - DD MMM');
 });
 
 const app = new Vue({

@@ -24,3 +24,5 @@ project/plugins/project/
 
 /logs/
 /derby.log
+/README.md
+/npm-debug.log

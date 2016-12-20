@@ -7,9 +7,9 @@ const Status = {
   REJECTED: -1
 };
 
-function getByStatus(request, reply, status) {
+function getByStatus(request, reply, status, order) {
   const Article = request.getDb().getModel(ARTICLE_MODEL);
-  return Article.findAll({where: {status: status}, order: 'publicationDate DESC'})
+  return Article.findAll({where: {status: status}, order: order})
     .then(
       (articles) => {
         return reply(articles)
@@ -47,21 +47,21 @@ module.exports = [
     method: 'GET',
     path: '/article/pending',
     handler: function (request, reply) {
-      return getByStatus(request, reply, Status.PENDING);
+      return getByStatus(request, reply, Status.PENDING, 'publicationDate ASC');
     }
   },
   {
     method: 'GET',
     path: '/article/accepted',
     handler: function (request, reply) {
-      return getByStatus(request, reply, Status.ACCEPTED);
+      return getByStatus(request, reply, Status.ACCEPTED, 'publicationDate DESC');
     }
   },
   {
     method: 'GET',
     path: '/article/rejected',
     handler: function (request, reply) {
-      return getByStatus(request, reply, Status.REJECTED);
+      return getByStatus(request, reply, Status.REJECTED, 'publicationDate DESC');
     }
   },
   {
