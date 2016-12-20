@@ -1,27 +1,33 @@
 function getArticles(context, state) {
-  return context.$http.get('/api/article/' + state).then(function (res) {
-    return res.body;
-  }, function (err) {
-    console.log('Could not load articles: ' + err);
-    return [];
+  return new Promise((resolve, reject) => {
+    context.$http.get('/api/article/' + state).then(
+      (res) => resolve(res.body),
+      (err) => {
+        console.log('Could not load articles: ' + err);
+        reject([]);
+      });
   });
 }
 
 function setState(context, id, state) {
-  return context.$http.put('/api/article/' + id + '/status/' + state).then(function (res) {
-    return res.body;
-  }, function (err) {
-    console.log('Could not load articles: ' + err);
-    return [];
+  return new Promise((resolve, reject) => {
+    context.$http.put('/api/article/' + id + '/status/' + state).then(
+      (res) => resolve(res.body),
+      (err) => {
+        console.log('Could not load articles: ' + err);
+        reject(err);
+      })
   });
 }
 
 function deleteArticle(context, id) {
-  return context.$http.delete('/api/article/' + id).then(function (res) {
-    return res.body;
-  }, function (err) {
-    console.log('Could not delete article: ' + err);
-    return [];
+  return new Promise((resolve, reject) => {
+    context.$http.delete('/api/article/' + id).then(
+      (res) => resolve(res.body),
+      (err) => {
+        console.log('Could not delete article: ' + err);
+        reject(err);
+      });
   });
 }
 

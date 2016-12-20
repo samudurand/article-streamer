@@ -10,7 +10,6 @@
           <tr>
             <th class="mdl-data-table__cell--non-numeric">Date</th>
             <th class="mdl-data-table__cell--non-numeric">Content</th>
-            <!--<th>Score</th>-->
             <th></th>
             <th></th>
             <th></th>
@@ -62,27 +61,15 @@
     },
     methods: {
       reject: function (id) {
-        ArticleService.setState(this, id, -1).then(
-          function () {
-            this.$data.articles.shift();
-          },
-          function (err) {
-            console.log(err)
-          }
-        );
+        const vm = this;
+        ArticleService.setState(vm, id, -1).then(
+          () => vm.$data.articles.shift());
       },
       backToPending: function (id) {
-        ArticleService.setState(this, id, 0).then(
-          function () {
-            const vm = this;
-            getAccepted(this).then(function (articles) {
-              vm.articles = articles;
-            });
-          },
-          function (err) {
-            console.log(err)
-          }
-        );
+        const vm = this;
+        ArticleService.setState(vm, id, 0).then(
+          () => getAccepted(vm).then(
+            (articles) => vm.articles = articles));
       }
     }
   };

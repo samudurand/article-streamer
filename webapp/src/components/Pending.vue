@@ -12,7 +12,6 @@
             <tr>
               <th class="mdl-data-table__cell--non-numeric">Date</th>
               <th class="mdl-data-table__cell--non-numeric">Content</th>
-              <!--<th>Score</th>-->
               <th></th>
               <th></th>
               <th></th>
@@ -23,7 +22,6 @@
               <td class="mdl-data-table__cell--non-numeric">{{article.publicationDate | parseDate }}</td>
               <td class="mdl-data-table__cell--non-numeric">
                 <div style="word-break: break-all; white-space: normal;" v-html="formatContent(article.content)"></div></td>
-              <!--<td>{{article.score}}</td>-->
               <td class="nopadding">
                 <button v-if="index === 0" class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" v-on:click="accept(article.id)">
                   <i class="material-icons green">add</i>
@@ -79,37 +77,26 @@
         bus.$emit('delete-article', id);
       },
       accept: function (id) {
+        const vm = this;
         ArticleService.setState(this, id, 1).then(
-          function () {
-            this.$data.articles.shift();
-          },
-          function (err) {
-            console.log(err)
-          }
+          ()    => vm.$data.articles.shift(),
+          (err) => console.log(err)
         );
       },
       reject: function (id) {
+        const vm = this;
         ArticleService.setState(this, id, -1).then(
-          function () {
-            this.$data.articles.shift();
-          },
-          function (err) {
-            console.log(err)
-          }
+          () => vm.$data.articles.shift()
         );
       },
       remove: function (id) {
-        ArticleService.delete(this, id).then(
-          function () {
-            this.$data.articles.shift();
-          },
-          function (err) {
-            console.log(err)
-          }
+        const vm = this;
+        ArticleService.delete(vm, id).then(
+          () => vm.$data.articles.shift(), () => {}
         );
       },
       formatContent: function (content) {
-          return linkifyHtml(content);
+        return linkifyHtml(content);
       }
     },
     components: {
