@@ -1,4 +1,4 @@
-FROM openjdk:8-jre
+FROM anapsix/alpine-java:8_server-jre_unlimited
 MAINTAINER Firens <https://github.com/firens>
 
 LABEL description="Article processor for the Article Streamer project" \
