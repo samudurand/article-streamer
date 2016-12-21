@@ -6,19 +6,21 @@ At the moment only Twitter is supported.
 
 ![current architecture](./readme-assets/schema.png)
 
-# Components
-
-This system is composed of 6 elements
-
-- An **aggregator** : aggregates tweets, posts and all other items streamed from the sources (Twitter, Instagram...). All tweets are put in a pending topic in Kafka for 12h.
-- A **score updater** (Twitter specific) : loads periodically (every 12h) all pending tweets and update their Score based on their current popularity, before sending them for analytics and persistence   
-- 
-
 # Article Streamer
 
 The idea of this project is to provide a tool that will aggregate articles about one or several provided subjects (Scala, Spark...) 
 from various sources (Twitter, Linkedin, Blogs... ). 
 For each a score will be calculated. That score will represent the potential interest or value based on their popularity and other factors (to be determined)
+
+# Components
+
+This system has 5 main components :
+
+- An **aggregator** : aggregates tweets, posts and all other items streamed from the possible article sources (Twitter, Instagram...). See the [README](./aggregator/README.md) for usage and details.
+- A **score updater** (Twitter specific) : loads periodically (every 12h) all pending tweets and update their *score* based on their current popularity. See the [README](./twitter-score-updater/README.md) for usage and details.   
+- A **processor** : process all articles as soon available, then apply some analytics, and finally persist each into the main DB. See the [README](./processor/README.md) for usage and details.   
+- A **data server** : simple app serving/manipulating the data stored in the main DB. See the [README](./data-server/README.md) for usage and details.
+- A **webapp** : used to browse the articles stored in the main DB, and to manipulate there current state. See the [README](./webapp/README.md) for usage and details.
 
 ## Deploy and run the Aggregator on Heroku
 

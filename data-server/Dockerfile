@@ -6,7 +6,7 @@ COPY package.json /server/package.json
 
 WORKDIR /server
 
-RUN npm install
+RUN npm install --production
 
 COPY . /server
 
