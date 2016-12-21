@@ -69,6 +69,7 @@ lazy val aggregator = (project in file("aggregator")).
     libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
     libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion,
     libraryDependencies += "org.quartz-scheduler" % "quartz" % "2.2.1",
+    libraryDependencies += "net.debasishg" %% "redisclient" % "3.2",
 
     coverageExcludedPackages := ".*BasicConsumer;.*MainApp;.*DefaultTwitterStreamer"
 

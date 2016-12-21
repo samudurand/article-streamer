@@ -4,6 +4,7 @@ import java.sql.Timestamp
 import java.util.{TimeZone, UUID}
 
 import articlestreamer.aggregator.kafka.scheduled.EndQueueJob
+import articlestreamer.aggregator.redis.RedisClientFactory
 import articlestreamer.aggregator.twitter.TwitterStreamerFactory
 import articlestreamer.aggregator.twitter.utils.TwitterStatusMethods
 import articlestreamer.shared.configuration.ConfigLoader
@@ -24,9 +25,11 @@ class Aggregator(config: ConfigLoader,
                  producer: KafkaProducerWrapper,
                  scheduler: Scheduler,
                  scoreCalculator: TwitterScoreCalculator,
-                 streamer: TwitterStreamerFactory) extends CustomJsonFormats with TwitterStatusMethods with LazyLogging {
+                 streamer: TwitterStreamerFactory,
+                 redisFactory: RedisClientFactory) extends CustomJsonFormats with TwitterStatusMethods with LazyLogging {
 
   val topicManager = new HalfDayTopicManager(config)
+  val redisClient = redisFactory.getClient()
 
   def run() = {
 
