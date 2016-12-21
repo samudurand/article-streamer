@@ -58,7 +58,8 @@ lazy val aggregator = (project in file("aggregator")).
 
     assemblyOutputPath in assembly := file(s"./aggregator/docker/aggregator-assembly-${version.value}.jar"),
     assemblyMergeStrategy in assembly := {
-        case PathList("development.conf", "docker-env.list") => MergeStrategy.discard
+        case PathList("development.conf") => MergeStrategy.discard
+        case PathList("docker-env.list") => MergeStrategy.discard
         case x =>
             val oldStrategy = (assemblyMergeStrategy in assembly).value
             oldStrategy(x)
@@ -119,7 +120,8 @@ lazy val twitterScoreUpdater = (project in file("twitter-score-updater")).
 
     assemblyOutputPath in assembly := file(s"./twitter-score-updater/docker/score-updater-assembly-${version.value}.jar"),
     assemblyMergeStrategy in assembly := {
-      case PathList("development.conf", "docker-env.list") => MergeStrategy.discard
+      case PathList("docker-env.list") => MergeStrategy.discard
+      case PathList("development.conf") => MergeStrategy.discard
       case x =>
         val oldStrategy = (assemblyMergeStrategy in assembly).value
         oldStrategy(x)
