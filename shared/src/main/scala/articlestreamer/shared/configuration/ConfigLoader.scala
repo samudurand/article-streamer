@@ -19,6 +19,8 @@ final case class TwitterSearchConfig(mainTag: String,
 
 final case class MysqlConfig(jdbcUrl: String, user: String, password: String, driver: String)
 
+final case class RedisConfig(host: String, port: Int)
+
 trait ConfigLoader extends LazyLogging with Serializable {
 
   val appConfig = ConfigFactory.load()
@@ -46,6 +48,11 @@ trait ConfigLoader extends LazyLogging with Serializable {
     appConfig.getString("mysql.user"),
     appConfig.getString("mysql.password"),
     appConfig.getString("mysql.driver")
+  )
+
+  val redisConfig = RedisConfig(
+    appConfig.getString("redis.host"),
+    appConfig.getInt("redis.port")
   )
 
   /**

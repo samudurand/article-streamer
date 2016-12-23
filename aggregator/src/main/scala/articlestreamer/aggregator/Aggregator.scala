@@ -28,8 +28,10 @@ class Aggregator(config: ConfigLoader,
                  streamer: TwitterStreamerFactory,
                  redisFactory: RedisClientFactory) extends CustomJsonFormats with TwitterStatusMethods with LazyLogging {
 
-  val topicManager = new HalfDayTopicManager(config)
-  val redisClient = redisFactory.getClient()
+  private val topicManager = new HalfDayTopicManager(config)
+  private val redisClient = redisFactory.getClient(config.redisConfig.host, config.redisConfig.port)
+
+  sys.addShutdownHook(redisClient.disconnect)
 
   def run() = {
 

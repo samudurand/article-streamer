@@ -3,6 +3,7 @@ package articlestreamer.aggregator
 import java.text.SimpleDateFormat
 import java.util.TimeZone
 
+import articlestreamer.aggregator.redis.RedisClientFactory
 import articlestreamer.aggregator.twitter.{DefaultTwitterStreamerFactory, TwitterStreamer}
 import articlestreamer.shared.BaseSpec
 import articlestreamer.shared.configuration.ConfigLoader
@@ -34,6 +35,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
   var scoreCalculator: TwitterScoreCalculator = _
   var streamer: TwitterStreamer = _
   var scheduler: Scheduler = _
+  var redisFactory: RedisClientFactory = _
 
   before {
     kafkaWrapper = mock(classOf[KafkaProducerWrapper])
@@ -50,7 +52,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     val factory = mock(classOf[DefaultTwitterStreamerFactory])
     when(factory.getStreamer(any(), any(), any())).thenReturn(streamer)
 
-    val aggregator = new Aggregator(config, kafkaWrapper, scheduler, scoreCalculator, factory)
+    val aggregator = new Aggregator(config, kafkaWrapper, scheduler, scoreCalculator, factory, redisFactory)
     aggregator.run()
 
     verify(streamer, times(1)).startStreaming()
@@ -169,7 +171,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     val factory = mock(classOf[DefaultTwitterStreamerFactory])
     when(factory.getStreamer(any(), captor.capture(), any())).thenReturn(streamer)
 
-    val aggregator = new Aggregator(config, kafkaWrapper, scheduler, scoreCalculator, factory)
+    val aggregator = new Aggregator(config, kafkaWrapper, scheduler, scoreCalculator, factory, redisFactory)
     aggregator.run()
     captor.getValue()
   }
