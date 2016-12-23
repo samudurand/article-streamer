@@ -42,6 +42,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     scoreCalculator = mock(classOf[TwitterScoreCalculator])
     streamer = mock(classOf[TwitterStreamer])
     scheduler = StdSchedulerFactory.getDefaultScheduler
+    redisFactory = mock(classOf[RedisClientFactory])
   }
 
   after {

@@ -31,7 +31,9 @@ class Aggregator(config: ConfigLoader,
   private val topicManager = new HalfDayTopicManager(config)
   private val redisClient = redisFactory.getClient(config.redisConfig.host, config.redisConfig.port)
 
-  sys.addShutdownHook(redisClient.disconnect)
+  sys.addShutdownHook {
+    redisClient.disconnect
+  }
 
   def run() = {
 
@@ -49,7 +51,7 @@ class Aggregator(config: ConfigLoader,
 
       producer.stopProducer()
 
-      scheduler.shutdown()
+      scheduler.shutdown(false)
     })
   }
 
@@ -62,7 +64,7 @@ class Aggregator(config: ConfigLoader,
         logger.warn(s"Tweet ${status.getId} ignored. Reason : 'Retweet' .")
       } else if (!status.containsEnglish) {
         logger.warn(s"Tweet ${status.getId} ignored. Reason : 'Not English' . Content : '${status.getText.mkString}'")
-      } else if (!status.isPotentialArticle) {
+      } else if (status.getUsableLinks.isEmpty) {
         logger.warn(s"Tweet ${status.getId} ignored. Reason : 'Not Potential Article' . Content : '${status.getText.mkString}'")
       } else {
         val article = convertToArticle(status)

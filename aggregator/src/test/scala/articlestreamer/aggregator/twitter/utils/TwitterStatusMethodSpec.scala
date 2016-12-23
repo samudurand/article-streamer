@@ -20,7 +20,7 @@ class TwitterStatusMethodSpec extends BaseSpec with TwitterStatusMethods {
     status.containsEnglish shouldBe false
   }
 
-  "Status with at least one page url" should "be identified as a potential article" in {
+  "Status with a page url" should "return a single URL" in {
     val urlPage = buildEntity("http://thenextweb.com/e-dash-display")
     val urlImg = buildEntity("https://pbs.twimg.com/1234.jpeg")
     val facebookUrl = buildEntity("https://www.facebook.com/62648/photos/352127.62868648/1222842638/?type=3&theater")
@@ -30,20 +30,20 @@ class TwitterStatusMethodSpec extends BaseSpec with TwitterStatusMethods {
     val status = mock(classOf[Status])
     when(status.getURLEntities).thenReturn(urls)
 
-    status.isPotentialArticle shouldBe true
+    status.getUsableLinks shouldBe Array(urlPage)
   }
 
-  "Status with only a page url" should "be identified as a potential article" in {
+  "Status with only a page url" should "return a single URL" in {
     val urlPage = buildEntity("http://thenextweb.com/e-dash-display")
     val urls = Array(urlPage)
 
     val status = mock(classOf[Status])
     when(status.getURLEntities).thenReturn(urls)
 
-    status.isPotentialArticle shouldBe true
+    status.getUsableLinks shouldBe Array(urlPage)
   }
 
-  "Status with only media urls" should "be rejected" in {
+  "Status with only media urls" should "return an empty list" in {
     val urlImg = buildEntity("https://pbs.twimg.com/1234.jpeg")
     val urlVideo = buildEntity("https://pbs.twimg.com/34567.mov")
     val urls = Array(urlVideo, urlImg)
@@ -51,10 +51,10 @@ class TwitterStatusMethodSpec extends BaseSpec with TwitterStatusMethods {
     val status = mock(classOf[Status])
     when(status.getURLEntities).thenReturn(urls)
 
-    status.isPotentialArticle shouldBe false
+    status.getUsableLinks shouldBe empty
   }
 
-  "Status with only social networks urls" should "be rejected" in {
+  "Status with only social networks urls" should "return empty list" in {
     val facebookUrl = buildEntity("https://www.facebook.com/62648/photos/352127.62868648/1222842638/?type=3&theater")
     val instagramUrl = buildEntity("https://www.instagram.com/?hl=en")
     val urls = Array(instagramUrl, facebookUrl)
@@ -62,13 +62,13 @@ class TwitterStatusMethodSpec extends BaseSpec with TwitterStatusMethods {
     val status = mock(classOf[Status])
     when(status.getURLEntities).thenReturn(urls)
 
-    status.isPotentialArticle shouldBe false
+    status.getUsableLinks shouldBe empty
   }
 
-  "Status with no urls" should "be rejected" in {
+  "Status with no urls" should "return empty list" in {
     val status = mock(classOf[Status])
     when(status.getURLEntities).thenReturn(Array[URLEntity]())
-    status.isPotentialArticle shouldBe false
+    status.getUsableLinks shouldBe empty
   }
 
   private def buildEntity(url: String): URLEntity = {
