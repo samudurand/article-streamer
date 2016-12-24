@@ -8,8 +8,11 @@ services:
     env_file: ./aggregator/docker-env.list
     environment:
       KAFKA_BROKERS: kafka:9092
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     depends_on:
       - kafka
+      - redis
 
   score_updater:
     container_name: score_updater

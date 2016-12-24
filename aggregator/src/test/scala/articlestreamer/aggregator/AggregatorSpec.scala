@@ -3,6 +3,7 @@ package articlestreamer.aggregator
 import java.text.SimpleDateFormat
 import java.util.TimeZone
 
+import articlestreamer.aggregator.service.URLStoreService
 import articlestreamer.aggregator.twitter.{DefaultTwitterStreamerFactory, TwitterStreamer}
 import articlestreamer.shared.BaseSpec
 import articlestreamer.shared.configuration.ConfigLoader
@@ -34,12 +35,14 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
   var scoreCalculator: TwitterScoreCalculator = _
   var streamer: TwitterStreamer = _
   var scheduler: Scheduler = _
+  var urlStore: URLStoreService = _
 
   before {
     kafkaWrapper = mock(classOf[KafkaProducerWrapper])
     scoreCalculator = mock(classOf[TwitterScoreCalculator])
     streamer = mock(classOf[TwitterStreamer])
     scheduler = StdSchedulerFactory.getDefaultScheduler
+    urlStore = mock(classOf[URLStoreService])
   }
 
   after {
@@ -50,7 +53,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     val factory = mock(classOf[DefaultTwitterStreamerFactory])
     when(factory.getStreamer(any(), any(), any())).thenReturn(streamer)
 
-    val aggregator = new Aggregator(config, kafkaWrapper, scheduler, scoreCalculator, factory)
+    val aggregator = new Aggregator(config, kafkaWrapper, scheduler, scoreCalculator, factory, urlStore)
     aggregator.run()
 
     verify(streamer, times(1)).startStreaming()
@@ -61,6 +64,8 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
 
     val uRLEntity = mock(classOf[URLEntity])
     when(uRLEntity.getExpandedURL).thenReturn("http://anyurl.com")
+
+    when(urlStore.exists(anyString())).thenReturn(false)
 
     val tweetHandler = captureTweetHandler()
 
@@ -80,6 +85,8 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
 
     tweetHandler(status)
 
+    verify(urlStore, times(1)).save("http://anyurl.com")
+
     val articleRecord = captor.getValue
     articleRecord.key() should startWith ("tweet")
     val articleSent = read[TwitterArticle](articleRecord.value())
@@ -87,6 +94,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     articleSent.originalId shouldBe "1000"
     articleSent.score shouldBe Some(10)
     articleSent.links shouldBe List("http://anyurl.com")
+
   }
 
   "Any tweet not potentially an article " should "be ignored" in {
@@ -110,6 +118,36 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
 
     tweetHandler(status)
 
+    verify(urlStore, never()).save(any())
+    verify(kafkaWrapper, never()).send(any())
+  }
+
+  "Any tweet containing only known links" should "be ignored" in {
+    val uRLEntity = mock(classOf[URLEntity])
+    when(uRLEntity.getExpandedURL).thenReturn("http://anyurl.com")
+
+    when(urlStore.exists(anyString())).thenReturn(true)
+
+    val tweetHandler = captureTweetHandler()
+
+    val status = mock(classOf[Status])
+    val date = df.parse("01-01-2000 00:00:00")
+    when(status.getCreatedAt).thenReturn(date)
+    when(status.getURLEntities).thenReturn(Array[URLEntity](uRLEntity))
+    when(status.getId).thenReturn(1000l)
+    when(status.getText).thenReturn("some content")
+    when(status.isRetweet).thenReturn(false)
+    when(status.getLang).thenReturn("en")
+
+    val user = mock(classOf[User])
+    when(status.getUser).thenReturn(user)
+
+    val captor: ArgumentCaptor[ProducerRecord[String, String]]  = ArgumentCaptor.forClass(classOf[ProducerRecord[String, String]])
+    when(kafkaWrapper.send(captor.capture())).thenReturn(null)
+
+    tweetHandler(status)
+
+    verify(urlStore, never()).save(any())
     verify(kafkaWrapper, never()).send(any())
   }
 
@@ -169,7 +207,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     val factory = mock(classOf[DefaultTwitterStreamerFactory])
     when(factory.getStreamer(any(), captor.capture(), any())).thenReturn(streamer)
 
-    val aggregator = new Aggregator(config, kafkaWrapper, scheduler, scoreCalculator, factory)
+    val aggregator = new Aggregator(config, kafkaWrapper, scheduler, scoreCalculator, factory, urlStore)
     aggregator.run()
     captor.getValue()
   }

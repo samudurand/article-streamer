@@ -4,6 +4,7 @@ import java.sql.Timestamp
 import java.util.{TimeZone, UUID}
 
 import articlestreamer.aggregator.kafka.scheduled.EndQueueJob
+import articlestreamer.aggregator.service.URLStoreService
 import articlestreamer.aggregator.twitter.TwitterStreamerFactory
 import articlestreamer.aggregator.twitter.utils.TwitterStatusMethods
 import articlestreamer.shared.configuration.ConfigLoader
@@ -18,15 +19,16 @@ import org.quartz.CronScheduleBuilder._
 import org.quartz.JobBuilder.newJob
 import org.quartz.TriggerBuilder._
 import org.quartz.{JobDataMap, Scheduler}
-import twitter4j.Status
+import twitter4j.{Status, URLEntity}
 
 class Aggregator(config: ConfigLoader,
                  producer: KafkaProducerWrapper,
                  scheduler: Scheduler,
                  scoreCalculator: TwitterScoreCalculator,
-                 streamer: TwitterStreamerFactory) extends CustomJsonFormats with TwitterStatusMethods with LazyLogging {
+                 streamer: TwitterStreamerFactory,
+                 urlStore: URLStoreService) extends CustomJsonFormats with TwitterStatusMethods with LazyLogging {
 
-  val topicManager = new HalfDayTopicManager(config)
+  private val topicManager = new HalfDayTopicManager(config)
 
   def run() = {
 
@@ -44,7 +46,7 @@ class Aggregator(config: ConfigLoader,
 
       producer.stopProducer()
 
-      scheduler.shutdown()
+      scheduler.shutdown(false)
     })
   }
 
@@ -57,18 +59,43 @@ class Aggregator(config: ConfigLoader,
         logger.warn(s"Tweet ${status.getId} ignored. Reason : 'Retweet' .")
       } else if (!status.containsEnglish) {
         logger.warn(s"Tweet ${status.getId} ignored. Reason : 'Not English' . Content : '${status.getText.mkString}'")
-      } else if (!status.isPotentialArticle) {
-        logger.warn(s"Tweet ${status.getId} ignored. Reason : 'Not Potential Article' . Content : '${status.getText.mkString}'")
       } else {
-        val article = convertToArticle(status)
+        val usableLinks = status.getUsableLinks
+        if (usableLinks.isEmpty) {
+          logger.warn(s"Tweet ${status.getId} ignored. Reason : 'Not Potential Article' . Content : '${status.getText.mkString}'")
+        } else {
+          val unknwonLinks = findUnknownLinks(usableLinks)
+          if (unknwonLinks.isEmpty) {
+            logger.warn(s"Tweet ${status.getId} ignored. Reason : 'Links all already known' . Links : '${status.getURLEntities.mkString}'")
+          } else {
+            saveNewLinks(unknwonLinks)
 
-        val record = new ProducerRecord[String, String](
-          topicManager.getCurrentTopic(),
-          s"tweet-${status.getId}",
-          write(article))
+            val article = convertToArticle(status)
 
-        producer.send(record)
+            val record = new ProducerRecord[String, String](
+              topicManager.getCurrentTopic(),
+              s"tweet-${status.getId}",
+              write(article))
+
+            producer.send(record)
+          }
+        }
       }
+    }
+  }
+
+  private def saveNewLinks(links: Seq[URLEntity]) = {
+    links.foreach { link =>
+      urlStore.save(link.getExpandedURL)
+    }
+  }
+
+  /**
+    * Check if the provided list contains at least one link unknown by interrogating the Link Storage
+    */
+  private def findUnknownLinks(links: Seq[URLEntity]): Seq[URLEntity] = {
+    links.filterNot { link =>
+      urlStore.exists(link.getExpandedURL)
     }
   }
 

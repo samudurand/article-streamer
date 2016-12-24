@@ -1,5 +1,7 @@
 package articlestreamer.aggregator
 
+import articlestreamer.aggregator.redis.DefaultRedisClientFactory
+import articlestreamer.aggregator.service.RedisURLStoreService
 import articlestreamer.aggregator.twitter.DefaultTwitterStreamerFactory
 import articlestreamer.shared.configuration.DefaultConfigLoader
 import articlestreamer.shared.kafka.{KafkaFactory, KafkaProducerWrapper}
@@ -12,7 +14,7 @@ import twitter4j.TwitterFactory
 /**
   * Created by sam on 15/10/2016.
   */
-object MainApp extends App {
+object App extends App {
 
   lazy val twitterFactory = wire[TwitterFactory]
   lazy val config = wire[DefaultConfigLoader]
@@ -21,6 +23,8 @@ object MainApp extends App {
   lazy val streamFactory = new DefaultTwitterStreamerFactory
   lazy val twitterService = wire[TwitterService]
   lazy val scoreCalculator = wire[NaiveTwitterScoreCalculator]
+  lazy val redisFactory = wire[DefaultRedisClientFactory]
+  lazy val urlStore = wire[RedisURLStoreService]
 
   lazy val scheduler = StdSchedulerFactory.getDefaultScheduler
 
