@@ -3,11 +3,12 @@ package articlestreamer.aggregator.service
 import articlestreamer.aggregator.redis.RedisClientFactory
 import articlestreamer.shared.configuration.ConfigLoader
 import com.redis.Seconds
+import com.typesafe.scalalogging.LazyLogging
 
 /**
   * Uses Redis as URL Store
   */
-class RedisURLStoreService(config: ConfigLoader, factory: RedisClientFactory) extends URLStoreService {
+class RedisURLStoreService(config: ConfigLoader, factory: RedisClientFactory) extends URLStoreService with LazyLogging {
 
   private val redisClient = factory.getClient(config.redisConfig.host, config.redisConfig.port)
 
@@ -23,7 +24,12 @@ class RedisURLStoreService(config: ConfigLoader, factory: RedisClientFactory) ex
     * Save a new URL in the store
     */
   override def save(url: String): Unit = {
-    redisClient.set(url, "", onlyIfExists = false, Seconds(config.redisConfig.expiryTime))
+    val result = redisClient.set(url, "", onlyIfExists = false, Seconds(config.redisConfig.expiryTime))
+    if (result) {
+      logger.info(s"Redis: successfully saved url [$url]")
+    } else {
+      logger.error(s"Redis: failed to save url [$url]")
+    }
   }
 
 }

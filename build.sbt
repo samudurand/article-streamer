@@ -71,7 +71,7 @@ lazy val aggregator = (project in file("aggregator")).
     libraryDependencies += "org.quartz-scheduler" % "quartz" % "2.2.1",
     libraryDependencies += "net.debasishg" %% "redisclient" % "3.2",
 
-    coverageExcludedPackages := ".*RedisClientFactory;.*BasicConsumer;.*MainApp;.*DefaultTwitterStreamer"
+    coverageExcludedPackages := ".*RedisClientFactory;.*BasicConsumer;.*App;.*DefaultTwitterStreamer"
 
   ) dependsOn (shared % "test->test;compile->compile")
 
