@@ -3,7 +3,6 @@ package articlestreamer.aggregator
 import java.text.SimpleDateFormat
 import java.util.TimeZone
 
-import articlestreamer.aggregator.redis.RedisClientFactory
 import articlestreamer.aggregator.service.URLStoreService
 import articlestreamer.aggregator.twitter.{DefaultTwitterStreamerFactory, TwitterStreamer}
 import articlestreamer.shared.BaseSpec
@@ -66,6 +65,8 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     val uRLEntity = mock(classOf[URLEntity])
     when(uRLEntity.getExpandedURL).thenReturn("http://anyurl.com")
 
+    when(urlStore.exists(anyString())).thenReturn(false)
+
     val tweetHandler = captureTweetHandler()
 
     val status = mock(classOf[Status])
@@ -84,6 +85,8 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
 
     tweetHandler(status)
 
+    verify(urlStore, times(1)).save("http://anyurl.com")
+
     val articleRecord = captor.getValue
     articleRecord.key() should startWith ("tweet")
     val articleSent = read[TwitterArticle](articleRecord.value())
@@ -91,6 +94,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     articleSent.originalId shouldBe "1000"
     articleSent.score shouldBe Some(10)
     articleSent.links shouldBe List("http://anyurl.com")
+
   }
 
   "Any tweet not potentially an article " should "be ignored" in {
@@ -114,6 +118,36 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
 
     tweetHandler(status)
 
+    verify(urlStore, never()).save(any())
+    verify(kafkaWrapper, never()).send(any())
+  }
+
+  "Any tweet containing only known links" should "be ignored" in {
+    val uRLEntity = mock(classOf[URLEntity])
+    when(uRLEntity.getExpandedURL).thenReturn("http://anyurl.com")
+
+    when(urlStore.exists(anyString())).thenReturn(true)
+
+    val tweetHandler = captureTweetHandler()
+
+    val status = mock(classOf[Status])
+    val date = df.parse("01-01-2000 00:00:00")
+    when(status.getCreatedAt).thenReturn(date)
+    when(status.getURLEntities).thenReturn(Array[URLEntity](uRLEntity))
+    when(status.getId).thenReturn(1000l)
+    when(status.getText).thenReturn("some content")
+    when(status.isRetweet).thenReturn(false)
+    when(status.getLang).thenReturn("en")
+
+    val user = mock(classOf[User])
+    when(status.getUser).thenReturn(user)
+
+    val captor: ArgumentCaptor[ProducerRecord[String, String]]  = ArgumentCaptor.forClass(classOf[ProducerRecord[String, String]])
+    when(kafkaWrapper.send(captor.capture())).thenReturn(null)
+
+    tweetHandler(status)
+
+    verify(urlStore, never()).save(any())
     verify(kafkaWrapper, never()).send(any())
   }
 

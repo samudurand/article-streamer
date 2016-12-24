@@ -53,7 +53,7 @@ trait ConfigLoader extends LazyLogging with Serializable {
   val redisConfig = RedisConfig(
     appConfig.getString("redis.host"),
     appConfig.getInt("redis.port"),
-    appConfig.getInt("redis.expiryTime")
+    appConfig.getLong("redis.expiryTime")
   )
 
   /**
