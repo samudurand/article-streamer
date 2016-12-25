@@ -8,20 +8,17 @@ class NaiveTwitterScoreCalculator(configLoader: ConfigLoader, twitterService: Tw
 
   import configLoader._
 
-  val config = twitterSearchConfig
+  private val config = twitterConfig.searchConfig
 
-  val VALUE_RELATED_TAGS = 100
+  private val VALUE_RELATED_TAGS = 100
+  private val VALUE_ARTICLE_CLOSE_WORDS = 500
+  private val VALUE_ARTICLE_RELATED_WORDS = 100
+  private val VALUE_SUBJECT_CLOSE_WORDS = 100
+  private val VALUE_SUBJECT_RELATED_WORDS = 20
+  private val COST_ARTICLE_UNRELATED_WORDS = -200
+  private val COST_SUBJECT_UNRELATED_WORDS = -50
 
-  val VALUE_ARTICLE_CLOSE_WORDS = 500
-  val VALUE_ARTICLE_RELATED_WORDS = 100
-
-  val VALUE_SUBJECT_CLOSE_WORDS = 100
-  val VALUE_SUBJECT_RELATED_WORDS = 20
-
-  val COST_ARTICLE_UNRELATED_WORDS = -200
-  val COST_SUBJECT_UNRELATED_WORDS = -50
-
-  val wordsAndValues = List(
+  protected val wordsAndValues = List(
     (config.relatedTags, VALUE_RELATED_TAGS),
     (config.articleCloseWords, VALUE_ARTICLE_CLOSE_WORDS),
     (config.articleRelatedWords, VALUE_ARTICLE_RELATED_WORDS),
