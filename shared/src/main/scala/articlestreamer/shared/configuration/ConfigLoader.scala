@@ -2,7 +2,7 @@ package articlestreamer.shared.configuration
 
 import java.io.{File, PrintWriter}
 
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.JavaConversions._
@@ -21,17 +21,34 @@ final case class MysqlConfig(jdbcUrl: String, user: String, password: String, dr
 
 final case class RedisConfig(host: String, port: Int, expiryTime: Long)
 
+final case class TwitterAuthConfig(consumerKey: String,
+                                   consumerSecret: String,
+                                   accessToken: String,
+                                   accessSecret: String)
+
+/**
+  * Configuration for Twitter (used through Twitter4J)
+  * @param authConfig : OAuth keys and secrets
+  * @param searchConfig : Tags and scores evaluation criteria
+  * @param batchSize : Size of the batch required from the Twitter API when requesting tweets details
+  * @param ignoredAuthors : list of authors username whose tweets should be ignored
+  */
+final case class TwitterConfig(authConfig: TwitterAuthConfig,
+                               searchConfig: TwitterSearchConfig,
+                               batchSize: Int, ignoredAuthors: List[String])
+
 trait ConfigLoader extends LazyLogging with Serializable {
 
-  val appConfig = ConfigFactory.load()
+  protected val appConfig: Config = ConfigFactory.load()
 
-  val twitterOuathConsumerKey = appConfig.getString("twitter.oauth.oauthConsumerKey")
-  val twitterOauthConsumerSecret = appConfig.getString("twitter.oauth.oauthConsumerSecret")
-  val twitterOauthAccessToken = appConfig.getString("twitter.oauth.oauthAccessToken")
-  val twitterOauthAccessTokenSecret = appConfig.getString("twitter.oauth.oauthAccessTokenSecret")
-
-  val twitterPath = "twitter.search"
-  val twitterSearchConfig = TwitterSearchConfig(
+  private val twitterAuthConfig: TwitterAuthConfig = TwitterAuthConfig(
+    appConfig.getString("twitter.oauth.oauthConsumerKey"),
+    appConfig.getString("twitter.oauth.oauthConsumerSecret"),
+    appConfig.getString("twitter.oauth.oauthAccessToken"),
+    appConfig.getString("twitter.oauth.oauthAccessTokenSecret")
+  )
+  private val twitterPath = "twitter.search"
+  private val twitterSearchConfig = TwitterSearchConfig(
     appConfig.getString(s"$twitterPath.tagToTrack"),
     appConfig.getInt(s"$twitterPath.minimumScore"),
     appConfig.getStringList(s"$twitterPath.relatedTags").toList,
@@ -42,6 +59,11 @@ trait ConfigLoader extends LazyLogging with Serializable {
     appConfig.getStringList(s"$twitterPath.articleUnrelatedWords").toList,
     appConfig.getStringList(s"$twitterPath.subjectUnrelatedWords").toList
   )
+  val twitterConfig: TwitterConfig = TwitterConfig(
+    twitterAuthConfig,
+    twitterSearchConfig,
+    appConfig.getInt("twitter.tweetsBatchSize"),
+    appConfig.getStringList("twitter.ignoredAuthors").toList)
 
   val mysqlConfig = MysqlConfig(
     appConfig.getString("mysql.jdbcUrl"),
@@ -59,7 +81,6 @@ trait ConfigLoader extends LazyLogging with Serializable {
   /**
     * Size of the tweets batch when querying for tweet info
     */
-  val tweetsBatchSize = appConfig.getInt("twitter.tweetsBatchSize")
 
   val kafkaMainTopic = appConfig.getString("kafka.topic-default")
   val kafkaFirstTopic = appConfig.getString("kafka.topic1")

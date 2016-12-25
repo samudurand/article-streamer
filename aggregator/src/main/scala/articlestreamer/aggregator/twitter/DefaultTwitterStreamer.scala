@@ -9,25 +9,25 @@ case class DefaultTwitterStreamer(config: ConfigLoader,
                                   onStatusFct: (Status) => Unit,
                                   onStop: () => Unit) extends TwitterStreamer with LazyLogging {
 
-  val stream = new TwitterStreamFactory(TwitterAuthorizationConfig.getTwitterConfig(config)).getInstance
+  private val stream = new TwitterStreamFactory(TwitterAuthorizationConfig.getTwitterConfig(config)).getInstance
 
   def statusListener = new StatusListener() {
-    def onStatus(status: Status) = onStatusFct(status)
-    def onDeletionNotice(statusDeletionNotice: StatusDeletionNotice) = {}
-    def onTrackLimitationNotice(numberOfLimitedStatuses: Int) = {logger.error(s"Limitation hit : $numberOfLimitedStatuses")}
-    def onException(ex: Exception) = { logger.error("Error while streaming tweets", ex) }
-    def onScrubGeo(arg0: Long, arg1: Long) = {}
-    def onStallWarning(warning: StallWarning) = {}
+    override def onStatus(status: Status): Unit = onStatusFct(status)
+    override def onDeletionNotice(statusDeletionNotice: StatusDeletionNotice): Unit = {}
+    override def onTrackLimitationNotice(numberOfLimitedStatuses: Int): Unit = {logger.error(s"Limitation hit : $numberOfLimitedStatuses")}
+    override def onException(ex: Exception): Unit = { logger.error("Error while streaming tweets", ex) }
+    override def onScrubGeo(arg0: Long, arg1: Long): Unit = {}
+    override def onStallWarning(warning: StallWarning): Unit = {}
   }
 
-  override def startStreaming() = {
+  override def startStreaming(): Unit = {
     logger.info("Twitter Streamer : Starting streaming")
     stream.addListener(statusListener)
-    stream.filter(new FilterQuery().track(config.twitterSearchConfig.mainTag))
+    stream.filter(new FilterQuery().track(config.twitterConfig.searchConfig.mainTag))
     logger.info("Twitter Streamer : Streaming started")
   }
 
-  override def stop() = {
+  override def stop(): Unit = {
     stream.cleanUp()
     stream.shutdown()
     onStop()
