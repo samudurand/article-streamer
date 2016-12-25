@@ -57,7 +57,7 @@
 
 <script>
   import ArticleService from '../service/articles.service'
-  import linkifyHtml from 'linkifyjs/html';
+  import ContentFormattingService from '../service/contentFormatting.service'
   import ConfirmDialog from './ConfirmDialog.vue'
   import bus from '../Bus'
 
@@ -96,7 +96,7 @@
         );
       },
       formatContent: function (content) {
-        return linkifyHtml(content);
+        return ContentFormattingService.formatLinks(content);
       }
     },
     components: {
