@@ -6,7 +6,7 @@ import java.util.TimeZone
 import articlestreamer.aggregator.service.URLStoreService
 import articlestreamer.aggregator.twitter.{DefaultTwitterStreamerFactory, TwitterStreamer}
 import articlestreamer.shared.BaseSpec
-import articlestreamer.shared.configuration.ConfigLoader
+import articlestreamer.shared.configuration.{ConfigLoader, TwitterConfig}
 import articlestreamer.shared.kafka.{HalfDayTopicManager, KafkaProducerWrapper}
 import articlestreamer.shared.marshalling.CustomJsonFormats
 import articlestreamer.shared.model.TwitterArticle
@@ -28,7 +28,9 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
 
   class TestConfig extends ConfigLoader
 
-  val config = new TestConfig()
+  val config = new TestConfig() {
+    override val twitterConfig = TwitterConfig(null, null, 1, List("SpamAuthor"))
+  }
 
   val topicManager = new HalfDayTopicManager(config)
   var kafkaWrapper : KafkaProducerWrapper = _
@@ -166,6 +168,32 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     when(status.isRetweet).thenReturn(true)
     when(status.getLang).thenReturn("en")
     val user = mock(classOf[User])
+    when(status.getUser).thenReturn(user)
+
+    val captor: ArgumentCaptor[ProducerRecord[String, String]]  = ArgumentCaptor.forClass(classOf[ProducerRecord[String, String]])
+    when(kafkaWrapper.send(captor.capture())).thenReturn(null)
+
+    tweetHandler(status)
+
+    verify(kafkaWrapper, never()).send(any())
+  }
+
+  "All tweets from ignored authors" should "be ignored" in {
+    val uRLEntity = mock(classOf[URLEntity])
+    when(uRLEntity.getExpandedURL).thenReturn("http://anyurl.com")
+
+    val tweetHandler = captureTweetHandler()
+
+    val status = mock(classOf[Status])
+    val date = df.parse("01-01-2000 00:00:00")
+    when(status.getCreatedAt).thenReturn(date)
+    when(status.getURLEntities).thenReturn(Array[URLEntity](uRLEntity))
+    when(status.getId).thenReturn(1000l)
+    when(status.getText).thenReturn("some content")
+    when(status.isRetweet).thenReturn(false)
+    when(status.getLang).thenReturn("en")
+    val user = mock(classOf[User])
+    when(user.getScreenName).thenReturn("SpamAuthor")
     when(status.getUser).thenReturn(user)
 
     val captor: ArgumentCaptor[ProducerRecord[String, String]]  = ArgumentCaptor.forClass(classOf[ProducerRecord[String, String]])
