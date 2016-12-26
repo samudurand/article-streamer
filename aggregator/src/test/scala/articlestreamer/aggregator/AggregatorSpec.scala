@@ -80,6 +80,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     when(status.isRetweet).thenReturn(false)
     when(status.getLang).thenReturn("en")
     val user = mock(classOf[User])
+    when(user.getScreenName).thenReturn("max")
     when(status.getUser).thenReturn(user)
 
     val captor: ArgumentCaptor[ProducerRecord[String, String]]  = ArgumentCaptor.forClass(classOf[ProducerRecord[String, String]])
@@ -113,6 +114,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     when(status.getLang).thenReturn("en")
 
     val user = mock(classOf[User])
+    when(user.getScreenName).thenReturn("max")
     when(status.getUser).thenReturn(user)
 
     val captor: ArgumentCaptor[ProducerRecord[String, String]]  = ArgumentCaptor.forClass(classOf[ProducerRecord[String, String]])
@@ -142,6 +144,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     when(status.getLang).thenReturn("en")
 
     val user = mock(classOf[User])
+    when(user.getScreenName).thenReturn("max")
     when(status.getUser).thenReturn(user)
 
     val captor: ArgumentCaptor[ProducerRecord[String, String]]  = ArgumentCaptor.forClass(classOf[ProducerRecord[String, String]])
@@ -168,6 +171,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     when(status.isRetweet).thenReturn(true)
     when(status.getLang).thenReturn("en")
     val user = mock(classOf[User])
+    when(user.getScreenName).thenReturn("max")
     when(status.getUser).thenReturn(user)
 
     val captor: ArgumentCaptor[ProducerRecord[String, String]]  = ArgumentCaptor.forClass(classOf[ProducerRecord[String, String]])
@@ -193,7 +197,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     when(status.isRetweet).thenReturn(false)
     when(status.getLang).thenReturn("en")
     val user = mock(classOf[User])
-    when(user.getScreenName).thenReturn("SpamAuthor")
+    when(user.getScreenName).thenReturn("spamAuthor")
     when(status.getUser).thenReturn(user)
 
     val captor: ArgumentCaptor[ProducerRecord[String, String]]  = ArgumentCaptor.forClass(classOf[ProducerRecord[String, String]])
@@ -220,6 +224,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     when(status.getLang).thenReturn("fr")
 
     val user = mock(classOf[User])
+    when(user.getScreenName).thenReturn("max")
     when(status.getUser).thenReturn(user)
 
     val captor: ArgumentCaptor[ProducerRecord[String, String]]  = ArgumentCaptor.forClass(classOf[ProducerRecord[String, String]])

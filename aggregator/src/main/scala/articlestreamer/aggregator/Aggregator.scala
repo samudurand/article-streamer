@@ -29,7 +29,7 @@ class Aggregator(config: ConfigLoader,
                  urlStore: URLStoreService) extends CustomJsonFormats with TwitterStatusMethods with LazyLogging {
 
   private val topicManager = new HalfDayTopicManager(config)
-  private val ignoredAuthors = config.twitterConfig.ignoredAuthors
+  private val ignoredAuthors = config.twitterConfig.ignoredAuthors.map(username => username.toLowerCase)
 
   def run() = {
 
@@ -58,7 +58,7 @@ class Aggregator(config: ConfigLoader,
 
       if (status.isRetweet) {
         logger.warn(s"Tweet ${status.getId} ignored. Reason : 'Retweet' .")
-      } else if (ignoredAuthors.contains(status.getUser.getScreenName)) {
+      } else if (ignoredAuthors.contains(status.getUser.getScreenName.toLowerCase)) {
         logger.warn(s"Tweet ${status.getId} ignored. Reason : 'Ignored author' . Author : '${status.getUser.getScreenName.mkString}'")
       } else if (!status.containsEnglish) {
         logger.warn(s"Tweet ${status.getId} ignored. Reason : 'Not English' . Content : '${status.getText.mkString}'")
