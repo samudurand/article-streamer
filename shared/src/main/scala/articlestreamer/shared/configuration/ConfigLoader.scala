@@ -35,7 +35,9 @@ final case class TwitterAuthConfig(consumerKey: String,
   */
 final case class TwitterConfig(authConfig: TwitterAuthConfig,
                                searchConfig: TwitterSearchConfig,
-                               batchSize: Int, ignoredAuthors: List[String])
+                               batchSize: Int,
+                               ignoredAuthors: List[String],
+                               ignoredDomains: List[String])
 
 trait ConfigLoader extends LazyLogging with Serializable {
 
@@ -63,7 +65,8 @@ trait ConfigLoader extends LazyLogging with Serializable {
     twitterAuthConfig,
     twitterSearchConfig,
     appConfig.getInt("twitter.tweetsBatchSize"),
-    appConfig.getStringList("twitter.ignoredAuthors").toList)
+    appConfig.getStringList("twitter.ignoredAuthors").toList,
+    appConfig.getStringList("twitter.ignoredDomains").toList)
 
   val mysqlConfig = MysqlConfig(
     appConfig.getString("mysql.jdbcUrl"),

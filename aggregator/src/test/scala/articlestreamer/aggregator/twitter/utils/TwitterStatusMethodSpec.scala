@@ -30,7 +30,7 @@ class TwitterStatusMethodSpec extends BaseSpec with TwitterStatusMethods {
     val status = mock(classOf[Status])
     when(status.getURLEntities).thenReturn(urls)
 
-    status.getUsableLinks shouldBe Array(urlPage)
+    status.getUsableLinks(List()) shouldBe Array(urlPage)
   }
 
   "Status with only a page url" should "return a single URL" in {
@@ -40,7 +40,7 @@ class TwitterStatusMethodSpec extends BaseSpec with TwitterStatusMethods {
     val status = mock(classOf[Status])
     when(status.getURLEntities).thenReturn(urls)
 
-    status.getUsableLinks shouldBe Array(urlPage)
+    status.getUsableLinks(List()) shouldBe Array(urlPage)
   }
 
   "Status with only media urls" should "return an empty list" in {
@@ -51,7 +51,7 @@ class TwitterStatusMethodSpec extends BaseSpec with TwitterStatusMethods {
     val status = mock(classOf[Status])
     when(status.getURLEntities).thenReturn(urls)
 
-    status.getUsableLinks shouldBe empty
+    status.getUsableLinks(List()) shouldBe empty
   }
 
   "Status with only social networks urls" should "return empty list" in {
@@ -62,13 +62,22 @@ class TwitterStatusMethodSpec extends BaseSpec with TwitterStatusMethods {
     val status = mock(classOf[Status])
     when(status.getURLEntities).thenReturn(urls)
 
-    status.getUsableLinks shouldBe empty
+    status.getUsableLinks(List()) shouldBe empty
+  }
+
+  "Status with only urls from ignored domains" should "return empty list" in {
+    val adsUrl = buildEntity("https://adsDomain.com/62648/photos/352127.62868648/1222842638/?type=3&theater")
+
+    val status = mock(classOf[Status])
+    when(status.getURLEntities).thenReturn(Array(adsUrl))
+
+    status.getUsableLinks(List("otherUrl", "adsDomain.com")) shouldBe empty
   }
 
   "Status with no urls" should "return empty list" in {
     val status = mock(classOf[Status])
     when(status.getURLEntities).thenReturn(Array[URLEntity]())
-    status.getUsableLinks shouldBe empty
+    status.getUsableLinks(List()) shouldBe empty
   }
 
   private def buildEntity(url: String): URLEntity = {

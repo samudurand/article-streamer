@@ -9,32 +9,52 @@ import twitter4j.URLEntity
   */
 class URLEntitiesMethodsSpec extends BaseSpec with URLEntitiesMethods {
 
+  "Domain from HTTP URLEntity" should "be retrievable" in {
+    val httpUrl = buildEntity("http://thenextweb.com/e-dash-display?source=twitter")
+    httpUrl.domain shouldBe "thenextweb.com"
+  }
+
+  "Domain from HTTPS URLEntity" should "be retrievable" in {
+    val httpsUrl = buildEntity("https://thenextweb.com/e-dash-display?source=twitter")
+    httpsUrl.domain shouldBe "thenextweb.com"
+  }
+
+  "Domain from other protocol URLEntity" should "not be retrievable" in {
+    val ftpUrl = buildEntity("ftp://thenextweb.com/e-dash-display?source=twitter")
+    ftpUrl.domain shouldBe ""
+  }
+
+  "Domain from weirdly formatted URLEntity" should "not be retrievable" in {
+    val weirdUrl = buildEntity("http://thenextweb.com\\e-dash-display?source=twitter")
+    weirdUrl.domain shouldBe ""
+  }
+
   "URL Entity" should "not contain an image url" in {
     val urlPage = buildEntity("http://thenextweb.com/e-dash-display")
     urlPage.isImageUrl shouldBe false
   }
 
-  "URL Entity" should "contain an image url" in {
+  it should "contain an image url" in {
     val urlImg = buildEntity("https://pbs.twimg.com/1234.jpeg")
     urlImg.isImageUrl shouldBe true
   }
 
-  "URL Entity" should "not contain a video url" in {
+  it should "not contain a video url" in {
     val urlPage = buildEntity("http://thenextweb.com/e-dash-display")
     urlPage.isVideoUrl shouldBe false
   }
 
-  "URL Entity" should "contain a video url" in {
+  it should "contain a video url" in {
     val urlVideo = buildEntity("https://pbs.twimg.com/1234.mov")
     urlVideo.isVideoUrl shouldBe true
   }
 
-  "URL Entity" should "not contain a media url" in {
+  it should "not contain a media url" in {
     val urlPage = buildEntity("http://thenextweb.com/e-dash-display")
     urlPage.isMediaUrl shouldBe false
   }
 
-  "URL Entity" should "contain a media url" in {
+  it should "contain a media url" in {
     val urlVideo = buildEntity("https://pbs.twimg.com/1234.mp4")
     val urlImg = buildEntity("https://pbs.twimg.com/1234.jpg")
 
@@ -42,17 +62,17 @@ class URLEntitiesMethodsSpec extends BaseSpec with URLEntitiesMethods {
     urlImg.isMediaUrl shouldBe true
   }
 
-  "URL Entity" should "contain a social network url" in {
+  it should "contain a social network url" in {
     val urlPage = buildEntity("http://www.facebook.com/62648/photos/352127.62868648/1222842638/?type=3&theater")
     urlPage.isSocialNetworkURL shouldBe true
   }
 
-  "URL Entity" should "contain a social network secured url" in {
+  it should "contain a social network secured url" in {
     val urlPage = buildEntity("https://www.facebook.com/62648/photos/352127.62868648/1222842638/?type=3&theater")
     urlPage.isSocialNetworkURL shouldBe true
   }
 
-  "URL Entity" should "not contain a social network url" in {
+  it should "not contain a social network url" in {
     val urlPage = buildEntity("http://thenextweb.com/e-dash-display")
     urlPage.isSocialNetworkURL shouldBe false
   }

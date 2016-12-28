@@ -17,7 +17,7 @@ trait TwitterStatusMethods extends URLEntitiesMethods {
       * Identify all links in this Status that could be links to articles.
       * This excludes any social network link as well as media urls.
       */
-    def getUsableLinks: Array[URLEntity] = {
+    def getUsableLinks(ignoredDomains: List[String]): Array[URLEntity] = {
 
       val links = status.getURLEntities
 
@@ -27,7 +27,7 @@ trait TwitterStatusMethods extends URLEntitiesMethods {
       }
 
       // At least one of those links isn't a media
-      links.filterNot(link => link.isMediaUrl || link.isSocialNetworkURL)
+      links.filterNot(link => link.isMediaUrl || link.isSocialNetworkURL || ignoredDomains.contains(link.domain))
     }
 
   }

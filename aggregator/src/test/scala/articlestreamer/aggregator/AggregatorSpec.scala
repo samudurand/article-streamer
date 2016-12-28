@@ -29,7 +29,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
   class TestConfig extends ConfigLoader
 
   val config = new TestConfig() {
-    override val twitterConfig = TwitterConfig(null, null, 1, List("SpamAuthor"))
+    override val twitterConfig = TwitterConfig(null, null, 1, List("SpamAuthor"), List("AdsDomain"))
   }
 
   val topicManager = new HalfDayTopicManager(config)

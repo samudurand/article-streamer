@@ -63,7 +63,7 @@ class Aggregator(config: ConfigLoader,
       } else if (!status.containsEnglish) {
         logger.warn(s"Tweet ${status.getId} ignored. Reason : 'Not English' . Content : '${status.getText.mkString}'")
       } else {
-        val usableLinks = status.getUsableLinks
+        val usableLinks = status.getUsableLinks(config.twitterConfig.ignoredDomains)
         if (usableLinks.isEmpty) {
           logger.warn(s"Tweet ${status.getId} ignored. Reason : 'Not Potential Article' . Content : '${status.getText.mkString}'")
         } else {
