@@ -1,4 +1,21 @@
-# article-streamer
+# Aggregator
+
+At the moment the Aggregator only gets his data from Twitter with a single focus : recovering tweets referring to articles or other learning resources about Apache Spark. 
+The goal is to eventually aggregates articles from several sources such as (Professional) social networks (Linkedin, Twitter), blogs, and any other potential article source.
+
+## Architecture
+
+Coming soon
+
+## Process
+
+Only Twitter is currently supported. Using [Twitter4J]() the aggregator streams all tweets containing the tag *#Spark* and apply the following steps to each tweet : 
+
+Need to replace by a schema 
+1. Is retweet ?
+2. Is in English ?
+3. Is from an ignored Author
+4. Contains at least one usable link* (not a link to Twitter, another social medias, an unusable media (image, gif...))
 
 ## Development
 

@@ -45,8 +45,7 @@ class TwitterStatusMethodSpec extends BaseSpec with TwitterStatusMethods {
 
   "Status with only media urls" should "return an empty list" in {
     val urlImg = buildEntity("https://pbs.twimg.com/1234.jpeg")
-    val urlVideo = buildEntity("https://pbs.twimg.com/34567.mov")
-    val urls = Array(urlVideo, urlImg)
+    val urls = Array(urlImg)
 
     val status = mock(classOf[Status])
     when(status.getURLEntities).thenReturn(urls)

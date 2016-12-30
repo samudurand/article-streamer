@@ -39,8 +39,9 @@ trait URLEntitiesMethods {
       videoTypes.exists(urlEntity.getExpandedURL.endsWith(_))
     }
 
-    def isMediaUrl: Boolean = {
-      urlEntity.isImageUrl || urlEntity.isVideoUrl
+    def isUnusableMediaUrl: Boolean = {
+      // Currently accepting videos, might reject them in the future
+      urlEntity.isImageUrl
     }
 
     def isSocialNetworkURL: Boolean = {

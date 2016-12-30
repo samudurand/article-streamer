@@ -27,7 +27,7 @@ trait TwitterStatusMethods extends URLEntitiesMethods {
       }
 
       // At least one of those links isn't a media
-      links.filterNot(link => link.isMediaUrl || link.isSocialNetworkURL || ignoredDomains.contains(link.domain))
+      links.filterNot(link => link.isUnusableMediaUrl || link.isSocialNetworkURL || ignoredDomains.contains(link.domain))
     }
 
   }

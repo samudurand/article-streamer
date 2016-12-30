@@ -58,10 +58,10 @@ class Aggregator(config: ConfigLoader,
 
       if (status.isRetweet) {
         logger.warn(s"Tweet ${status.getId} ignored. Reason : 'Retweet' .")
-      } else if (ignoredAuthors.contains(status.getUser.getScreenName.toLowerCase)) {
-        logger.warn(s"Tweet ${status.getId} ignored. Reason : 'Ignored author' . Author : '${status.getUser.getScreenName.mkString}'")
       } else if (!status.containsEnglish) {
         logger.warn(s"Tweet ${status.getId} ignored. Reason : 'Not English' . Content : '${status.getText.mkString}'")
+      } else if (ignoredAuthors.contains(status.getUser.getScreenName.toLowerCase)) {
+        logger.warn(s"Tweet ${status.getId} ignored. Reason : 'Ignored author' . Author : '${status.getUser.getScreenName.mkString}'")
       } else {
         val usableLinks = status.getUsableLinks(config.twitterConfig.ignoredDomains)
         if (usableLinks.isEmpty) {
