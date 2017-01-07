@@ -7,7 +7,7 @@ import java.util.concurrent
 
 import articlestreamer.processor.kafka.KafkaConsumerWrapperSpec.prepareRecords
 import articlestreamer.shared.BaseSpec
-import articlestreamer.shared.configuration.ConfigLoader
+import articlestreamer.shared.configuration.{ConfigLoader, TwitterConfig}
 import articlestreamer.shared.kafka.{DualTopicManager, KafkaFactory}
 import articlestreamer.shared.marshalling.CustomJsonFormats
 import articlestreamer.shared.model.{TweetAuthor, TwitterArticle}
@@ -30,7 +30,8 @@ import scala.io.Source
 class ScoreUpdaterSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats {
 
   class TestConfig extends ConfigLoader {
-    override val tweetsBatchSize: Int = 1
+    val tconfig = TwitterConfig(null, null, 1, null, null)
+    override val twitterConfig: TwitterConfig = tconfig
     override val kafkaMaxAttempts: Int = 2
   }
 

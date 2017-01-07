@@ -55,10 +55,7 @@ class URLEntitiesMethodsSpec extends BaseSpec with URLEntitiesMethods {
   }
 
   it should "contain a media url" in {
-    val urlVideo = buildEntity("https://pbs.twimg.com/1234.mp4")
     val urlImg = buildEntity("https://pbs.twimg.com/1234.jpg")
-
-    urlVideo.isUnusableMediaUrl shouldBe true
     urlImg.isUnusableMediaUrl shouldBe true
   }
 
