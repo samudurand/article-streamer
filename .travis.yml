@@ -1,2 +1,3 @@
+language: scala
 script:
-- bundle exec sbt test-all
+- sbt test-all
