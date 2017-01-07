@@ -51,7 +51,7 @@ class ScoreUpdater(config: ConfigLoader,
 
     // Grouped to fit twitter limitations
     articles
-      .grouped(config.tweetsBatchSize)
+      .grouped(config.twitterConfig.batchSize)
       .flatMap { batch =>
         try {
           val mappedBatch = batch.map( article => (article.originalId.toLong, article)).toMap
