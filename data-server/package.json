@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "chai": "*",
+    "istanbul": "*",
     "mocha": "*",
     "sequelize-mock": "^0.6.1",
     "sqlite3": "^3.1.8"
@@ -25,7 +26,8 @@
     "start": "nodemon server.js",
     "prestart": "npm run lint",
     "pretest": "npm run lint",
-    "test": "mocha -c"
+    "test": "istanbul cover node_modules/.bin/_mocha",
+    "check-coverage": "istanbul check-coverage"
   },
   "author": "Samuel durand",
   "license": "MIT"
