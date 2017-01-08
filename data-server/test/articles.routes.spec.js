@@ -2,8 +2,9 @@ require('chai').should();
 const server = require('./server');
 
 describe('Articles API', function() {
+
   describe('Access Control', function() {
-    it('should provide an option endpoint with Access Control headers', function(done) {
+    it('provides an option endpoint with Access Control headers', function(done) {
       server.inject({method: 'OPTIONS', url: '/any'}, function(response) {
         try {
           response.statusCode.should.equal(200);
@@ -16,5 +17,17 @@ describe('Articles API', function() {
       });
     });
   });
+
+  // describe('Status', function() {
+  //   it('get pending articles', function(done) {
+  //     server.inject({method: 'GET', url: '/article/pending'}, function(response) {
+  //       try {
+  //         response.statusCode.should.equal(200);
+  //         done();
+  //       } catch (err) { done(err); }
+  //     });
+  //   });
+  // });
+
 });
 

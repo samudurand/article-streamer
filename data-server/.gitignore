@@ -4,3 +4,4 @@
 /config/local.json
 /docker-env.list
 /npm-debug.log
+/test/database.sqlite

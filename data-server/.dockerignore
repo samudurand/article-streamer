@@ -3,3 +3,4 @@ config/local.json
 *.iml
 node_modules
 docker-env.list
+/test/
