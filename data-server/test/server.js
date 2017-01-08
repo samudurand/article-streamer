@@ -1,8 +1,5 @@
 const Hapi = require('hapi');
-const Sequelize = require('sequelize');
-
-// const sequelize = new SequelizeMock();
-// sequelize.authenticate = function () { return Promise.resolve(); };
+const sequelize = require('./test-sequelize');
 
 const server = new Hapi.Server();
 server.connection();
@@ -13,13 +10,7 @@ server.register([
       {
         name: 'sqlite',
         models: ['./models/**/*.js'],
-        sequelize: new Sequelize('database', 'username', 'password', {
-          dialect: 'sqlite',
-          define: {
-            timestamps: false
-          },
-          storage: __dirname + '/database.sqlite'
-        }),
+        sequelize: sequelize,
         sync: true,
         forceSync: false
       }
