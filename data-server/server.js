@@ -43,7 +43,7 @@ server.register([
     // Load the routes
     register: require('hapi-router'),
     options: {
-      routes: 'routes/**/*.route.js' // uses glob to include files
+      routes: 'routes/**/*.route.js'
     }
   }
 ], {}, (err) => {
