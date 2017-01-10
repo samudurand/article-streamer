@@ -181,7 +181,7 @@ describe('Articles API', function () {
         });
       });
 
-      it('fail to delete not existing article', (done) => {
+      it('fail to delete article if database down', (done) => {
         fs.rename(originalDBName, tempDBName, () => {
           server.inject({method: 'DELETE', url: '/article/' + articlePending1.id}, function (response) {
             try {
