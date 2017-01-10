@@ -1,6 +1,17 @@
 require('chai').should();
+const fs = require('fs');
 const server = require('./server');
 const sequelize = require('./test-sequelize');
+
+const originalDBName = './test/database.sqlite';
+const tempDBName = './test/database-temp.sqlite';
+
+const articlePending1 = require('./data/article-pending-1.json');
+const articlePending2 = require('./data/article-pending-2.json');
+const articleAccepted1 = require('./data/article-accepted-1.json');
+const articleAccepted2 = require('./data/article-accepted-2.json');
+const articleRejected1 = require('./data/article-rejected-1.json');
+const articleRejected2 = require('./data/article-rejected-2.json');
 
 describe('Articles API', function () {
 
@@ -23,66 +34,6 @@ describe('Articles API', function () {
 
   describe('Status', function () {
 
-    const articlePending1 = {
-      'id': '27193e76-b9cb-406d-963f-a82823c599fc',
-      'originalId': '816643621646663680',
-      'publicationDate': '2017-01-04T13:53:06.000Z',
-      'content': 'Apache #Hadoop vs #Apache #Spark: Two Popular #BigData Frameworks Compared. ?? https://t.co/vKJEnRQkyx\n#IoT… https://t.co/mXwJIhSadB',
-      'author': 8742802,
-      'score': 0,
-      'status': 0
-    };
-
-    const articlePending2 = {
-      'id': '613b68d3-d50c-44fd-b3d6-db5c723ee039',
-      'originalId': '816646637711921152',
-      'publicationDate': '2017-01-04T14:05:05.000Z',
-      'content': '#BigData trends 2k17\n#MachineLearning #DataLakes #Hadoop vs #Spark\nhttps://t.co/gxMF2yrN92\n#BigDataAnalytics\nvisit: https://t.co/erDmOmaaNS',
-      'author': 3040662624,
-      'score': 2,
-      'status': 0
-    };
-
-    const articleAccepted1 = {
-      'id': '208e80db-73eb-4be3-8f7b-0219a17314d6',
-      'originalId': '816678724007436288',
-      'publicationDate': '2017-01-04T16:12:35.000Z',
-      'content': 'Databricks and Apache #Spark Year in Review https://t.co/5rC2tlyBwD',
-      'author': 16672776,
-      'score': 0,
-      'status': 1
-    };
-
-    const articleAccepted2 = {
-      'id': 'cc67656d-de9c-4bd9-816b-55d43023a9e4',
-      'originalId': '816695699999956992',
-      'publicationDate': '2017-01-04T17:20:03.000Z',
-      'content': '#Bigdata and business intelligence #trends for 2017 https://t.co/dlYVET3PMl #machinelearning #hadoop #Spark https://t.co/jXdCZOUgZ5',
-      'author': 2153053644,
-      'score': 117,
-      'status': 1
-    };
-
-    const articleRejected1 = {
-      'id': 'd2447696-56df-4474-86fa-16ca039b4a38',
-      'originalId': '816683212042866689',
-      'publicationDate': '2017-01-04T16:30:25.000Z',
-      'content': 'Centizen is hiring in Beaverton, OR #job #nosql #spark https://t.co/NkoLIf65ck',
-      'author': 201971646,
-      'score': 0,
-      'status': -1
-    };
-
-    const articleRejected2 = {
-      'id': 'c0c35fd1-6e25-4695-b9dc-a16ef6e7b6fb',
-      'originalId': '816694701533249536',
-      'publicationDate': '2017-01-04T17:16:04.000Z',
-      'content': 'It was mint to be! Come check out the 17 Chevy Spark??#chevy #chevrolet #spark #mint #minttobe #haha #testdrive… https://t.co/SUSKCpJ8d4 https://t.co/s0vEax2XBJ',
-      'author': 243695491,
-      'score': 100,
-      'status': -1
-    };
-
     before(function (done) {
       cleanupDb(done);
     });
@@ -96,7 +47,17 @@ describe('Articles API', function () {
     });
 
     afterEach(function (done) {
-      cleanupDb(done);
+      // If database name was changed to provoke database errors resets it
+      fs.access(originalDBName, fs.constants.F_OK, (err) => {
+        if (!err) {
+          fs.rename(tempDBName, originalDBName, () => {
+            cleanupDb(done);
+          });
+        } else {
+          cleanupDb(done);
+        }
+      });
+
     });
 
     it('gets all pending articles', (done) => {
@@ -144,9 +105,44 @@ describe('Articles API', function () {
       });
     });
 
+    it('change status from pending to accepted', (done) => {
+      server.inject({method: 'PUT', url: '/article/' + articlePending1.id + '/status/1'}, function (response) {
+        try {
+          response.statusCode.should.equal(204);
+          done();
+        } catch (err) {
+          done(err);
+        }
+      });
+    });
+
+    it('fail to change status for non existing article', (done) => {
+      server.inject({method: 'PUT', url: '/article/00000000-0000-0000-0000-000000000000/status/1'}, function (response) {
+        try {
+          response.statusCode.should.equal(500);
+          done();
+        } catch (err) {
+          done(err);
+        }
+      });
+    });
+
+    it('fail to change status if database unreachable', (done) => {
+      fs.rename(originalDBName, tempDBName, () => {
+        server.inject({method: 'PUT', url: '/article/' + articlePending1.id + '/status/1'}, function (response) {
+          try {
+            response.statusCode.should.equal(500);
+            done();
+          } catch (err) {
+            done(err);
+          }
+        });
+      });
+    });
+
     function cleanupDb(callback) {
       const Article = sequelize.model('article');
-      Article.truncate().then(() => callback());
+      Article.truncate().then(() => callback(), () => callback());
     }
 
   });
