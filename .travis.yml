@@ -4,6 +4,6 @@ jdk:
 node_js: "7.0.0"
 install: "npm install --prefix data-server"
 script:
-  - npm test
+  - npm test --prefix data-server
 #script:
 #  - sbt test-all
