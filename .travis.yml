@@ -2,7 +2,7 @@ language: scala
 jdk:
   - oraclejdk8
 node_js: "7.0.0"
-install: "npm install"
+install: "npm install --prefix data-server"
 script:
   - npm test
 #script:
