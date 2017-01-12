@@ -7,25 +7,25 @@ const Status = {
   REJECTED: -1
 };
 
+function withAccessControlHeaders(reply) {
+  return reply
+    .header('Access-Control-Allow-Origin', '*')
+    .header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
+    .header('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
+    .header('Access-Control-Allow-Credentials', true);
+}
+
 function getByStatus(request, reply, status, order) {
   const Article = request.getDb().getModel(ARTICLE_MODEL);
   return Article.findAll({where: {status: status}, order: order})
     .then(
       (articles) => {
-        return reply(articles)
-          .header('Access-Control-Allow-Origin', '*')
-          .header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
-          .header('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
-          .header('Access-Control-Allow-Credentials', true)
+        return withAccessControlHeaders(reply(articles))
           .code(200);
       },
       (err) => {
         logger.error('Cannot retrieve articles.', err);
-        return reply()
-          .header('Access-Control-Allow-Origin', '*')
-          .header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
-          .header('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
-          .header('Access-Control-Allow-Credentials', true)
+        return withAccessControlHeaders(reply())
           .code(500);
       });
 }
@@ -35,11 +35,7 @@ module.exports = [
     method: 'OPTIONS',
     path: '/{path*}',
     handler: function (request, reply) {
-      return reply()
-        .header('Access-Control-Allow-Origin', '*')
-        .header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
-        .header('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
-        .header('Access-Control-Allow-Credentials', true)
+      return withAccessControlHeaders(reply())
         .code(200);
     }
   },
@@ -76,29 +72,17 @@ module.exports = [
         .then(
           (count) => {
             if (count == 1) {
-              return reply({})
-                .header('Access-Control-Allow-Origin', '*')
-                .header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
-                .header('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
-                .header('Access-Control-Allow-Credentials', true)
+              return withAccessControlHeaders(reply({}))
                 .code(204);
             } else {
               logger.error('Failed to update status of article [' + id + ']');
-              return reply({error: 'affected [' + count + '] records'})
-                .header('Access-Control-Allow-Origin', '*')
-                .header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
-                .header('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
-                .header('Access-Control-Allow-Credentials', true)
+              return withAccessControlHeaders(reply({error: 'affected [' + count + '] records'}))
                 .code(500);
             }
           },
           (err) => {
             logger.error('Failed to update status of article', err);
-            return reply()
-              .header('Access-Control-Allow-Origin', '*')
-              .header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
-              .header('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
-              .header('Access-Control-Allow-Credentials', true)
+            return withAccessControlHeaders(reply())
               .code(500);
           }
         );
@@ -124,29 +108,17 @@ module.exports = [
         .then(
           (count) => {
             if (count == 1) {
-              return reply({})
-                .header('Access-Control-Allow-Origin', '*')
-                .header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
-                .header('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
-                .header('Access-Control-Allow-Credentials', true)
+              return withAccessControlHeaders(reply({}))
                 .code(204);
             } else {
               logger.error('Could not delete article [' + id + ']');
-              return reply({error: 'affected [' + count + '] records'})
-                .header('Access-Control-Allow-Origin', '*')
-                .header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
-                .header('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
-                .header('Access-Control-Allow-Credentials', true)
+              return withAccessControlHeaders(reply({error: 'affected [' + count + '] records'}))
                 .code(500);
             }
           },
           (err) => {
             logger.error('Could not delete article [' + id + ']', err);
-            return reply()
-              .header('Access-Control-Allow-Origin', '*')
-              .header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
-              .header('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
-              .header('Access-Control-Allow-Credentials', true)
+            return withAccessControlHeaders(reply())
               .code(500);
           }
         );
