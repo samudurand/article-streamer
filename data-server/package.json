@@ -25,6 +25,7 @@
     "lint": "eslint .",
     "start": "nodemon server.js",
     "prestart": "npm run lint",
+    "pretest": "npm run lint",
     "test": "istanbul cover node_modules/.bin/_mocha",
     "check-coverage": "istanbul check-coverage"
   },
