@@ -1,5 +1,15 @@
 language: scala
 jdk:
   - oraclejdk8
+node_js: "7.0.0"
+before_install:
+  - wget https://raw.githubusercontent.com/creationix/nvm/v0.31.0/nvm.sh -O ~/.nvm/nvm.sh
+  - source ~/.nvm/nvm.sh
+  - nvm install 7
+  - node --version
+install: "npm install --prefix data-server"
 script:
-  - sbt test-all
+  - npm test --prefix data-server
+  - npm run check-coverage --prefix data-server
+#script:
+#  - sbt test-all
