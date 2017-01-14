@@ -64,7 +64,8 @@
       reject: function (id) {
         const vm = this;
         ArticleService.setState(vm, id, -1).then(
-          () => vm.$data.articles.shift());
+          () => getAccepted(vm).then(
+            (articles) => vm.articles = articles));
       },
       backToPending: function (id) {
         const vm = this;
