@@ -76,7 +76,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     when(status.getCreatedAt).thenReturn(date)
     when(status.getURLEntities).thenReturn(List[URLEntity](uRLEntity).toArray)
     when(status.getId).thenReturn(1000l)
-    when(status.getText).thenReturn("some content")
+    when(status.getText).thenReturn("some content with #Spark inside")
     when(status.isRetweet).thenReturn(false)
     when(status.getLang).thenReturn("en")
     val user = mock(classOf[User])
