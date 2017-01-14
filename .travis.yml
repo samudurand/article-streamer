@@ -11,5 +11,4 @@ install: "npm install --prefix data-server"
 script:
   - npm test --prefix data-server
   - npm run check-coverage --prefix data-server
-#script:
-#  - sbt test-all
+  - sbt test-all
