@@ -7,15 +7,15 @@ import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.JavaConversions._
 
-final case class TwitterSearchConfig(mainTag: String,
-                               minimumScore: Int,
-                               relatedTags: List[String],
-                               articleCloseWords: List[String],
-                               articleRelatedWords: List[String],
-                               subjectCloseWords: List[String],
-                               subjectRelatedWords: List[String],
-                               articleUnrelatedWords: List[String],
-                               subjectUnrelatedWords: List[String])
+final case class TwitterSearchConfig(tags: List[String],
+                                     minimumScore: Int,
+                                     relatedTags: List[String],
+                                     articleCloseWords: List[String],
+                                     articleRelatedWords: List[String],
+                                     subjectCloseWords: List[String],
+                                     subjectRelatedWords: List[String],
+                                     articleUnrelatedWords: List[String],
+                                     subjectUnrelatedWords: List[String])
 
 final case class MysqlConfig(jdbcUrl: String, user: String, password: String, driver: String)
 
@@ -51,7 +51,7 @@ trait ConfigLoader extends LazyLogging with Serializable {
   )
   private val twitterPath = "twitter.search"
   private val twitterSearchConfig = TwitterSearchConfig(
-    appConfig.getString(s"$twitterPath.tagToTrack"),
+    appConfig.getStringList(s"$twitterPath.tagsToTrack").toList,
     appConfig.getInt(s"$twitterPath.minimumScore"),
     appConfig.getStringList(s"$twitterPath.relatedTags").toList,
     appConfig.getStringList(s"$twitterPath.articleCloseWords").toList,

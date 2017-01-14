@@ -23,7 +23,7 @@ case class DefaultTwitterStreamer(config: ConfigLoader,
   override def startStreaming(): Unit = {
     logger.info("Twitter Streamer : Starting streaming")
     stream.addListener(statusListener)
-    stream.filter(new FilterQuery().track(config.twitterConfig.searchConfig.mainTag))
+    stream.filter(new FilterQuery().track(config.twitterConfig.searchConfig.tags:_*))
     logger.info("Twitter Streamer : Streaming started")
   }
 
