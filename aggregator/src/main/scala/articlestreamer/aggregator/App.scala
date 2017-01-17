@@ -25,6 +25,7 @@ object App extends App {
   lazy val scoreCalculator = wire[NaiveTwitterScoreCalculator]
   lazy val redisFactory = wire[DefaultRedisClientFactory]
   lazy val urlStore = wire[RedisURLStoreService]
+  lazy val http = scalaj.http.Http
 
   lazy val scheduler = StdSchedulerFactory.getDefaultScheduler
 

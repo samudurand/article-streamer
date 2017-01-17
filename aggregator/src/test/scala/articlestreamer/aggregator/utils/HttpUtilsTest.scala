@@ -1,7 +1,6 @@
 package articlestreamer.aggregator.utils
 
 import articlestreamer.shared.BaseSpec
-import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito.{mock, when}
 import org.scalatest.BeforeAndAfter
@@ -21,7 +20,19 @@ class HttpUtilsTest extends BaseSpec with BeforeAndAfter {
     httpUtils = new HttpUtils(http)
   }
 
-  "An URL with a single redirections" should "be followed till the end" in {
+  "A direct URL" should "be simply returned" in {
+    val simpleResponse = new HttpResponse[String]("", 200, Map())
+    val request = mock(classOf[HttpRequest])
+    when(request.options(any[HttpOption](), any())).thenReturn(request)
+    when(request.asString).thenReturn(simpleResponse)
+    when(http.apply(anyString())).thenReturn(request)
+
+    val endUrl = httpUtils.getEndUrl("http://noredirection")
+
+    endUrl shouldBe Some("http://noredirection")
+  }
+
+  "An URL with a single redirection" should "be followed till the end" in {
     val simpleResponse = new HttpResponse[String]("", 200, Map())
     val redirectResponse = new HttpResponse[String]("", 304, Map("Location" -> IndexedSeq("http://final")))
     val request = mock(classOf[HttpRequest])
@@ -31,7 +42,37 @@ class HttpUtilsTest extends BaseSpec with BeforeAndAfter {
 
     val endUrl = httpUtils.getEndUrl("http://redirection")
 
-    endUrl shouldBe "http://final"
+    endUrl shouldBe Some("http://final")
+  }
+
+  "An URL with multiple redirection" should "be followed till the end" in {
+    val simpleResponse = new HttpResponse[String]("", 200, Map())
+    val firstRedirectResponse = new HttpResponse[String]("", 304, Map("Location" -> IndexedSeq("http://firstRedirect")))
+    val secondRedirectResponse = new HttpResponse[String]("", 304, Map("Location" -> IndexedSeq("http://secondRedirect")))
+    val thirdRedirectResponse = new HttpResponse[String]("", 304, Map("Location" -> IndexedSeq("http://final")))
+    val request = mock(classOf[HttpRequest])
+    when(request.options(any[HttpOption](), any())).thenReturn(request)
+    when(request.asString).thenReturn(firstRedirectResponse, secondRedirectResponse, thirdRedirectResponse, simpleResponse)
+    when(http.apply(anyString())).thenReturn(request)
+
+    val endUrl = httpUtils.getEndUrl("http://redirection")
+
+    endUrl shouldBe Some("http://final")
+  }
+
+  "An URL with multiple redirection ending on error" should "be followed till the end" in {
+    val simpleResponse = new HttpResponse[String]("", 200, Map())
+    val firstRedirectResponse = new HttpResponse[String]("", 304, Map("Location" -> IndexedSeq("http://firstRedirect")))
+    val secondRedirectResponse = new HttpResponse[String]("", 304, Map("Location" -> IndexedSeq("http://secondRedirect")))
+    val thirdRedirectResponse = new HttpResponse[String]("", 400, Map())
+    val request = mock(classOf[HttpRequest])
+    when(request.options(any[HttpOption](), any())).thenReturn(request)
+    when(request.asString).thenReturn(firstRedirectResponse, secondRedirectResponse, thirdRedirectResponse, simpleResponse)
+    when(http.apply(anyString())).thenReturn(request)
+
+    val endUrl = httpUtils.getEndUrl("http://redirection")
+
+    endUrl shouldBe None
   }
 
 }

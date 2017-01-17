@@ -21,6 +21,8 @@ import org.quartz.impl.StdSchedulerFactory
 import org.scalatest.BeforeAndAfter
 import twitter4j.{Status, URLEntity, User}
 
+import scalaj.http.Http
+
 class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats {
 
   val df: SimpleDateFormat = new SimpleDateFormat(dformat)
@@ -55,7 +57,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     val factory = mock(classOf[DefaultTwitterStreamerFactory])
     when(factory.getStreamer(any(), any(), any())).thenReturn(streamer)
 
-    val aggregator = new Aggregator(config, kafkaWrapper, scheduler, scoreCalculator, factory, urlStore)
+    val aggregator = new Aggregator(Http, config, kafkaWrapper, scheduler, scoreCalculator, factory, urlStore)
     aggregator.run()
 
     verify(streamer, times(1)).startStreaming()
@@ -240,7 +242,7 @@ class AggregatorSpec extends BaseSpec with BeforeAndAfter with CustomJsonFormats
     val factory = mock(classOf[DefaultTwitterStreamerFactory])
     when(factory.getStreamer(any(), captor.capture(), any())).thenReturn(streamer)
 
-    val aggregator = new Aggregator(config, kafkaWrapper, scheduler, scoreCalculator, factory, urlStore)
+    val aggregator = new Aggregator(Http, config, kafkaWrapper, scheduler, scoreCalculator, factory, urlStore)
     aggregator.run()
     captor.getValue()
   }

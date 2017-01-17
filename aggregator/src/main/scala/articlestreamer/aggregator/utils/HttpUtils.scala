@@ -1,23 +1,35 @@
 package articlestreamer.aggregator.utils
 
-import scalaj.http.{BaseHttp, HttpOptions, HttpResponse}
+import com.typesafe.scalalogging.LazyLogging
 
-class HttpUtils(http: BaseHttp) {
+import scalaj.http.{BaseHttp, HttpOptions, HttpRequest, HttpResponse}
+
+class HttpUtils(http: BaseHttp) extends LazyLogging {
 
   /**
     * Follows a redirection link in a recursive manner until reaching the final URL
     * @param link original URL
-    * @return the final URL reached
+    * @return the final URL reached or None if an error code was returned on the way
     */
-  def getEndUrl(link: String): String = {
+  def getEndUrl(link: String): Option[String] = {
 
-    def getNextUrl(link: String): String = {
-      val response: HttpResponse[String] = http(link).options(HttpOptions.followRedirects(false)).asString
-      val redirectUrl = response.header("Location")
-      if (isRedirectCode(response.code) && redirectUrl.isDefined && redirectUrl.get.trim().nonEmpty) {
-        getNextUrl(redirectUrl.get)
-      } else {
-        link
+    def getNextUrl(link: String): Option[String] = {
+      val request: HttpRequest = http(link).options(HttpOptions.followRedirects(false))
+      try {
+        val response = request.asString
+        val redirectUrl = response.header("Location")
+        val responseCode = response.code
+        if (responseCode >= 400) {
+          None
+        } else if (isRedirectCode(responseCode) && redirectUrl.isDefined && redirectUrl.get.trim().nonEmpty) {
+          getNextUrl(redirectUrl.get)
+        } else {
+          Some(link)
+        }
+      } catch {
+        case ex: Throwable =>
+          logger.warn(s"Exception when trying to follow link $link")
+          None
       }
     }
 
@@ -26,6 +38,14 @@ class HttpUtils(http: BaseHttp) {
 
   def isRedirectCode(code: Int): Boolean = {
     code >= 300 && code < 400
+  }
+
+  /**
+    * Find out very naively if a link is likely to be a shortlink
+    * TODO at the moment only based on link length
+    */
+  def isPotentialShortLink(link: String): Boolean = {
+    link.length < 50
   }
 
 }
