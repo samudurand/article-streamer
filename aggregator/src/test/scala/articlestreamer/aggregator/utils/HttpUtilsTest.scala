@@ -75,4 +75,15 @@ class HttpUtilsTest extends BaseSpec with BeforeAndAfter {
     endUrl shouldBe None
   }
 
+  "An HTTP code" should "be identified properly as redirection code" in {
+    httpUtils.isRedirectCode(304) shouldBe true
+    httpUtils.isRedirectCode(200) shouldBe false
+    httpUtils.isRedirectCode(500) shouldBe false
+  }
+
+  "An link that looks like a shortlink" should "be identified as potential shortlink" in {
+    httpUtils.isPotentialShortLink("http://shortlink") shouldBe true
+    httpUtils.isPotentialShortLink("http://linktoolongtobeqshortlink.com?param2=123456") shouldBe false
+  }
+
 }
