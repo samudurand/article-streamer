@@ -3,6 +3,7 @@ package articlestreamer.aggregator
 import articlestreamer.aggregator.redis.DefaultRedisClientFactory
 import articlestreamer.aggregator.service.RedisURLStoreService
 import articlestreamer.aggregator.twitter.DefaultTwitterStreamerFactory
+import articlestreamer.aggregator.utils.HttpUtils
 import articlestreamer.shared.configuration.DefaultConfigLoader
 import articlestreamer.shared.kafka.{KafkaFactory, KafkaProducerWrapper}
 import articlestreamer.shared.scoring.NaiveTwitterScoreCalculator
@@ -25,6 +26,8 @@ object App extends App {
   lazy val scoreCalculator = wire[NaiveTwitterScoreCalculator]
   lazy val redisFactory = wire[DefaultRedisClientFactory]
   lazy val urlStore = wire[RedisURLStoreService]
+  lazy val http = scalaj.http.Http
+  lazy val httpUtil = wire[HttpUtils]
 
   lazy val scheduler = StdSchedulerFactory.getDefaultScheduler
 

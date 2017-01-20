@@ -64,10 +64,11 @@ lazy val aggregator = (project in file("aggregator")).
     },
 
     libraryDependencies ++= Dependencies.commonDependencies,
-    libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
-    libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion,
-    libraryDependencies += "org.quartz-scheduler" % "quartz" % "2.2.1",
     libraryDependencies += "net.debasishg" %% "redisclient" % "3.2",
+    libraryDependencies += "org.apache.kafka" % "kafka-clients"     % Dependencies.kafkaClientVersion,
+    libraryDependencies += "org.quartz-scheduler" % "quartz" % "2.2.1",
+    libraryDependencies += "org.scalaj" %% "scalaj-http" % "2.3.0",
+    libraryDependencies += "org.twitter4j"    % "twitter4j-stream"  % Dependencies.twitter4JVersion,
 
     coverageExcludedPackages := ".*RedisClientFactory;.*BasicConsumer;.*App;.*DefaultTwitterStreamer"
 
@@ -99,10 +100,10 @@ lazy val processor = (project in file("processor")).
     },
 
     libraryDependencies ++= Dependencies.commonDependencies,
+    libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.40",
     libraryDependencies += "org.apache.spark" %% "spark-core"       % "2.0.0" exclude("org.slf4j","slf4j-log4j12"),
     libraryDependencies += "org.apache.spark" %% "spark-sql"        % "2.0.0",
     libraryDependencies += "org.apache.spark" %% "spark-streaming"  % "2.0.0",
-    libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.40",
     libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka-0-10" % "2.0.0" exclude("org.slf4j","slf4j-log4j12"),
 
     libraryDependencies += "com.holdenkarau" %% "spark-testing-base" % "2.0.0_0.4.7" % "test",

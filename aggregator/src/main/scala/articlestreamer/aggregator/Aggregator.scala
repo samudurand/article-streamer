@@ -7,6 +7,7 @@ import articlestreamer.aggregator.kafka.scheduled.EndQueueJob
 import articlestreamer.aggregator.service.URLStoreService
 import articlestreamer.aggregator.twitter.TwitterStreamerFactory
 import articlestreamer.aggregator.twitter.utils.TwitterStatusMethods
+import articlestreamer.aggregator.utils.HttpUtils
 import articlestreamer.shared.configuration.ConfigLoader
 import articlestreamer.shared.kafka.{HalfDayTopicManager, KafkaProducerWrapper}
 import articlestreamer.shared.marshalling.CustomJsonFormats
@@ -21,11 +22,15 @@ import org.quartz.TriggerBuilder._
 import org.quartz.{JobDataMap, Scheduler}
 import twitter4j.{Status, URLEntity}
 
-class Aggregator(config: ConfigLoader,
+import scalaj.http.BaseHttp
+
+class Aggregator(http: BaseHttp,
+                 config: ConfigLoader,
                  producer: KafkaProducerWrapper,
                  scheduler: Scheduler,
                  scoreCalculator: TwitterScoreCalculator,
                  streamer: TwitterStreamerFactory,
+                 httpUtils: HttpUtils,
                  urlStore: URLStoreService) extends CustomJsonFormats with TwitterStatusMethods with LazyLogging {
 
   private val topicManager = new HalfDayTopicManager(config)
@@ -67,11 +72,11 @@ class Aggregator(config: ConfigLoader,
         if (usableLinks.isEmpty) {
           logger.warn(s"Tweet ${status.getId} ignored. Reason : 'Not Potential Article' . Content : '${status.getText.mkString}'")
         } else {
-          val unknwonLinks = findUnknownLinks(usableLinks)
-          if (unknwonLinks.isEmpty) {
-            logger.warn(s"Tweet ${status.getId} ignored. Reason : 'Links all already known' . Links : '${status.getURLEntities.mkString}'")
+          val unknownLinks = findUnknownLinks(usableLinks)
+          if (unknownLinks.isEmpty) {
+            logger.warn(s"Tweet ${status.getId} ignored. Reason : 'Links all already known or broken shortlink' . Links : '${status.getURLEntities.mkString}'")
           } else {
-            saveNewLinks(unknwonLinks)
+            saveNewLinks(unknownLinks)
 
             val article = convertToArticle(status)
 
@@ -87,18 +92,26 @@ class Aggregator(config: ConfigLoader,
     }
   }
 
-  private def saveNewLinks(links: Seq[URLEntity]) = {
+  private def saveNewLinks(links: Seq[String]) = {
     links.foreach { link =>
-      urlStore.save(link.getExpandedURL)
+      urlStore.save(link)
     }
   }
 
   /**
-    * Check if the provided list contains at least one link unknown by interrogating the Link Storage
+    * Check if the provided list contains at least one link unknown by interrogating the Link Storage.
+    * Any shortlink is explored to discover the real URL and discarded is leading to a broken link.
     */
-  private def findUnknownLinks(links: Seq[URLEntity]): Seq[URLEntity] = {
-    links.filterNot { link =>
-      urlStore.exists(link.getExpandedURL)
+  private def findUnknownLinks(links: Seq[URLEntity]): Seq[String] = {
+    links.flatMap { link =>
+      val url = link.getExpandedURL
+      if (httpUtils.isPotentialShortLink(url)) {
+        httpUtils.getEndUrl(url)
+      } else {
+        Some(url)
+      }
+    }.filterNot { link =>
+      urlStore.exists(link)
     }
   }
 
