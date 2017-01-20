@@ -2,7 +2,7 @@ package articlestreamer.aggregator.utils
 
 import com.typesafe.scalalogging.LazyLogging
 
-import scalaj.http.{BaseHttp, HttpOptions, HttpRequest, HttpResponse}
+import scalaj.http.{BaseHttp, HttpOptions, HttpRequest}
 
 class HttpUtils(http: BaseHttp) extends LazyLogging {
 

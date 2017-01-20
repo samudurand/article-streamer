@@ -13,7 +13,6 @@ import articlestreamer.shared.kafka.{HalfDayTopicManager, KafkaProducerWrapper}
 import articlestreamer.shared.marshalling.CustomJsonFormats
 import articlestreamer.shared.model.{TweetAuthor, TwitterArticle}
 import articlestreamer.shared.scoring.TwitterScoreCalculator
-import com.softwaremill.macwire._
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.kafka.clients.producer._
 import org.json4s.jackson.Serialization.write
@@ -31,11 +30,11 @@ class Aggregator(http: BaseHttp,
                  scheduler: Scheduler,
                  scoreCalculator: TwitterScoreCalculator,
                  streamer: TwitterStreamerFactory,
+                 httpUtils: HttpUtils,
                  urlStore: URLStoreService) extends CustomJsonFormats with TwitterStatusMethods with LazyLogging {
 
   private val topicManager = new HalfDayTopicManager(config)
   private val ignoredAuthors = config.twitterConfig.ignoredAuthors.map(username => username.toLowerCase)
-  private val httpUtils = wire[HttpUtils]
 
   def run() = {
 
