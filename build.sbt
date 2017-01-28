@@ -15,6 +15,7 @@ libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.40"
 addCommandAlias("build-agg", ";project aggregator;coverageOff;assembly")
 addCommandAlias("build-proc", ";project processor;coverageOff;assembly")
 addCommandAlias("build-score", ";project twitterScoreUpdater;coverageOff;assembly")
+addCommandAlias("build-all", ";build-agg;build-proc;build-score")
 
 // Test with coverage from root
 addCommandAlias("test-agg", ";project aggregator;clean;coverage;test;coverageReport")
@@ -58,6 +59,7 @@ lazy val aggregator = (project in file("aggregator")).
     assemblyMergeStrategy in assembly := {
         case PathList("development.conf") => MergeStrategy.discard
         case PathList("docker-env.list") => MergeStrategy.discard
+        case "logback.xml" => MergeStrategy.last
         case x =>
             val oldStrategy = (assemblyMergeStrategy in assembly).value
             oldStrategy(x)
