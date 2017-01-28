@@ -56,7 +56,7 @@ class ProcessorSpec extends BaseSpec with StreamingSuiteBase with BeforeAndAfter
     val processor = new Processor(new MysqlTestConfig(jdbcUrl), ssProvider)
 
     List(sc.parallelize(List(article1, article2)))
-      .foreach(processor.saveToDB)
+      .foreach(processor.saveToDB("", "", "org.apache.derby.jdbc.EmbeddedDriver", jdbcUrl))
 
     val data = retrieveSavedData
     data should have length 2

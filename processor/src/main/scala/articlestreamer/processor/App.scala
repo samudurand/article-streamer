@@ -10,6 +10,6 @@ object App extends App {
   lazy val sparkProvider = wire[OnDemandSparkProvider]
 
   val processor = wire[Processor]
-  processor()
+  processor.apply()
 
 }
