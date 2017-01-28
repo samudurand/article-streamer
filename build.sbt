@@ -100,6 +100,7 @@ lazy val processor = (project in file("processor")).
     },
 
     libraryDependencies ++= Dependencies.commonDependencies,
+    libraryDependencies += "ch.epfl.scala" %% "spores" % "0.4.3",
     libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.40",
     libraryDependencies += "org.apache.spark" %% "spark-core"       % "2.0.0" exclude("org.slf4j","slf4j-log4j12"),
     libraryDependencies += "org.apache.spark" %% "spark-sql"        % "2.0.0",
