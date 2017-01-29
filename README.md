@@ -2,43 +2,25 @@ That project is a **Work In Progress**
 
 # Current State
 
-At the moment only Twitter is supported.
+At the moment only Twitter is supported, with a single tag : *#Spark*
 
 ![current architecture](./readme-assets/schema.png)
 
 # Article Streamer
 
-The idea of this project is to provide a tool that will aggregate articles about one or several provided subjects (Scala, Spark...) 
-from various sources (Twitter, Linkedin, Blogs... ). 
+The idea of this project is to provide a tool that will aggregate **recently** published articles (tutorials, technical news, updates, case studies) and other source of learning (videos, webinars...) about one or several provided subjects (Scala, Spark...). 
+Each of the resources would be retrieved from various sources (Twitter, Linkedin, Blogs... ). 
 For each a score will be calculated. That score will represent the potential interest or value based on their popularity and other factors (to be determined)
 
 # Components
 
 This system has 5 main components :
 
-- An **aggregator** : aggregates tweets, posts and all other items streamed from the possible article sources (Twitter, Instagram...). See the [README](./aggregator/README.md) for usage and details.
-- A **score updater** (Twitter specific) : loads periodically (every 12h) all pending tweets and update their *score* based on their current popularity. See the [README](./twitter-score-updater/README.md) for usage and details.   
-- A **processor** : process all articles as soon available, then apply some analytics, and finally persist each into the main DB. See the [README](./processor/README.md) for usage and details.   
-- A **data server** : simple app serving/manipulating the data stored in the main DB. See the [README](./data-server/README.md) for usage and details.
-- A **webapp** : used to browse the articles stored in the main DB, and to manipulate there current state. See the [README](./webapp/README.md) for usage and details.
-
-## Deploy and run the Aggregator on Heroku
-
-Deploy to heroku
-
-```$ sbt assembly deployHeroku```
-
-Start the Aggregator in a worker
-
-```$ heroku ps:scale worker=1```
-
-Verify if it works
-
-```$ heroku logs```
-
-Stop the Aggregator
-
-```$ heroku ps:scale worker=0``` 
+- **Aggregator** : aggregates tweets, posts and all other items streamed from the possible article sources (Twitter, Instagram...). [Usage and details...](./aggregator/README.md)
+- **Score updater** (Twitter specific) : loads periodically (every 12h) all pending tweets and update their *score* based on their current popularity. [Usage and details...](./twitter-score-updater/README.md)   
+- **Processor** : process all articles as soon available, then apply some analytics, and finally persist each into the main DB. [Usage and details...](./processor/README.md)   
+- **Data server** : simple app serving/manipulating the data stored in the main DB. [Usage and details...](./data-server/README.md)
+- **Webapp** : used to browse the articles stored in the main DB, and to manipulate there current state. [Usage and details...](./webapp/README.md)
 
 ## Docker
 

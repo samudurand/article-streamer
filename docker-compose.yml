@@ -8,8 +8,11 @@ services:
     env_file: ./aggregator/docker-env.list
     environment:
       KAFKA_BROKERS: kafka:9092
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     depends_on:
       - kafka
+      - redis
 
   score_updater:
     container_name: score_updater
@@ -39,7 +42,7 @@ services:
       context: ./data-server/
     image: firens/streamer-data-server:0.0.1
     ports:
-         - "8000:8000"
+      - "8000:8000"
     env_file: ./data-server/docker-env.list
 
   webapp:
@@ -48,7 +51,7 @@ services:
       context: ./webapp/
     image: firens/streamer-webapp:0.0.1
     ports:
-         - "8080:8080"
+      - "8080:8080"
     env_file: ./webapp/docker-env.list
     environment:
       DATA_SERVER_HOST: data_server:8000
@@ -59,7 +62,7 @@ services:
     container_name: kafka
     image: ches/kafka:0.10.1.0
     ports:
-     - "9092:9092"
+      - "9092:9092"
     environment:
       ZOOKEEPER_CONNECTION_STRING: zookeeper:2181
       KAFKA_ADVERTISED_HOST_NAME: kafka
@@ -72,7 +75,13 @@ services:
     container_name: zookeeper
     image: jplock/zookeeper:3.4.8
     ports:
-     - "2181:2181"
+      - "2181:2181"
+
+  redis:
+    container_name: redis
+    image: redis:3.2-alpine
+    ports:
+      - "6379:6379"
 
 volumes:
   kafka-data:

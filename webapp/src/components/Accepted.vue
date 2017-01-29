@@ -19,7 +19,7 @@
           <tr v-for="article in articles">
             <td class="mdl-data-table__cell--non-numeric">{{article.publicationDate | parseDate }}</td>
             <td class="mdl-data-table__cell--non-numeric">
-              <div style="word-break: break-all; white-space: normal;">{{article.content}}</div>
+              <div style="word-break: break-all; white-space: normal;" v-html="formatContent(article.content)"></div>
             </td>
             <td class="nopadding">
               <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" v-on:click="reject(article.id)">
@@ -49,6 +49,7 @@
 
 <script>
   import ArticleService from '../service/articles.service'
+  import ContentFormattingService from '../service/contentFormatting.service'
 
   function getAccepted(context) {
     return ArticleService.get(context, 'accepted');
@@ -63,13 +64,17 @@
       reject: function (id) {
         const vm = this;
         ArticleService.setState(vm, id, -1).then(
-          () => vm.$data.articles.shift());
+          () => getAccepted(vm).then(
+            (articles) => vm.articles = articles));
       },
       backToPending: function (id) {
         const vm = this;
         ArticleService.setState(vm, id, 0).then(
           () => getAccepted(vm).then(
             (articles) => vm.articles = articles));
+      },
+      formatContent: function (content) {
+        return ContentFormattingService.formatLinks(content);
       }
     }
   };
