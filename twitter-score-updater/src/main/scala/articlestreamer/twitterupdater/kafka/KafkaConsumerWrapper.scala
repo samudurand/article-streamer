@@ -9,9 +9,7 @@ import articlestreamer.shared.kafka.KafkaFactory
 import articlestreamer.shared.marshalling.TwitterArticleMarshaller
 import articlestreamer.shared.model.TwitterArticle
 import com.typesafe.scalalogging.LazyLogging
-import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecord, ConsumerRecords}
-import org.apache.kafka.common.config.SslConfigs
 
 import scala.collection.mutable
 import scala.concurrent.duration._
@@ -115,14 +113,14 @@ object KafkaConsumerWrapper {
     properties.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, "5000")
     properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
 
-    if (kafkaSSLMode) {
-      properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL")
-      properties.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, s"$kafkaTrustStore/truststore.jks")
-      properties.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, "test1234")
-      properties.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, s"$kafkaTrustStore/keystore.jks")
-      properties.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, "test1234")
-      properties.put(SslConfigs.SSL_KEY_PASSWORD_CONFIG, "test1234")
-    }
+//    if (kafkaSSLMode) {
+//      properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL")
+//      properties.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, s"$kafkaTrustStore/truststore.jks")
+//      properties.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, "test1234")
+//      properties.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, s"$kafkaTrustStore/keystore.jks")
+//      properties.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, "test1234")
+//      properties.put(SslConfigs.SSL_KEY_PASSWORD_CONFIG, "test1234")
+//    }
 
     properties
   }

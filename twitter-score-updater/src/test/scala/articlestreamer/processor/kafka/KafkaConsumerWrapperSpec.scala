@@ -84,22 +84,22 @@ class KafkaConsumerWrapperSpec extends BaseSpec with BeforeAndAfter with CustomJ
     consumerWrapper.stopConsumer()
     verify(consumer, times(1)).close()
   }
-
-  "Config" should "be tested with SSL" in {
-    class Test2Config extends ConfigLoader {
-      override val kafkaSSLMode: Boolean = true
-    }
-
-    consumerWrapper = new KafkaConsumerWrapper(new Test2Config, factory, "")
-  }
-
-  "Config" should "be tested without SSL" in {
-    class Test2Config extends ConfigLoader {
-      override val kafkaSSLMode: Boolean = false
-    }
-
-    consumerWrapper = new KafkaConsumerWrapper(new Test2Config, factory, "")
-  }
+//
+//  "Config" should "be tested with SSL" in {
+//    class Test2Config extends ConfigLoader {
+//      override val kafkaSSLMode: Boolean = true
+//    }
+//
+//    consumerWrapper = new KafkaConsumerWrapper(new Test2Config, factory, "")
+//  }
+//
+//  "Config" should "be tested without SSL" in {
+//    class Test2Config extends ConfigLoader {
+//      override val kafkaSSLMode: Boolean = false
+//    }
+//
+//    consumerWrapper = new KafkaConsumerWrapper(new Test2Config, factory, "")
+//  }
 
 }
 

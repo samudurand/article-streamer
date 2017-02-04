@@ -38,20 +38,20 @@ class KafkaProducerWrapperSpec extends BaseSpec with BeforeAndAfter {
     verify(producer, times(1)).close()
   }
 
-  "Config" should "be tested with SSL" in {
-    class Test2Config extends ConfigLoader {
-      override val kafkaSSLMode: Boolean = true
-    }
-
-    producerWrapper = new KafkaProducerWrapper(new Test2Config, factory)
-  }
-
-  it should "be tested without SSL" in {
-    class Test2Config extends ConfigLoader {
-      override val kafkaSSLMode: Boolean = false
-    }
-
-    producerWrapper = new KafkaProducerWrapper(new Test2Config, factory)
-  }
+//  "Config" should "be tested with SSL" in {
+//    class Test2Config extends ConfigLoader {
+//      override val kafkaSSLMode: Boolean = true
+//    }
+//
+//    producerWrapper = new KafkaProducerWrapper(new Test2Config, factory)
+//  }
+//
+//  it should "be tested without SSL" in {
+//    class Test2Config extends ConfigLoader {
+//      override val kafkaSSLMode: Boolean = false
+//    }
+//
+//    producerWrapper = new KafkaProducerWrapper(new Test2Config, factory)
+//  }
 
 }
